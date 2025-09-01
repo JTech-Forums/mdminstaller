@@ -13,7 +13,7 @@ class JTechMDMInstaller {
         this.commandHistory = [];
         this.currentTutorialStep = 0;
         this.tutorialSteps = [];
-        this.glide = null;
+        this.swiper = null;
     }
 
     async init() {
@@ -175,9 +175,9 @@ class JTechMDMInstaller {
                 const consoleCard = document.getElementById('consoleCard');
                 if (installCard) installCard.classList.add('hidden');
                 if (consoleCard) consoleCard.classList.add('hidden');
-                if (this.glide) {
-                    this.glide.destroy();
-                    this.glide = null;
+                if (this.swiper) {
+                    this.swiper.destroy(true, true);
+                    this.swiper = null;
                 }
             } else {
                 // Connect
@@ -256,8 +256,8 @@ class JTechMDMInstaller {
 
         this.availableApks.slice(0, 5).forEach((apk) => {
 
-            const slide = document.createElement('li');
-            slide.className = 'glide__slide';
+            const slide = document.createElement('div');
+            slide.className = 'swiper-slide';
             slide.innerHTML = `
                 <div class="app-item">
                     <div class="app-icon">
@@ -273,37 +273,26 @@ class JTechMDMInstaller {
             grid.appendChild(slide);
         });
 
-        if (this.glide) {
-            this.glide.destroy();
+        if (this.swiper) {
+            this.swiper.destroy(true, true);
         }
 
-        this.glide = new Glide('#kitsGlide', {
-            type: 'carousel',
-            perView: 5,
-            focusAt: 'center',
-            gap: 24,
-            animationDuration: 800,
-            animationTimingFunc: 'cubic-bezier(0.25, 0.8, 0.25, 1)'
+        this.swiper = new Swiper('#kitsSwiper', {
+            effect: 'coverflow',
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: 'auto',
+            coverflowEffect: {
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true,
+            },
+            pagination: {
+                el: '#kitsSwiper .swiper-pagination',
+            },
         });
-
-        this.glide.on(['mount.after', 'run.after'], () => this.updateCarousel3D());
-        this.glide.mount();
-        this.updateCarousel3D();
-    }
-
-    updateCarousel3D() {
-        if (!this.glide) return;
-        const slides = Array.from(document.querySelectorAll('#kitsGrid .glide__slide'));
-        const center = this.glide.index;
-        const total = slides.length;
-
-        slides.forEach(slide => slide.classList.remove('center', 'prev', 'next', 'prev2', 'next2'));
-
-        slides[center]?.classList.add('center');
-        slides[(center - 1 + total) % total]?.classList.add('prev');
-        slides[(center + 1) % total]?.classList.add('next');
-        slides[(center - 2 + total) % total]?.classList.add('prev2');
-        slides[(center + 2) % total]?.classList.add('next2');
     }
 
     getPresetApkInfo(type) {
