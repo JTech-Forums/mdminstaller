@@ -1,0 +1,3 @@
+dpm set-device-owner com.tripleu.mdm/com.tripleu.mdm.helper.DeviceAdminReceiver
+pm grant com.tripleu.mdm android.permission.WRITE_SECURE_SETTINGS
+settings put secure enabled_accessibility_services "com.tripleu.mdm/com.tripleu.mdm.helper.AppBlockAccessibilityService"

@@ -1,0 +1,2 @@
+dpm set-device-owner com.rrivenllc.offlinemdm/com.rrivenllc.offlinemdm.receivers.DeviceOwnerReceiver
+pm grant com.rrivenllc.offlinemdm android.permission.WRITE_SECURE_SETTINGS

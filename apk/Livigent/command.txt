@@ -1,0 +1,2 @@
+dpm set-device-owner com.lge.livigent.lglitemdm/com.lge.livigent.lglitemdm.receivers.DevAdmin
+pm grant com.lge.livigent.lglitemdm android.permission.WRITE_SECURE_SETTINGS
