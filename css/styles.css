@@ -273,9 +273,11 @@ body {
 }
 
 #kitsSwiper .swiper-slide-active .app-item {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-    filter: brightness(1.1);
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    filter: brightness(1.2);
+    z-index: 1;
+
 }
 
 #kitsSwiper .swiper-slide img {
@@ -314,7 +316,7 @@ body {
 }
 
 .app-item span {
-    color: var(--bg-color);
+    color: var(--text-primary);
 }
 
 .app-actions {
