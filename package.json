@@ -4,8 +4,8 @@
   "description": "Web-based MDM APK installer for Android devices using WebUSB",
   "main": "index.html",
   "scripts": {
-    "start": "python3 -m http.server 8000",
-    "serve": "npx http-server -p 8000",
+    "start": "node server.js",
+    "dev": "node server.js",
     "serve-https": "npx http-server -S -C cert.pem -p 8443"
   },
   "keywords": [

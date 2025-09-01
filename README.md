@@ -68,16 +68,19 @@ git clone https://github.com/your-username/jtechmdminstaller.git
 cd jtechmdminstaller
 ```
 
-2. Serve the files locally (requires HTTPS for WebUSB):
+2. Start the development server (exposes the `/api/apks` endpoint):
 ```bash
-# Using Python
-python -m http.server 8000
-
-# Or using Node.js
-npx http-server -S -C cert.pem
+npm start
+# or
+node server.js
 ```
 
-3. Access via `https://localhost:8000`
+3. Access via `http://localhost:8000`
+
+4. For HTTPS (required by WebUSB outside `localhost`):
+```bash
+npm run serve-https
+```
 
 ### Project Structure
 
