@@ -246,16 +246,54 @@ body {
 /* MDM Apps Slider */
 #kitsGlide {
     margin-bottom: 1.5rem;
+    perspective: 1000px;
 }
 
 #kitsGlide .glide__slides {
     list-style: none;
+    transform-style: preserve-3d;
 }
 
 #kitsGlide .glide__slide {
     display: flex;
     justify-content: center;
     padding: 0 0.5rem;
+    transition: transform 0.5s ease, filter 0.5s ease;
+}
+
+#kitsGlide .glide__slide .app-item {
+    transition: transform 0.5s ease, filter 0.5s ease;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+#kitsGlide .glide__slide.center .app-item {
+    transform: translateZ(160px) scale(1.2);
+    z-index: 3;
+}
+
+#kitsGlide .glide__slide.prev .app-item {
+    transform: rotateY(25deg) translateZ(80px) scale(1);
+    filter: hue-rotate(-20deg) saturate(1.2);
+    z-index: 2;
+}
+
+#kitsGlide .glide__slide.next .app-item {
+    transform: rotateY(-25deg) translateZ(80px) scale(1);
+    filter: hue-rotate(20deg) saturate(1.2);
+    z-index: 2;
+}
+
+#kitsGlide .glide__slide.prev2 .app-item {
+    transform: rotateY(40deg) translateZ(0) scale(0.85);
+    filter: brightness(0.5);
+    z-index: 1;
+}
+
+#kitsGlide .glide__slide.next2 .app-item {
+    transform: rotateY(-40deg) translateZ(0) scale(0.85);
+    filter: brightness(0.5);
+    z-index: 1;
 }
 
 .app-item {
