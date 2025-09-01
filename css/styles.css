@@ -243,6 +243,18 @@ body {
     cursor: not-allowed;
 }
 
+.btn-link {
+    background: transparent;
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border: none;
+    text-decoration: underline;
+}
+
+.btn-link:hover {
+    color: var(--primary-hover);
+}
+
 /* MDM Apps Slider */
 #kitsSwiper {
     width: 100%;
@@ -260,6 +272,12 @@ body {
     align-items: center;
 }
 
+#kitsSwiper .swiper-slide-active .app-item {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    filter: brightness(1.1);
+}
+
 #kitsSwiper .swiper-slide img {
     display: block;
     width: 100%;
@@ -271,16 +289,15 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 1.5rem 1rem;
-    background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+    background: #ffffff;
     border: 2px solid var(--border-color);
     border-radius: 0.5rem;
     cursor: default;
     transition: all 0.2s;
+    color: var(--bg-color);
 }
 
 .app-item:hover {
-    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-    border-color: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -296,18 +313,34 @@ body {
     width: 100%;
 }
 
+.app-item span {
+    color: var(--bg-color);
+}
+
+.app-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.app-actions .btn {
+    width: 100%;
+}
+
 .app-icon {
     width: 48px;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-    color: white;
+    background: #ffffff;
+    color: var(--bg-color);
     border-radius: 0.5rem;
     font-weight: 600;
     font-size: 1.125rem;
     position: relative;
+    border: 1px solid var(--border-color);
 }
 
 .app-icon img {
