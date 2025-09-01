@@ -36,8 +36,8 @@ export function renderKits(apks, { onInstall, onInfo } = {}) {
         slidesPerView: 'auto',
         slideToClickedSlide: true,
         spaceBetween: 40,
-        slidesOffsetBefore: 0,
-        slidesOffsetAfter: 0,
+        slidesOffsetBefore: 80,
+        slidesOffsetAfter: 80,
         initialSlide: startIndex >= 0 ? startIndex : 0,
         coverflowEffect: {
             rotate: 8,
