@@ -70,9 +70,7 @@ cd jtechmdminstaller
 
 2. Start the development server (exposes the `/api/apks` endpoint):
 ```bash
-npm start
-# or
-node server.js
+npm run dev
 ```
 
 3. Access via `http://localhost:8000`
@@ -86,7 +84,7 @@ npm run serve-https
 
 ```
 jtechmdminstaller/
-├── index.html           # Main HTML file
+├── template.html        # HTML template served by the server
 ├── css/
 │   └── styles.css      # Styling
 ├── js/
