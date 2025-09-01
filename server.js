@@ -21,42 +21,54 @@ const server = http.createServer((req, res) => {
   
   // Handle API endpoints
   if (req.url === '/api/apks') {
-    // List APK files in the apk folder
-    fs.readdir('./apk', (err, files) => {
+    // List application folders in the apk directory
+    fs.readdir('./apk', { withFileTypes: true }, (err, entries) => {
       if (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Failed to read apk folder' }));
         return;
       }
-      
-      const apkFiles = files
-        .filter(file => file.toLowerCase().endsWith('.apk'))
-        .map(file => {
-          const stats = fs.statSync(path.join('./apk', file));
-          const baseName = file.replace('.apk', '');
-          const commandFile = baseName + '.txt';
-          
-          // Check if companion .txt file exists
+
+      const apps = entries
+        .filter(entry => entry.isDirectory())
+        .map(dir => {
+          const dirPath = path.join('./apk', dir.name);
+
+          // Load post-install commands if available
           let postInstallCommands = null;
-          if (files.includes(commandFile)) {
+          const commandPath = path.join(dirPath, 'command.txt');
+          if (fs.existsSync(commandPath)) {
             try {
-              const commandContent = fs.readFileSync(path.join('./apk', commandFile), 'utf8');
+              const commandContent = fs.readFileSync(commandPath, 'utf8');
               postInstallCommands = commandContent.trim().split('\n').filter(cmd => cmd.trim());
             } catch (err) {
-              console.warn(`Failed to read command file ${commandFile}:`, err.message);
+              console.warn(`Failed to read command file for ${dir.name}:`, err.message);
             }
           }
-          
+
+          // Find image file (png/jpg/jpeg)
+          let imageFile = null;
+          const imageCandidates = ['image.png', 'image.jpg', 'image.jpeg'];
+          for (const img of imageCandidates) {
+            const imgPath = path.join(dirPath, img);
+            if (fs.existsSync(imgPath)) {
+              imageFile = `/apk/${dir.name}/${img}`;
+              break;
+            }
+          }
+
+          const apkUrl = `https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/${dir.name}.apk`;
+
           return {
-            name: file,
-            size: stats.size,
-            path: `/apk/${file}`,
-            postInstallCommands: postInstallCommands
+            name: dir.name,
+            image: imageFile,
+            url: apkUrl,
+            postInstallCommands
           };
         });
-      
+
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(apkFiles));
+      res.end(JSON.stringify(apps));
     });
     return;
   }

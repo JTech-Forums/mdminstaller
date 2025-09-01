@@ -286,6 +286,13 @@ body {
     position: relative;
 }
 
+.app-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 0.5rem;
+}
+
 .command-indicator {
     position: absolute;
     top: -4px;
