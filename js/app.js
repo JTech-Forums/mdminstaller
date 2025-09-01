@@ -253,7 +253,9 @@ class JTechMDMInstaller {
 
         grid.innerHTML = '';
 
+
         this.availableApks.slice(0, 5).forEach((apk) => {
+
             const slide = document.createElement('li');
             slide.className = 'glide__slide';
             slide.innerHTML = `
