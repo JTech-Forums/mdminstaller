@@ -1,6 +1,7 @@
 import { AdbConnection } from './adb-connection.js';
 import { ApkInstaller } from './apk-installer.js';
 import { UIManager } from './ui-manager.js';
+import KITS from './kits.js';
 
 class JTechMDMInstaller {
     constructor() {
@@ -72,17 +73,18 @@ class JTechMDMInstaller {
         document.getElementById('downloadConsoleBtn')?.addEventListener('click', () => this.downloadConsoleOutput());
 
         // Modals
-        document.getElementById('helpBtn')?.addEventListener('click', () => {
+        document.getElementById('tutorialBtn')?.addEventListener('click', () => {
             this.showTutorialStep(0);
-            document.getElementById('helpModal').classList.remove('hidden');
+            document.getElementById('tutorialModal').classList.remove('hidden');
         });
 
         document.getElementById('aboutBtn')?.addEventListener('click', () => {
             document.getElementById('aboutModal').classList.remove('hidden');
         });
 
-        document.getElementById('closeHelpBtn')?.addEventListener('click', () => {
-            document.getElementById('helpModal').classList.add('hidden');
+        document.getElementById('closeTutorialBtn')?.addEventListener('click', () => {
+            document.getElementById('tutorialModal').classList.add('hidden');
+            localStorage.setItem('tutorialSeen', 'true');
         });
 
         document.getElementById('closeAboutBtn')?.addEventListener('click', () => {
@@ -91,16 +93,18 @@ class JTechMDMInstaller {
 
         document.getElementById('skipTutorialBtn')?.addEventListener('click', () => {
             document.getElementById('welcomeModal')?.classList.add('hidden');
+            localStorage.setItem('tutorialSeen', 'true');
         });
 
         document.getElementById('startTutorialBtn')?.addEventListener('click', () => {
             document.getElementById('welcomeModal')?.classList.add('hidden');
             this.showTutorialStep(0);
-            document.getElementById('helpModal')?.classList.remove('hidden');
+            document.getElementById('tutorialModal')?.classList.remove('hidden');
         });
 
         document.getElementById('closeWelcomeBtn')?.addEventListener('click', () => {
             document.getElementById('welcomeModal')?.classList.add('hidden');
+            localStorage.setItem('tutorialSeen', 'true');
         });
 
         document.getElementById('nextStepBtn')?.addEventListener('click', () => {
@@ -126,7 +130,8 @@ class JTechMDMInstaller {
         if (this.tutorialSteps.length === 0) return;
 
         if (index >= this.tutorialSteps.length) {
-            document.getElementById('helpModal')?.classList.add('hidden');
+            document.getElementById('tutorialModal')?.classList.add('hidden');
+            localStorage.setItem('tutorialSeen', 'true');
             return;
         }
 
@@ -239,7 +244,17 @@ class JTechMDMInstaller {
             const response = await fetch('/api/apks');
             const apks = await response.json();
 
-            this.availableApks = apks;
+            // Merge server-provided APK info with additional kit metadata
+            this.availableApks = apks.map(apk => {
+                const kit = KITS.find(k => k.key === apk.name) || {};
+                return {
+                    ...apk,
+                    ...kit,
+                    title: kit.title || apk.name,
+                    infoUrl: kit.infoUrl || '#',
+                    key: kit.key || apk.name
+                };
+            });
         } catch (error) {
             console.error('Failed to load APKs:', error);
             this.uiManager.log('Failed to load APK files from server', 'warning');
@@ -254,21 +269,25 @@ class JTechMDMInstaller {
         grid.innerHTML = '';
 
 
-        this.availableApks.slice(0, 5).forEach((apk) => {
+        this.availableApks.forEach((apk) => {
 
             const slide = document.createElement('div');
             slide.className = 'swiper-slide';
             slide.innerHTML = `
                 <div class="app-item">
                     <div class="app-icon">
-                        ${apk.image ? `<img src="${apk.image}" alt="${apk.name}">` : ''}
+                        ${apk.image ? `<img src="${apk.image}" alt="${apk.title}">` : ''}
                     </div>
-                    <span>${apk.name}</span>
-                    <button class="btn btn-primary install-btn">Install</button>
+                    <span>${apk.title}</span>
+                    <div class="app-actions">
+                        <button class="btn btn-primary install-btn">Install</button>
+                        <button class="btn btn-link info-btn">View Info</button>
+                    </div>
                 </div>
             `;
 
             slide.querySelector('.install-btn').addEventListener('click', () => this.installKit(apk));
+            slide.querySelector('.info-btn').addEventListener('click', () => window.open(apk.infoUrl, '_blank'));
 
             grid.appendChild(slide);
         });
@@ -277,21 +296,21 @@ class JTechMDMInstaller {
             this.swiper.destroy(true, true);
         }
 
+        const startIndex = this.availableApks.findIndex(a => a.key === 'TripleUMDM' || a.name === 'TripleUMDM');
+
         this.swiper = new Swiper('#kitsSwiper', {
             effect: 'coverflow',
             grabCursor: true,
             centeredSlides: true,
             slidesPerView: 'auto',
+            initialSlide: startIndex >= 0 ? startIndex : 0,
             coverflowEffect: {
                 rotate: 50,
                 stretch: 0,
                 depth: 100,
                 modifier: 1,
                 slideShadows: true,
-            },
-            pagination: {
-                el: '#kitsSwiper .swiper-pagination',
-            },
+            }
         });
     }
 
@@ -513,20 +532,20 @@ class JTechMDMInstaller {
         }
 
         document.getElementById('progressCard').classList.remove('hidden');
-        this.uiManager.updateProgress(0, `Installing ${apk.name}...`);
-        this.uiManager.log(`Installing ${apk.name}...`, 'info');
+        this.uiManager.updateProgress(0, `Installing ${apk.title || apk.name}...`);
+        this.uiManager.log(`Installing ${apk.title || apk.name}...`, 'info');
 
         try {
             let fileToInstall = apk.file;
 
             if (apk.url && !apk.file) {
-                this.uiManager.log(`Downloading ${apk.name}...`, 'info');
+                this.uiManager.log(`Downloading ${apk.title || apk.name}...`, 'info');
                 const response = await fetch(apk.url);
                 if (!response.ok) {
                     throw new Error(`Failed to load APK file: ${response.statusText}`);
                 }
                 const arrayBuffer = await response.arrayBuffer();
-                fileToInstall = new File([arrayBuffer], apk.name + '.apk', { type: 'application/vnd.android.package-archive' });
+                fileToInstall = new File([arrayBuffer], (apk.name || apk.title) + '.apk', { type: 'application/vnd.android.package-archive' });
             }
 
             if (!fileToInstall) {
@@ -536,7 +555,7 @@ class JTechMDMInstaller {
             await this.apkInstaller.installFromFile(this.device, fileToInstall);
 
             if (apk.postInstallCommands && apk.postInstallCommands.length > 0) {
-                this.uiManager.log(`Executing post-install commands for ${apk.name}...`, 'info');
+                this.uiManager.log(`Executing post-install commands for ${apk.title || apk.name}...`, 'info');
                 this.uiManager.log('Waiting for app components to register...', 'info');
                 await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -560,16 +579,16 @@ class JTechMDMInstaller {
                     }
                 }
 
-                this.uiManager.log(`Post-install setup completed for ${apk.name}`, 'success');
+                this.uiManager.log(`Post-install setup completed for ${apk.title || apk.name}`, 'success');
             }
 
             this.uiManager.updateProgress(100, 'Installation complete');
-            this.uiManager.log(`Successfully installed ${apk.name}`, 'success');
-            this.uiManager.showSuccess(`${apk.name} installed successfully`);
+            this.uiManager.log(`Successfully installed ${apk.title || apk.name}`, 'success');
+            this.uiManager.showSuccess(`${apk.title || apk.name} installed successfully`);
         } catch (error) {
             this.uiManager.updateProgress(100, 'Installation failed');
-            this.uiManager.log(`Failed to install ${apk.name}: ${error.message}`, 'error');
-            this.uiManager.showError(`Failed to install ${apk.name}: ${error.message}`);
+            this.uiManager.log(`Failed to install ${apk.title || apk.name}: ${error.message}`, 'error');
+            this.uiManager.showError(`Failed to install ${apk.title || apk.name}: ${error.message}`);
         }
     }
 
@@ -759,5 +778,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await app.init();
     // Make UIManager globally accessible for modal buttons
     window.uiManager = app.uiManager;
-    document.getElementById('welcomeModal')?.classList.remove('hidden');
+    if (!localStorage.getItem('tutorialSeen')) {
+        document.getElementById('welcomeModal')?.classList.remove('hidden');
+    }
 });

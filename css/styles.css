@@ -243,6 +243,18 @@ body {
     cursor: not-allowed;
 }
 
+.btn-link {
+    background: transparent;
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border: none;
+    text-decoration: underline;
+}
+
+.btn-link:hover {
+    color: var(--primary-hover);
+}
+
 /* MDM Apps Slider */
 #kitsSwiper {
     width: 100%;
@@ -258,6 +270,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#kitsSwiper .swiper-slide-active .app-item {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    filter: brightness(1.2);
+    z-index: 1;
 }
 
 #kitsSwiper .swiper-slide img {
@@ -296,18 +315,34 @@ body {
     width: 100%;
 }
 
+.app-item span {
+    color: var(--text-primary);
+}
+
+.app-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.app-actions .btn {
+    width: 100%;
+}
+
 .app-icon {
     width: 48px;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-    color: white;
+    background: #ffffff;
+    color: var(--bg-color);
     border-radius: 0.5rem;
     font-weight: 600;
     font-size: 1.125rem;
     position: relative;
+    border: 1px solid var(--border-color);
 }
 
 .app-icon img {
