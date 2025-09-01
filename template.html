@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JTech MDM Installer - Android Device Management</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.theme.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -60,14 +59,9 @@
             <!-- APK Installation Card -->
             <div class="card install-card hidden" id="installCard">
                 <h2>Install MDM Applications</h2>
-                <div class="glide" id="kitsGlide">
-                    <div class="glide__track" data-glide-el="track">
-                        <ul class="glide__slides" id="kitsGrid"></ul>
-                    </div>
-                    <div class="glide__arrows" data-glide-el="controls">
-                        <button class="glide__arrow glide__arrow--left btn btn-secondary" data-glide-dir="<">Prev</button>
-                        <button class="glide__arrow glide__arrow--right btn btn-secondary" data-glide-dir=">">Next</button>
-                    </div>
+                <div class="swiper mySwiper" id="kitsSwiper">
+                    <div class="swiper-wrapper" id="kitsGrid"></div>
+                    <div class="swiper-pagination"></div>
                 </div>
             </div>
 
@@ -188,7 +182,7 @@
     </div>
 
     <script src="js/webadb.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/glide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="js/app.js" type="module"></script>
 </body>
 </html>
