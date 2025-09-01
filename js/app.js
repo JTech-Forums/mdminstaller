@@ -192,34 +192,28 @@ class JTechMDMInstaller {
         // Clear existing buttons except custom upload
         const existingButtons = apkButtonsContainer.querySelectorAll('.app-item:not([data-apk="custom"])');
         existingButtons.forEach(btn => btn.remove());
-        
+
         // Add buttons for each APK file
         this.availableApks.forEach((apk, index) => {
             const button = document.createElement('button');
             button.className = 'app-item';
             button.dataset.apk = `file-${index}`;
-            
-            // Show indicator if APK has post-install commands
+
             const hasCommands = apk.postInstallCommands && apk.postInstallCommands.length > 0;
             const commandIndicator = hasCommands ? '<span class="command-indicator" title="Has post-install commands">⚙️</span>' : '';
-            
+
+            const imageHtml = apk.image ? `<img src="${apk.image}" alt="${apk.name}">` : '';
+
             button.innerHTML = `
                 <div class="app-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-                        <polyline points="14,2 14,8 20,8"></polyline>
-                    </svg>
+                    ${imageHtml}
                     ${commandIndicator}
                 </div>
-                <div class="app-info">
-                    <h3>${apk.name.replace('.apk', '')}</h3>
-                    <p>${this.formatFileSize(apk.size)}${hasCommands ? ' • Custom Setup' : ''}</p>
-                </div>
+                <span>${apk.name}</span>
             `;
-            
+
             button.addEventListener('click', (e) => this.handleAppSelection(e));
-            
-            // Insert before the custom upload button
+
             const customButton = apkButtonsContainer.querySelector('[data-apk="custom"]');
             apkButtonsContainer.insertBefore(button, customButton);
         });
@@ -229,17 +223,17 @@ class JTechMDMInstaller {
         if (type === 'custom') {
             return null; // Handle custom upload
         }
-        
+
         if (type.startsWith('file-')) {
             const index = parseInt(type.replace('file-', ''));
             const apk = this.availableApks[index];
-            
+
             if (apk) {
                 return {
-                    name: apk.name.replace('.apk', ''),
+                    name: apk.name,
                     file: null, // Will be loaded when needed
-                    apkPath: apk.path,
-                    size: this.formatFileSize(apk.size),
+                    url: apk.url,
+                    size: 'Remote',
                     package: 'unknown',
                     postInstallCommands: apk.postInstallCommands
                 };
@@ -362,10 +356,10 @@ class JTechMDMInstaller {
             try {
                 let fileToInstall = apk.file;
                 
-                // If it's an APK from the folder, fetch it
-                if (apk.apkPath && !apk.file) {
-                    this.uiManager.log(`Loading ${apk.name} from server...`, 'info');
-                    const response = await fetch(apk.apkPath);
+                // If it's an APK from a remote URL, fetch it
+                if (apk.url && !apk.file) {
+                    this.uiManager.log(`Downloading ${apk.name}...`, 'info');
+                    const response = await fetch(apk.url);
                     if (!response.ok) {
                         throw new Error(`Failed to load APK file: ${response.statusText}`);
                     }

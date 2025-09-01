@@ -15,11 +15,22 @@ export class AdbConnection {
             }
 
             // Connect to ADB with auth callback for user notification
-            this.adb = await this.webusb.connectAdb("host::", (publicKey) => {
-                console.log('Device requires authorization. Please check your Android device.');
-                // This callback is called when the device needs authorization
-                // The prompt should appear on the Android device automatically
-            });
+            const connectWithAuth = async () => {
+                return await this.webusb.connectAdb("host::", (publicKey) => {
+                    console.log('Device requires authorization. Please check your Android device.');
+                    // This callback is called when the device needs authorization
+                    // The prompt should appear on the Android device automatically
+                });
+            };
+
+            this.adb = await connectWithAuth();
+
+            // Wait until the device is authorized
+            while (this.adb && this.adb.mode === 'unauthorized') {
+                console.log('Waiting for device authorization...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                this.adb = await connectWithAuth();
+            }
 
             if (!this.adb) {
                 throw new Error('Failed to establish ADB connection');
