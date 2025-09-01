@@ -302,6 +302,7 @@ body {
     transform: rotateY(-60deg) translateZ(0) scale(0.85);
     filter: brightness(0.6);
     opacity: 0.6;
+
     z-index: 1;
 }
 
