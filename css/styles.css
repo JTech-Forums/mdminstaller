@@ -636,6 +636,27 @@ body {
     margin-top: 1.5rem;
 }
 
+.tutorial-step {
+    display: none;
+}
+
+.tutorial-step.active {
+    display: block;
+}
+
+.tutorial-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
 .footer-text {
     margin-top: 2rem;
     padding-top: 1rem;

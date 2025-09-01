@@ -55,7 +55,7 @@
             </div>
 
             <!-- APK Installation Card -->
-            <div class="card install-card" id="installCard">
+            <div class="card install-card hidden" id="installCard">
                 <h2>Install MDM Applications</h2>
                 <div class="app-grid" id="kitsGrid"></div>
             </div>
@@ -113,7 +113,24 @@
         </div>
     </main>
 
-    <!-- Help Modal -->
+    <!-- Welcome Modal -->
+    <div class="modal hidden" id="welcomeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to JTech MDM Installer</h2>
+                <button class="modal-close" id="closeWelcomeBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Let's start by connecting your device.</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="skipTutorialBtn">Skip Tutorial</button>
+                    <button class="btn btn-primary" id="startTutorialBtn">Start Tutorial</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
     <div class="modal hidden" id="helpModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -121,37 +138,41 @@
                 <button class="modal-close" id="closeHelpBtn">&times;</button>
             </div>
             <div class="modal-body">
-                <ol>
-                    <li>
-                        <strong>Enable Developer Options on your Android device:</strong>
+                <div class="tutorial-container" id="tutorialContainer">
+                    <div class="tutorial-step active">
+                        <h3>Step 1: Enable Developer Options</h3>
                         <ul>
                             <li>Go to Settings → About Phone</li>
                             <li>Tap "Build Number" 7 times</li>
                         </ul>
-                    </li>
-                    <li>
-                        <strong>Enable USB Debugging:</strong>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 2: Enable USB Debugging</h3>
                         <ul>
                             <li>Go to Settings → Developer Options</li>
                             <li>Enable "USB Debugging"</li>
                         </ul>
-                    </li>
-                    <li>
-                        <strong>Connect your device:</strong>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 3: Connect Your Device</h3>
                         <ul>
                             <li>Connect via USB cable</li>
-                            <li>Click "Connect Device" button</li>
-                            <li>Authorize on your device when prompted</li>
+                            <li>Click "Connect Device" in this app</li>
+                            <li>If prompted on your device, tap "Allow" to authorize the connection</li>
                         </ul>
-                    </li>
-                    <li>
-                        <strong>Install MDM apps:</strong>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 4: Install MDM Apps</h3>
                         <ul>
                             <li>Select from quick install options or upload custom APKs</li>
                             <li>Click "Install All" to begin</li>
                         </ul>
-                    </li>
-                </ol>
+                    </div>
+                </div>
+                <div class="tutorial-navigation">
+                    <button class="btn btn-secondary" id="prevStepBtn">Previous</button>
+                    <button class="btn btn-primary" id="nextStepBtn">Next</button>
+                </div>
                 <div class="warning">
                     <strong>Note:</strong> This tool requires Chrome or Edge browser with WebUSB support.
                 </div>
