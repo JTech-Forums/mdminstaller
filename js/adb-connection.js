@@ -5,21 +5,35 @@ export class AdbConnection {
         this.device = null;
     }
 
-    async connect() {
+    async connect(uiManager = null) {
         try {
-            // Open WebUSB connection
-            this.webusb = await window.Adb.open("WebUSB");
-            
+            // Open WebUSB connection only once and reuse existing device
             if (!this.webusb) {
-                throw new Error('Failed to open WebUSB connection');
+                const devices = await navigator.usb.getDevices();
+                if (devices.length > 0) {
+                    await devices[0].open();
+                    this.webusb = new window.Adb.WebUSB.Transport(devices[0]);
+                } else {
+                    this.webusb = await window.Adb.open("WebUSB");
+                }
+
+                if (!this.webusb) {
+                    throw new Error('Failed to open WebUSB connection');
+                }
+
+                // Store the device reference
+                this.device = this.webusb.device;
             }
+
+            let authNotification = null;
 
             // Connect to ADB with auth callback for user notification
             const connectWithAuth = async () => {
-                return await this.webusb.connectAdb("host::", (publicKey) => {
+                return await this.webusb.connectAdb("host::", () => {
                     console.log('Device requires authorization. Please check your Android device.');
-                    // This callback is called when the device needs authorization
-                    // The prompt should appear on the Android device automatically
+                    if (uiManager && !authNotification) {
+                        authNotification = uiManager.showWarning('Please verify the connection on your device and tap "Allow"', true);
+                    }
                 });
             };
 
@@ -32,13 +46,14 @@ export class AdbConnection {
                 this.adb = await connectWithAuth();
             }
 
+            if (authNotification && uiManager) {
+                uiManager.dismissNotification(authNotification);
+            }
+
             if (!this.adb) {
                 throw new Error('Failed to establish ADB connection');
             }
 
-            // Store the device reference
-            this.device = this.webusb.device;
-            
             console.log('ADB connection established successfully');
             console.log('Device mode:', this.adb.mode);
             console.log('Device banner:', this.adb.banner);

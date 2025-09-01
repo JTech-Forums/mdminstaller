@@ -277,6 +277,7 @@ body {
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
     filter: brightness(1.2);
     z-index: 1;
+
 }
 
 #kitsSwiper .swiper-slide img {
@@ -290,16 +291,15 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 1.5rem 1rem;
-    background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+    background: #ffffff;
     border: 2px solid var(--border-color);
     border-radius: 0.5rem;
     cursor: default;
     transition: all 0.2s;
+    color: var(--bg-color);
 }
 
 .app-item:hover {
-    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-    border-color: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
