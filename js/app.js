@@ -13,6 +13,7 @@ class JTechMDMInstaller {
         this.commandHistory = [];
         this.currentTutorialStep = 0;
         this.tutorialSteps = [];
+        this.glide = null;
     }
 
     async init() {
@@ -249,20 +250,34 @@ class JTechMDMInstaller {
         grid.innerHTML = '';
 
         this.availableApks.forEach((apk) => {
-            const item = document.createElement('div');
-            item.className = 'app-item';
-            item.innerHTML = `
-                <div class="app-icon">
-                    ${apk.image ? `<img src="${apk.image}" alt="${apk.name}">` : ''}
+            const slide = document.createElement('li');
+            slide.className = 'glide__slide';
+            slide.innerHTML = `
+                <div class="app-item">
+                    <div class="app-icon">
+                        ${apk.image ? `<img src="${apk.image}" alt="${apk.name}">` : ''}
+                    </div>
+                    <span>${apk.name}</span>
+                    <button class="btn btn-primary install-btn">Install</button>
                 </div>
-                <span>${apk.name}</span>
-                <button class="btn btn-primary install-btn">Install</button>
             `;
 
-            item.querySelector('.install-btn').addEventListener('click', () => this.installKit(apk));
+            slide.querySelector('.install-btn').addEventListener('click', () => this.installKit(apk));
 
-            grid.appendChild(item);
+            grid.appendChild(slide);
         });
+
+        if (this.glide) {
+            this.glide.destroy();
+        }
+
+        this.glide = new Glide('#kitsGlide', {
+            type: 'carousel',
+            perView: 5,
+            focusAt: 'center',
+            gap: 24
+        });
+        this.glide.mount();
     }
 
     getPresetApkInfo(type) {
