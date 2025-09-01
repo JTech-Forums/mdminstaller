@@ -30,7 +30,7 @@ const server = http.createServer((req, res) => {
       }
 
       const apps = entries
-        .filter(entry => entry.isDirectory())
+        .filter(entry => entry.isDirectory() && entry.name !== 'blog')
         .map(dir => {
           const dirPath = path.join('./apk', dir.name);
 
