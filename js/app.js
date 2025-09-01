@@ -13,6 +13,7 @@ class JTechMDMInstaller {
         this.commandHistory = [];
         this.currentTutorialStep = 0;
         this.tutorialSteps = [];
+        this.glide = null;
     }
 
     async init() {
@@ -174,6 +175,10 @@ class JTechMDMInstaller {
                 const consoleCard = document.getElementById('consoleCard');
                 if (installCard) installCard.classList.add('hidden');
                 if (consoleCard) consoleCard.classList.add('hidden');
+                if (this.glide) {
+                    this.glide.destroy();
+                    this.glide = null;
+                }
             } else {
                 // Connect
                 this.uiManager.log('Requesting USB device access...', 'info');
@@ -201,6 +206,7 @@ class JTechMDMInstaller {
                     const consoleCard = document.getElementById('consoleCard');
                     if (installCard) installCard.classList.remove('hidden');
                     if (consoleCard) consoleCard.classList.remove('hidden');
+                    this.renderAvailableApks();
                     this.uiManager.log('Device connected and ready', 'success');
                 }
             }
@@ -232,9 +238,8 @@ class JTechMDMInstaller {
         try {
             const response = await fetch('/api/apks');
             const apks = await response.json();
-            
+
             this.availableApks = apks;
-            this.renderAvailableApks();
         } catch (error) {
             console.error('Failed to load APKs:', error);
             this.uiManager.log('Failed to load APK files from server', 'warning');
@@ -248,21 +253,35 @@ class JTechMDMInstaller {
 
         grid.innerHTML = '';
 
-        this.availableApks.forEach((apk) => {
-            const item = document.createElement('div');
-            item.className = 'app-item';
-            item.innerHTML = `
-                <div class="app-icon">
-                    ${apk.image ? `<img src="${apk.image}" alt="${apk.name}">` : ''}
+        this.availableApks.slice(0, 5).forEach((apk) => {
+            const slide = document.createElement('li');
+            slide.className = 'glide__slide';
+            slide.innerHTML = `
+                <div class="app-item">
+                    <div class="app-icon">
+                        ${apk.image ? `<img src="${apk.image}" alt="${apk.name}">` : ''}
+                    </div>
+                    <span>${apk.name}</span>
+                    <button class="btn btn-primary install-btn">Install</button>
                 </div>
-                <span>${apk.name}</span>
-                <button class="btn btn-primary install-btn">Install</button>
             `;
 
-            item.querySelector('.install-btn').addEventListener('click', () => this.installKit(apk));
+            slide.querySelector('.install-btn').addEventListener('click', () => this.installKit(apk));
 
-            grid.appendChild(item);
+            grid.appendChild(slide);
         });
+
+        if (this.glide) {
+            this.glide.destroy();
+        }
+
+        this.glide = new Glide('#kitsGlide', {
+            type: 'carousel',
+            perView: 5,
+            focusAt: 'center',
+            gap: 24
+        });
+        this.glide.mount();
     }
 
     getPresetApkInfo(type) {
