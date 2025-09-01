@@ -11,10 +11,14 @@ const MIME_TYPES = {
   '.json': 'application/json',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon'
 };
+
+// Load HTML template once at startup
+const INDEX_HTML = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
 
 const server = http.createServer((req, res) => {
   console.log(`Request: ${req.method} ${req.url}`);
@@ -46,10 +50,13 @@ const server = http.createServer((req, res) => {
             }
           }
 
-          // Find image file (png/jpg/jpeg)
+          // Find icon file (png/jpg/jpeg/svg) with common names
           let imageFile = null;
-          const imageCandidates = ['image.png', 'image.jpg', 'image.jpeg'];
-          for (const img of imageCandidates) {
+          const iconCandidates = [
+            'icon.png', 'icon.jpg', 'icon.jpeg', 'icon.svg',
+            'image.png', 'image.jpg', 'image.jpeg', 'image.svg'
+          ];
+          for (const img of iconCandidates) {
             const imgPath = path.join(dirPath, img);
             if (fs.existsSync(imgPath)) {
               imageFile = `/apk/${dir.name}/${img}`;
@@ -73,10 +80,14 @@ const server = http.createServer((req, res) => {
     return;
   }
   
-  let filePath = '.' + req.url;
-  if (filePath === './') {
-    filePath = './index.html';
+  // Serve main interface
+  if (req.url === '/' || req.url === '/index.html') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(INDEX_HTML, 'utf-8');
+    return;
   }
+
+  let filePath = '.' + req.url;
   
   const extname = String(path.extname(filePath)).toLowerCase();
   const contentType = MIME_TYPES[extname] || 'application/octet-stream';
