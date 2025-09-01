@@ -11,6 +11,8 @@ class JTechMDMInstaller {
         this.apkQueue = [];
         this.availableApks = [];
         this.commandHistory = [];
+        this.currentTutorialStep = 0;
+        this.tutorialSteps = [];
     }
 
     async init() {
@@ -70,6 +72,7 @@ class JTechMDMInstaller {
 
         // Modals
         document.getElementById('helpBtn')?.addEventListener('click', () => {
+            this.showTutorialStep(0);
             document.getElementById('helpModal').classList.remove('hidden');
         });
 
@@ -85,6 +88,28 @@ class JTechMDMInstaller {
             document.getElementById('aboutModal').classList.add('hidden');
         });
 
+        document.getElementById('skipTutorialBtn')?.addEventListener('click', () => {
+            document.getElementById('welcomeModal')?.classList.add('hidden');
+        });
+
+        document.getElementById('startTutorialBtn')?.addEventListener('click', () => {
+            document.getElementById('welcomeModal')?.classList.add('hidden');
+            this.showTutorialStep(0);
+            document.getElementById('helpModal')?.classList.remove('hidden');
+        });
+
+        document.getElementById('closeWelcomeBtn')?.addEventListener('click', () => {
+            document.getElementById('welcomeModal')?.classList.add('hidden');
+        });
+
+        document.getElementById('nextStepBtn')?.addEventListener('click', () => {
+            this.showTutorialStep(this.currentTutorialStep + 1);
+        });
+
+        document.getElementById('prevStepBtn')?.addEventListener('click', () => {
+            this.showTutorialStep(this.currentTutorialStep - 1);
+        });
+
         // Close modals on outside click
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -93,6 +118,38 @@ class JTechMDMInstaller {
                 }
             });
         });
+    }
+
+    showTutorialStep(index) {
+        this.tutorialSteps = Array.from(document.querySelectorAll('.tutorial-step'));
+        if (this.tutorialSteps.length === 0) return;
+
+        if (index >= this.tutorialSteps.length) {
+            document.getElementById('helpModal')?.classList.add('hidden');
+            return;
+        }
+
+        if (index < 0) index = 0;
+
+        this.tutorialSteps.forEach((step, i) => {
+            step.classList.toggle('active', i === index);
+        });
+        this.currentTutorialStep = index;
+
+        const prevBtn = document.getElementById('prevStepBtn');
+        const nextBtn = document.getElementById('nextStepBtn');
+
+        if (prevBtn) {
+            prevBtn.disabled = index === 0;
+        }
+
+        if (nextBtn) {
+            if (index === this.tutorialSteps.length - 1) {
+                nextBtn.textContent = 'Finish';
+            } else {
+                nextBtn.textContent = 'Next';
+            }
+        }
     }
 
     async handleConnect() {
@@ -668,4 +725,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     await app.init();
     // Make UIManager globally accessible for modal buttons
     window.uiManager = app.uiManager;
+    document.getElementById('welcomeModal')?.classList.remove('hidden');
 });
