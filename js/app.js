@@ -281,7 +281,9 @@ class JTechMDMInstaller {
             type: 'carousel',
             perView: 5,
             focusAt: 'center',
-            gap: 24
+            gap: 24,
+            animationDuration: 800,
+            animationTimingFunc: 'cubic-bezier(0.25, 0.8, 0.25, 1)'
         });
 
         this.glide.on(['mount.after', 'run.after'], () => this.updateCarousel3D());
