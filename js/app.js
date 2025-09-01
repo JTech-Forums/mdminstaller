@@ -12,6 +12,7 @@ class JTechMDMInstaller {
         this.apkQueue = [];
         this.availableApks = [];
         this.commandHistory = [];
+        this.currentHistoryIndex = 0;
         this.currentTutorialStep = 0;
         this.tutorialSteps = [];
         this.swiper = null;
@@ -27,19 +28,20 @@ class JTechMDMInstaller {
     checkWebUSBSupport() {
         if (!('usb' in navigator)) {
             this.uiManager.showError('WebUSB is not supported in this browser. Please use Chrome or Edge.');
-            document.getElementById('connectBtn').disabled = true;
+            const btn = document.getElementById('connectBtn');
+            if (btn) btn.disabled = true;
         }
     }
 
     setupEventListeners() {
         // Connection button
-        document.getElementById('connectBtn').addEventListener('click', () => this.handleConnect());
+        document.getElementById('connectBtn')?.addEventListener('click', () => this.handleConnect());
 
         // File upload
         const uploadArea = document.getElementById('uploadArea');
         const apkInput = document.getElementById('apkInput');
 
-        uploadArea?.addEventListener('click', () => apkInput.click());
+        uploadArea?.addEventListener('click', () => apkInput?.click());
         apkInput?.addEventListener('change', (e) => this.handleFileSelection(e));
 
         // Drag and drop
@@ -61,7 +63,7 @@ class JTechMDMInstaller {
         // Queue management
         document.getElementById('clearQueueBtn')?.addEventListener('click', () => this.clearQueue());
         document.getElementById('installBtn')?.addEventListener('click', () => this.installApks());
-        
+
         // ADB Console
         document.getElementById('executeBtn')?.addEventListener('click', () => this.executeCommand());
         document.getElementById('commandInput')?.addEventListener('keypress', (e) => {
@@ -75,20 +77,20 @@ class JTechMDMInstaller {
         // Modals
         document.getElementById('tutorialBtn')?.addEventListener('click', () => {
             this.showTutorialStep(0);
-            document.getElementById('tutorialModal').classList.remove('hidden');
+            document.getElementById('tutorialModal')?.classList.remove('hidden');
         });
 
         document.getElementById('aboutBtn')?.addEventListener('click', () => {
-            document.getElementById('aboutModal').classList.remove('hidden');
+            document.getElementById('aboutModal')?.classList.remove('hidden');
         });
 
         document.getElementById('closeTutorialBtn')?.addEventListener('click', () => {
-            document.getElementById('tutorialModal').classList.add('hidden');
+            document.getElementById('tutorialModal')?.classList.add('hidden');
             localStorage.setItem('tutorialSeen', 'true');
         });
 
         document.getElementById('closeAboutBtn')?.addEventListener('click', () => {
-            document.getElementById('aboutModal').classList.add('hidden');
+            document.getElementById('aboutModal')?.classList.add('hidden');
         });
 
         document.getElementById('skipTutorialBtn')?.addEventListener('click', () => {
@@ -150,18 +152,14 @@ class JTechMDMInstaller {
         }
 
         if (nextBtn) {
-            if (index === this.tutorialSteps.length - 1) {
-                nextBtn.textContent = 'Finish';
-            } else {
-                nextBtn.textContent = 'Next';
-            }
+            nextBtn.textContent = (index === this.tutorialSteps.length - 1) ? 'Finish' : 'Next';
         }
     }
 
     async handleConnect() {
         try {
             const btn = document.getElementById('connectBtn');
-            btn.disabled = true;
+            if (btn) btn.disabled = true;
 
             if (this.device) {
                 // Disconnect
@@ -169,17 +167,19 @@ class JTechMDMInstaller {
                 this.device = null;
                 this.apkInstaller.setAdbConnection(null);
                 this.uiManager.updateConnectionStatus('disconnected');
-                btn.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
-                    </svg>
-                    Connect Device
-                `;
-                btn.disabled = false;
+                if (btn) {
+                    btn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                        </svg>
+                        Connect Device
+                    `;
+                    btn.disabled = false;
+                }
                 const installCard = document.getElementById('installCard');
                 const consoleCard = document.getElementById('consoleCard');
-                if (installCard) installCard.classList.add('hidden');
-                if (consoleCard) consoleCard.classList.add('hidden');
+                installCard?.classList.add('hidden');
+                consoleCard?.classList.add('hidden');
                 if (this.swiper) {
                     this.swiper.destroy(true, true);
                     this.swiper = null;
@@ -189,28 +189,28 @@ class JTechMDMInstaller {
                 this.uiManager.log('Requesting USB device access...', 'info');
                 this.uiManager.log('Please select your Android device from the browser prompt', 'info');
                 this.device = await this.adbConnection.connect(this.uiManager);
-                
+
                 if (this.device) {
-                    // Link the ADB connection to the APK installer
                     this.apkInstaller.setAdbConnection(this.adbConnection);
-                    
                     this.uiManager.log('Device connected. Getting device information...', 'info');
                     this.uiManager.log('If prompted on your device, tap "Allow" to authorize this computer', 'warning');
-                    
+
                     const deviceInfo = await this.adbConnection.getDeviceInfo();
                     this.uiManager.updateConnectionStatus('connected', deviceInfo);
-                    btn.innerHTML = `
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-                            <line x1="12" y1="2" x2="12" y2="12"></line>
-                        </svg>
-                        Disconnect
-                    `;
-                    btn.disabled = false;
+                    if (btn) {
+                        btn.innerHTML = `
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                                <line x1="12" y1="2" x2="12" y2="12"></line>
+                            </svg>
+                            Disconnect
+                        `;
+                        btn.disabled = false;
+                    }
                     const installCard = document.getElementById('installCard');
                     const consoleCard = document.getElementById('consoleCard');
-                    if (installCard) installCard.classList.remove('hidden');
-                    if (consoleCard) consoleCard.classList.remove('hidden');
+                    installCard?.classList.remove('hidden');
+                    consoleCard?.classList.remove('hidden');
                     this.renderAvailableApks();
                     this.uiManager.log('Device connected and ready', 'success');
                 }
@@ -218,7 +218,8 @@ class JTechMDMInstaller {
         } catch (error) {
             console.error('Connection error:', error);
             this.uiManager.showError(`Connection failed: ${error.message}`);
-            document.getElementById('connectBtn').disabled = false;
+            const btn = document.getElementById('connectBtn');
+            if (btn) btn.disabled = false;
         }
     }
 
@@ -227,10 +228,9 @@ class JTechMDMInstaller {
         const apkType = btn.dataset.apk;
 
         if (apkType === 'custom') {
-            document.getElementById('uploadSection').classList.remove('hidden');
-            document.getElementById('apkInput').click();
+            document.getElementById('uploadSection')?.classList.remove('hidden');
+            document.getElementById('apkInput')?.click();
         } else {
-            // Add pre-configured APK to queue
             const apkInfo = this.getPresetApkInfo(apkType);
             if (apkInfo) {
                 this.addToQueue(apkInfo);
@@ -244,7 +244,6 @@ class JTechMDMInstaller {
             const response = await fetch('/api/apks');
             const apks = await response.json();
 
-            // Merge server-provided APK info with additional kit metadata
             this.availableApks = apks.map(apk => {
                 const kit = KITS.find(k => k.key === apk.name) || {};
                 return {
@@ -269,66 +268,67 @@ class JTechMDMInstaller {
 
         grid.innerHTML = '';
 
-
         this.availableApks.forEach((apk) => {
-
             const slide = document.createElement('div');
             slide.className = 'swiper-slide';
             slide.innerHTML = `
-                <div class="app-item">
+                <div class="app-item card-modern">
                     <div class="app-icon">
                         ${apk.image ? `<img src="${apk.image}" alt="${apk.title}">` : ''}
                     </div>
-                    <span>${apk.title}</span>
-                    <div class="app-actions">
-                        <button class="btn btn-primary install-btn">Install</button>
-                        <button class="btn btn-link info-btn">View Info</button>
+                    <span class="app-title">${apk.title}</span>
+                    <div class="action-bar">
+                        <button class="install-btn">Install</button>
+                        <button class="info-btn">View Info</button>
                     </div>
                 </div>
             `;
 
-            slide.querySelector('.install-btn').addEventListener('click', () => this.installKit(apk));
-            slide.querySelector('.info-btn').addEventListener('click', () => window.open(apk.infoUrl, '_blank'));
+            slide.querySelector('.install-btn')?.addEventListener('click', () => this.installKit(apk));
+            slide.querySelector('.info-btn')?.addEventListener('click', () => window.open(apk.infoUrl, '_blank'));
 
             grid.appendChild(slide);
         });
 
-        if (this.swiper) {
-            this.swiper.destroy(true, true);
-        }
+        if (this.swiper) this.swiper.destroy(true, true);
 
         const startIndex = this.availableApks.findIndex(a => a.key === 'MBsmart' || a.name === 'MBsmart');
 
-        this.swiper = new Swiper('#kitsSwiper', {
-            effect: 'coverflow',
-            grabCursor: true,
-            centeredSlides: true,
-            slidesPerView: 'auto',
-            slideToClickedSlide: true,
-            initialSlide: startIndex >= 0 ? startIndex : 0,
-            coverflowEffect: {
-                rotate: 50,
-                stretch: 0,
-                depth: 100,
-                modifier: 1,
-                slideShadows: true,
-            }
-        });
+this.swiper = new Swiper('#kitsSwiper', {
+  effect: 'coverflow',
+  grabCursor: true,
+  centeredSlides: true,
+  slidesPerView: 'auto',
+  slideToClickedSlide: true,
+  spaceBetween: 40,
+  slidesOffsetBefore: 60,   // was 100
+  slidesOffsetAfter: 60,    // was 100
+  initialSlide: startIndex >= 0 ? startIndex : 0,
+  coverflowEffect: {
+    rotate: 8,
+    stretch: 0,
+    depth: 160,
+    modifier: 1,
+    slideShadows: false
+  },
+  watchSlidesProgress: true
+});
+
+
+
     }
 
     getPresetApkInfo(type) {
-        if (type === 'custom') {
-            return null; // Handle custom upload
-        }
+        if (type === 'custom') return null;
 
         if (type.startsWith('file-')) {
-            const index = parseInt(type.replace('file-', ''));
+            const index = parseInt(type.replace('file-', ''), 10);
             const apk = this.availableApks[index];
 
             if (apk) {
                 return {
                     name: apk.name,
-                    file: null, // Will be loaded when needed
+                    file: null,
                     url: apk.url,
                     size: 'Remote',
                     package: 'unknown',
@@ -336,12 +336,11 @@ class JTechMDMInstaller {
                 };
             }
         }
-        
         return null;
     }
 
     handleFileSelection(e) {
-        const files = Array.from(e.target.files);
+        const files = Array.from(e.target.files || []);
         files.forEach(file => {
             if (file.name.toLowerCase().endsWith('.apk')) {
                 this.addToQueue({
@@ -355,7 +354,7 @@ class JTechMDMInstaller {
     }
 
     handleFileDrop(e) {
-        const files = Array.from(e.dataTransfer.files);
+        const files = Array.from(e.dataTransfer.files || []);
         files.forEach(file => {
             if (file.name.toLowerCase().endsWith('.apk')) {
                 this.addToQueue({
@@ -369,12 +368,11 @@ class JTechMDMInstaller {
     }
 
     addToQueue(apkInfo) {
-        // Check if already in queue
         const exists = this.apkQueue.find(item => item.name === apkInfo.name);
         if (!exists) {
             this.apkQueue.push(apkInfo);
             this.updateQueueDisplay();
-            document.getElementById('apkQueue').classList.remove('hidden');
+            document.getElementById('apkQueue')?.classList.remove('hidden');
         }
     }
 
@@ -382,14 +380,14 @@ class JTechMDMInstaller {
         this.apkQueue.splice(index, 1);
         this.updateQueueDisplay();
         if (this.apkQueue.length === 0) {
-            document.getElementById('apkQueue').classList.add('hidden');
+            document.getElementById('apkQueue')?.classList.add('hidden');
         }
     }
 
     clearQueue() {
         this.apkQueue = [];
         this.updateQueueDisplay();
-        document.getElementById('apkQueue').classList.add('hidden');
+        document.getElementById('apkQueue')?.classList.add('hidden');
         document.querySelectorAll('.app-item').forEach(btn => {
             btn.classList.remove('selected');
         });
@@ -397,6 +395,8 @@ class JTechMDMInstaller {
 
     updateQueueDisplay() {
         const queueList = document.getElementById('queueList');
+        if (!queueList) return;
+
         queueList.innerHTML = '';
 
         this.apkQueue.forEach((apk, index) => {
@@ -418,7 +418,7 @@ class JTechMDMInstaller {
                 </button>
             `;
 
-            item.querySelector('.queue-item-remove').addEventListener('click', () => {
+            item.querySelector('.queue-item-remove')?.addEventListener('click', () => {
                 this.removeFromQueue(index);
             });
 
@@ -437,8 +437,9 @@ class JTechMDMInstaller {
             return;
         }
 
-        document.getElementById('progressCard').classList.remove('hidden');
-        document.getElementById('installBtn').disabled = true;
+        document.getElementById('progressCard')?.classList.remove('hidden');
+        const installBtn = document.getElementById('installBtn');
+        if (installBtn) installBtn.disabled = true;
 
         let successCount = 0;
         let failCount = 0;
@@ -446,14 +447,13 @@ class JTechMDMInstaller {
         for (let i = 0; i < this.apkQueue.length; i++) {
             const apk = this.apkQueue[i];
             const progress = ((i + 1) / this.apkQueue.length) * 100;
-            
+
             this.uiManager.updateProgress(progress, `Installing ${apk.name}...`);
             this.uiManager.log(`Installing ${apk.name}...`, 'info');
 
             try {
                 let fileToInstall = apk.file;
-                
-                // If it's an APK from a remote URL, fetch it
+
                 if (apk.url && !apk.file) {
                     this.uiManager.log(`Downloading ${apk.name}...`, 'info');
                     const response = await fetch(apk.url);
@@ -463,49 +463,43 @@ class JTechMDMInstaller {
                     const arrayBuffer = await response.arrayBuffer();
                     fileToInstall = new File([arrayBuffer], apk.name + '.apk', { type: 'application/vnd.android.package-archive' });
                 }
-                
+
                 if (fileToInstall) {
-                    // Install the APK file
                     await this.apkInstaller.installFromFile(this.device, fileToInstall);
-                    
-                    // Execute post-install commands if they exist
+
                     if (apk.postInstallCommands && apk.postInstallCommands.length > 0) {
                         this.uiManager.log(`Executing post-install commands for ${apk.name}...`, 'info');
-                        
-                        // Wait a bit for the app to fully register after installation
                         this.uiManager.log('Waiting for app components to register...', 'info');
                         await new Promise(resolve => setTimeout(resolve, 2000));
-                        
+
                         for (const command of apk.postInstallCommands) {
                             if (command.trim()) {
                                 try {
-                                    // Add extra delay for device admin commands
                                     if (command.includes('dpm set-device-owner') || command.includes('device-admin')) {
                                         this.uiManager.log('Device admin command detected - waiting for component registration...', 'info');
                                         await new Promise(resolve => setTimeout(resolve, 3000));
                                     }
-                                    
+
                                     this.uiManager.log(`Running: ${command}`, 'info');
                                     const result = await this.adbConnection.executeShellCommand(command);
                                     if (result.trim()) {
                                         this.uiManager.log(`Command output: ${result.trim()}`, 'info');
                                     }
-                                    
-                                    // Small delay between commands
+
                                     await new Promise(resolve => setTimeout(resolve, 500));
-                                    
+
                                 } catch (cmdError) {
                                     this.uiManager.log(`Command failed: ${command} - ${cmdError.message}`, 'warning');
                                 }
                             }
                         }
-                        
+
                         this.uiManager.log(`Post-install setup completed for ${apk.name}`, 'success');
                     }
                 } else {
                     throw new Error('No APK file available for installation');
                 }
-                
+
                 successCount++;
                 this.uiManager.log(`Successfully installed ${apk.name}`, 'success');
             } catch (error) {
@@ -515,13 +509,11 @@ class JTechMDMInstaller {
         }
 
         this.uiManager.updateProgress(100, 'Installation complete');
-        this.uiManager.log(`Installation complete: ${successCount} succeeded, ${failCount} failed`, 
-                          failCount > 0 ? 'warning' : 'success');
+        this.uiManager.log(`Installation complete: ${successCount} succeeded, ${failCount} failed`,
+            failCount > 0 ? 'warning' : 'success');
 
-        document.getElementById('installBtn').disabled = false;
-        
-        // Don't auto-hide progress card or clear logs - user can access them later
-        // Just clear the queue
+        if (installBtn) installBtn.disabled = false;
+
         setTimeout(() => {
             this.clearQueue();
         }, 2000);
@@ -533,7 +525,7 @@ class JTechMDMInstaller {
             return;
         }
 
-        document.getElementById('progressCard').classList.remove('hidden');
+        document.getElementById('progressCard')?.classList.remove('hidden');
         this.uiManager.updateProgress(0, `Installing ${apk.title || apk.name}...`);
         this.uiManager.log(`Installing ${apk.title || apk.name}...`, 'info');
 
@@ -550,9 +542,7 @@ class JTechMDMInstaller {
                 fileToInstall = new File([arrayBuffer], (apk.name || apk.title) + '.apk', { type: 'application/vnd.android.package-archive' });
             }
 
-            if (!fileToInstall) {
-                throw new Error('No APK file available for installation');
-            }
+            if (!fileToInstall) throw new Error('No APK file available for installation');
 
             await this.apkInstaller.installFromFile(this.device, fileToInstall);
 
@@ -571,9 +561,7 @@ class JTechMDMInstaller {
 
                         this.uiManager.log(`Running: ${command}`, 'info');
                         const result = await this.adbConnection.executeShellCommand(command);
-                        if (result.trim()) {
-                            this.uiManager.log(`Command output: ${result.trim()}`, 'info');
-                        }
+                        if (result.trim()) this.uiManager.log(`Command output: ${result.trim()}`, 'info');
 
                         await new Promise(resolve => setTimeout(resolve, 500));
                     } catch (cmdError) {
@@ -599,16 +587,13 @@ class JTechMDMInstaller {
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
     }
 
     async executeCommand() {
         const commandInput = document.getElementById('commandInput');
-        const command = commandInput.value.trim();
-        
-        if (!command) {
-            return;
-        }
+        const command = commandInput?.value.trim();
+        if (!command) return;
 
         if (!this.device) {
             this.logToConsole('ERROR: No device connected', 'error');
@@ -616,50 +601,38 @@ class JTechMDMInstaller {
         }
 
         const executeBtn = document.getElementById('executeBtn');
-        executeBtn.disabled = true;
-        executeBtn.innerHTML = `
-            <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-            </svg>
-            Running...
-        `;
+        if (executeBtn) {
+            executeBtn.disabled = true;
+            executeBtn.innerHTML = `
+                <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                </svg>
+                Running...
+            `;
+        }
 
         try {
-            // Add to command history
             this.commandHistory.push(command);
             this.currentHistoryIndex = this.commandHistory.length;
-            
-            // Log the command being executed
             this.logToConsole(`$ adb shell ${command}`, 'command');
-            
-            // Execute the command
             const result = await this.adbConnection.executeShellCommand(command);
-            
-            // Log the result
-            if (result.trim()) {
-                this.logToConsole(result, 'output');
-            } else {
-                this.logToConsole('(no output)', 'info');
-            }
-            
-            // Update history display
+            if (result.trim()) this.logToConsole(result, 'output');
+            else this.logToConsole('(no output)', 'info');
             this.updateCommandHistory();
-            
         } catch (error) {
             this.logToConsole(`ERROR: ${error.message}`, 'error');
         }
 
-        // Reset button
-        executeBtn.disabled = false;
-        executeBtn.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="5,3 19,12 5,21"></polygon>
-            </svg>
-            Execute
-        `;
-
-        // Clear input
-        commandInput.value = '';
+        if (executeBtn) {
+            executeBtn.disabled = false;
+            executeBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5,3 19,12 5,21"></polygon>
+                </svg>
+                Execute
+            `;
+        }
+        if (commandInput) commandInput.value = '';
     }
 
     logToConsole(message, type = 'info') {
@@ -669,7 +642,7 @@ class JTechMDMInstaller {
         const timestamp = new Date().toLocaleTimeString();
         const entry = document.createElement('div');
         entry.className = `console-entry ${type}`;
-        
+
         if (type === 'command') {
             entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="command">${message}</span>`;
         } else if (type === 'output') {
@@ -677,44 +650,41 @@ class JTechMDMInstaller {
         } else {
             entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>`;
         }
-        
+
         consoleOutput.appendChild(entry);
         consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
 
     showPreviousCommand() {
         if (this.commandHistory.length === 0) return;
-        
-        if (this.currentHistoryIndex > 0) {
-            this.currentHistoryIndex--;
-        }
-        
-        document.getElementById('commandInput').value = this.commandHistory[this.currentHistoryIndex] || '';
+        if (this.currentHistoryIndex > 0) this.currentHistoryIndex--;
+        const input = document.getElementById('commandInput');
+        if (input) input.value = this.commandHistory[this.currentHistoryIndex] || '';
     }
 
     showNextCommand() {
         if (this.commandHistory.length === 0) return;
-        
+        const input = document.getElementById('commandInput');
         if (this.currentHistoryIndex < this.commandHistory.length - 1) {
             this.currentHistoryIndex++;
-            document.getElementById('commandInput').value = this.commandHistory[this.currentHistoryIndex];
+            if (input) input.value = this.commandHistory[this.currentHistoryIndex];
         } else {
             this.currentHistoryIndex = this.commandHistory.length;
-            document.getElementById('commandInput').value = '';
+            if (input) input.value = '';
         }
     }
 
     updateCommandHistory() {
         const historyList = document.getElementById('historyList');
         const historySection = document.getElementById('commandHistory');
-        
+        if (!historyList || !historySection) return;
+
         if (this.commandHistory.length > 0) {
             historySection.classList.remove('hidden');
-            
             historyList.innerHTML = this.commandHistory
-                .slice(-10) // Show last 10 commands
+                .slice(-10)
                 .reverse()
-                .map((cmd, index) => `
+                .map((cmd) => `
                     <div class="history-item" onclick="document.getElementById('commandInput').value='${cmd.replace(/'/g, "\\'")}'; document.getElementById('commandInput').focus();">
                         <code>${cmd}</code>
                     </div>
@@ -724,9 +694,7 @@ class JTechMDMInstaller {
 
     clearConsole() {
         const consoleOutput = document.getElementById('consoleOutput');
-        if (consoleOutput) {
-            consoleOutput.innerHTML = '';
-        }
+        if (consoleOutput) consoleOutput.innerHTML = '';
     }
 
     downloadConsoleOutput() {
@@ -735,17 +703,17 @@ class JTechMDMInstaller {
             this.uiManager.showWarning('No console output to download');
             return;
         }
-        
+
         const content = Array.from(consoleOutput.children)
             .map(entry => entry.textContent)
             .join('\n');
-        
+
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const filename = `adb-console-output-${timestamp}.txt`;
-        
+
         const blob = new Blob([content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
-        
+
         const a = document.createElement('a');
         a.href = url;
         a.download = filename;
@@ -753,12 +721,11 @@ class JTechMDMInstaller {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
+
         this.uiManager.showSuccess('Console output downloaded');
     }
 
     async executeRawCommand(command) {
-        // Execute command without any quote processing - exactly as written in text file
         if (!this.adbConnection || !this.adbConnection.adb) {
             throw new Error('No device connected');
         }
@@ -774,11 +741,122 @@ class JTechMDMInstaller {
     }
 }
 
-// Initialize app when DOM is ready
+/* ----------- In-between balanced styles (taller, split actions, edge fade) ---------- */
+const style = document.createElement('style');
+style.textContent = `
+/* Wider inner window + allow overhangs to show */
+#kitsSwiper {
+  overflow: visible;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+}
+
+
+/* Slightly wider slide to fit the bigger pill cleanly */
+.swiper-slide{ opacity: 0.55; width: 320px; }   /* was 280px */
+
+/* Card dimensions to match the slide */
+.card-modern{
+  max-width: 320px;              /* was 300px */
+  min-height: 380px;             /* a touch taller */
+}
+
+
+
+/* Base slide opacity; neighbors darker; center bright */
+.swiper-slide { opacity: 0.55; width: 300px; }            /* wider -> more vertical presence */
+.swiper-slide-prev, .swiper-slide-next { opacity: 0.85; }
+.swiper-slide-active { opacity: 1; }
+
+/* Card container: darker, taller */
+.card-modern {
+  background: linear-gradient(180deg, #141a28 0%, #0f172a 100%);
+  color: #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  min-width: 260px;
+  max-width: 300px;
+  min-height: 360px;             /* vertical stretch */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  border: 1px solid rgba(148,163,184,0.12);
+  box-shadow: 0 10px 24px rgba(2,6,23,0.35);
+  transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
+}
+
+/* Slightly darken the two neighbors */
+.swiper-slide-prev .card-modern,
+.swiper-slide-next .card-modern {
+  filter: brightness(0.88) saturate(0.95);
+}
+
+/* Center card: gentle lift */
+.swiper-slide-active .card-modern {
+  transform: scale(1.03);
+  box-shadow: 0 16px 36px rgba(99,102,241,0.32);
+}
+
+/* Inner layout */
+.app-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.app-icon img {
+  width: 80px; height: 80px; object-fit: contain; margin-top: 6px;
+  border-radius: 14px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+}
+.app-title { font-weight: 700; letter-spacing: .2px; margin: 4px 0 8px; color: #e5e7eb; }
+
+/* Bigger, perfectly centered split pill */
+.action-bar{
+  width: 92%;                    /* fills the card nicely */
+  height: 48px;                  /* larger pill */
+  margin: 16px auto 0;           /* centered horizontally, spaced from title */
+  display: grid;
+  grid-template-columns: 1fr 1fr;/* exact halves */
+  align-items: stretch;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(99,102,241,0.28);
+  background: #0b1221;
+  padding: 0;                    /* ensure buttons fill fully */
+}
+
+.action-bar button{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  border: 0;
+  margin: 0;                     /* remove any UA offsets */
+  cursor: pointer;
+  line-height: 1;                /* no text clipping */
+}
+
+/* Left half: solid gradient, fully filled */
+.install-btn{
+  background: linear-gradient(90deg,#6d66f6,#7c6cf4);
+  color: #fff;
+}
+.install-btn:hover{ filter: brightness(1.07); }
+
+/* Right half */
+.info-btn{
+  background: rgba(99,102,241,0.10);
+  color: #c7d2fe;
+  border-left: 1px solid rgba(99,102,241,0.28);
+}
+.info-btn:hover{ background: rgba(99,102,241,0.16); }
+
+`;
+document.head.appendChild(style);
+
+/* ---------- Initialize app when DOM is ready ---------- */
 document.addEventListener('DOMContentLoaded', async () => {
     const app = new JTechMDMInstaller();
     await app.init();
-    // Make UIManager globally accessible for modal buttons
     window.uiManager = app.uiManager;
     if (!localStorage.getItem('tutorialSeen')) {
         document.getElementById('welcomeModal')?.classList.remove('hidden');
