@@ -35,17 +35,16 @@ export function renderKits(apks, { onInstall, onInfo } = {}) {
         centeredSlidesBounds: true,
         slidesPerView: 'auto',
         slideToClickedSlide: true,
-        spaceBetween: 40,
-        slidesOffsetBefore: 80,
-        slidesOffsetAfter: 80,
+        spaceBetween: 20,
         initialSlide: startIndex >= 0 ? startIndex : 0,
         coverflowEffect: {
             rotate: 8,
-            stretch: 0,
+            stretch: 10,
             depth: 160,
             modifier: 1,
             slideShadows: false
         },
-        watchSlidesProgress: true
+        watchSlidesProgress: true,
+        loop: true
     });
 }

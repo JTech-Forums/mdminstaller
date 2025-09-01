@@ -798,7 +798,7 @@ body {
     color: var(--text-primary);
     padding: 0.75rem 1rem;
     font-family: 'Courier New', monospace;
-    font-size: 0.875rem;
+    font-siez: 0.875rem;
 }
 
 .command-input::placeholder {
@@ -870,7 +870,7 @@ body {
     margin-bottom: 1.5rem;
 }
 
-.history-list {
+.history-.list {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.25rem;
@@ -899,4 +899,9 @@ body {
     padding: 0;
     font-family: 'Courier New', monospace;
     font-size: 0.875rem;
+}
+
+.install-card {
+    padding-top: 0;
+    padding-bottom: 0;
 }
