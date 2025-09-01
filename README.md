@@ -86,12 +86,14 @@ npm run serve-https
 jtechmdminstaller/
 ├── template.html        # HTML template served by the server
 ├── css/
-│   └── styles.css      # Styling
+│   ├── styles.css       # Core styling
+│   └── cards.css        # Styles for app cards carousel
 ├── js/
-│   ├── app.js          # Main application logic
-│   ├── adb-connection.js   # WebUSB/ADB connection handling
-│   ├── apk-installer.js    # APK installation logic
-│   └── ui-manager.js       # UI updates and notifications
+│   ├── apps.js          # Main application logic
+│   ├── connections.js   # WebUSB/ADB connection handling
+│   ├── apk-installer.js # APK installation logic
+│   ├── cards.js         # UI rendering for app cards
+│   └── ui-manager.js    # UI updates and notifications
 └── .github/
     └── workflows/
         └── deploy.yml  # GitHub Pages deployment
