@@ -140,9 +140,9 @@ body {
     background-clip: text;
 }
 
-/* ensure swiper cards can fully display within the install card */
+/* ensure swiper cards stay within the install card bounds */
 .install-card {
-    overflow: visible;
+    overflow: hidden;
 }
 
 /* Device Status */
