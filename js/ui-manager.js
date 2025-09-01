@@ -320,7 +320,7 @@ export class UIManager {
         this.log(message, 'success');
     }
 
-    showWarning(message) {
+    showWarning(message, persist = false) {
         // Create warning notification
         const notification = document.createElement('div');
         notification.className = 'warning-notification';
@@ -338,7 +338,7 @@ export class UIManager {
             animation: slideIn 0.3s ease-out;
             border: 1px solid var(--border-color);
         `;
-        
+
         notification.innerHTML = `
             <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -352,16 +352,29 @@ export class UIManager {
 
         document.body.appendChild(notification);
 
-        // Auto-remove after 4 seconds
-        setTimeout(() => {
+        if (!persist) {
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // Also log the warning
+        this.log(message, 'warning');
+
+        return notification;
+    }
+
+    dismissNotification(notification) {
+        if (notification) {
             notification.style.animation = 'slideIn 0.3s ease-out reverse';
             setTimeout(() => {
                 notification.remove();
             }, 300);
-        }, 4000);
-
-        // Also log the warning
-        this.log(message, 'warning');
+        }
     }
 
     toggleLoadingState(element, loading = true) {

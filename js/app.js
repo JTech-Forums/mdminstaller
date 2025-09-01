@@ -184,7 +184,7 @@ class JTechMDMInstaller {
                 // Connect
                 this.uiManager.log('Requesting USB device access...', 'info');
                 this.uiManager.log('Please select your Android device from the browser prompt', 'info');
-                this.device = await this.adbConnection.connect();
+                this.device = await this.adbConnection.connect(this.uiManager);
                 
                 if (this.device) {
                     // Link the ADB connection to the APK installer
