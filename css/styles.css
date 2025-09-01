@@ -40,6 +40,7 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
+    overflow-x: hidden; /* Prevent horizontal scrollbar from showing */
 }
 
 .container {
@@ -137,6 +138,11 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+/* ensure swiper cards can fully display within the install card */
+.install-card {
+    overflow: visible;
 }
 
 /* Device Status */
