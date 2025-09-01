@@ -126,6 +126,39 @@
                     <div class="log-output" id="logOutput"></div>
                 </div>
             </div>
+
+            <!-- ADB Console Card -->
+            <div class="card console-card hidden" id="consoleCard">
+                <h2>ADB Console</h2>
+                <p class="card-description">Execute ADB shell commands directly on the connected device</p>
+                
+                <div class="command-input-container">
+                    <div class="input-group">
+                        <span class="input-prefix">adb shell</span>
+                        <input type="text" id="commandInput" class="command-input" placeholder="Enter ADB command..." autocomplete="off">
+                        <button class="btn btn-primary" id="executeBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5,3 19,12 5,21"></polygon>
+                            </svg>
+                            Execute
+                        </button>
+                    </div>
+                </div>
+
+                <div class="command-history hidden" id="commandHistory">
+                    <h3>Command History</h3>
+                    <div class="history-list" id="historyList"></div>
+                </div>
+
+                <div class="console-output-container">
+                    <h3>Console Output</h3>
+                    <div class="console-output" id="consoleOutput"></div>
+                    <div class="console-actions">
+                        <button class="btn btn-small btn-secondary" id="clearConsoleBtn">Clear Output</button>
+                        <button class="btn btn-small btn-secondary" id="downloadConsoleBtn">Download Output</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 

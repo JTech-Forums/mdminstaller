@@ -120,13 +120,18 @@ export class AdbConnection {
             // The webadb library expects the command as-is, but some commands need special handling
             let processedCommand = command;
             
-            // Handle dpm commands specifically - remove outer quotes and escape inner ones
-            if (command.includes('dpm set-device-owner') && command.includes('"')) {
-                // Extract the component name from quotes
-                const match = command.match(/dpm set-device-owner ["']([^"']+)["']/);
+            // Handle dpm commands specifically - they need proper component name formatting
+            if (command.includes('dpm set-device-owner')) {
+                // Extract the component name (with or without quotes)
+                const match = command.match(/dpm set-device-owner\s+(?:["']([^"']+)["']|([^\s]+))/);
                 if (match) {
-                    processedCommand = `dpm set-device-owner ${match[1]}`;
+                    const componentName = match[1] || match[2];
+                    // For dpm commands, we need to properly escape the component name
+                    processedCommand = `dpm set-device-owner '${componentName}'`;
                 }
+            } else if (command.includes('dpm ') && command.includes('/')) {
+                // For other dpm commands with component names, wrap in single quotes
+                processedCommand = command.replace(/([\w.]+\/[\w.]+)/g, "'$1'");
             }
             
             console.log(`Processed command: ${processedCommand}`);

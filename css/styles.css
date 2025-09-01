@@ -675,3 +675,143 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Console Styles */
+.console-card {
+    margin-top: 1.5rem;
+}
+
+.command-input-container {
+    margin-bottom: 1.5rem;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--bg-color);
+}
+
+.input-prefix {
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.75rem 1rem;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    border-right: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.command-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.command-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.console-output-container {
+    margin-top: 1.5rem;
+}
+
+.console-output {
+    background: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.console-entry {
+    margin-bottom: 0.5rem;
+    word-wrap: break-word;
+}
+
+.console-entry.command {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.console-entry.output .output {
+    background: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+    color: var(--text-primary);
+    font-family: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.console-entry.error {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+.console-entry.info {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.timestamp {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.console-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Command History */
+.command-history {
+    margin-bottom: 1.5rem;
+}
+
+.history-list {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.history-item {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-item:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.history-item code {
+    background: transparent;
+    padding: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+}

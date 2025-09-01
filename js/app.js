@@ -10,6 +10,7 @@ class JTechMDMInstaller {
         this.device = null;
         this.apkQueue = [];
         this.availableApks = [];
+        this.commandHistory = [];
     }
 
     async init() {
@@ -61,6 +62,16 @@ class JTechMDMInstaller {
         // Queue management
         document.getElementById('clearQueueBtn')?.addEventListener('click', () => this.clearQueue());
         document.getElementById('installBtn')?.addEventListener('click', () => this.installApks());
+        
+        // ADB Console
+        document.getElementById('executeBtn')?.addEventListener('click', () => this.executeCommand());
+        document.getElementById('commandInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.executeCommand();
+            if (e.key === 'ArrowUp') this.showPreviousCommand();
+            if (e.key === 'ArrowDown') this.showNextCommand();
+        });
+        document.getElementById('clearConsoleBtn')?.addEventListener('click', () => this.clearConsole());
+        document.getElementById('downloadConsoleBtn')?.addEventListener('click', () => this.downloadConsoleOutput());
 
         // Modals
         document.getElementById('helpBtn')?.addEventListener('click', () => {
@@ -108,6 +119,7 @@ class JTechMDMInstaller {
                 `;
                 btn.disabled = false;
                 document.getElementById('installCard').classList.add('hidden');
+                document.getElementById('consoleCard').classList.add('hidden');
             } else {
                 // Connect
                 this.uiManager.log('Requesting USB device access...', 'info');
@@ -132,6 +144,7 @@ class JTechMDMInstaller {
                     `;
                     btn.disabled = false;
                     document.getElementById('installCard').classList.remove('hidden');
+                    document.getElementById('consoleCard').classList.remove('hidden');
                     this.uiManager.log('Device connected and ready', 'success');
                 }
             }
@@ -368,14 +381,28 @@ class JTechMDMInstaller {
                     if (apk.postInstallCommands && apk.postInstallCommands.length > 0) {
                         this.uiManager.log(`Executing post-install commands for ${apk.name}...`, 'info');
                         
+                        // Wait a bit for the app to fully register after installation
+                        this.uiManager.log('Waiting for app components to register...', 'info');
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
                         for (const command of apk.postInstallCommands) {
                             if (command.trim()) {
                                 try {
+                                    // Add extra delay for device admin commands
+                                    if (command.includes('dpm set-device-owner') || command.includes('device-admin')) {
+                                        this.uiManager.log('Device admin command detected - waiting for component registration...', 'info');
+                                        await new Promise(resolve => setTimeout(resolve, 3000));
+                                    }
+                                    
                                     this.uiManager.log(`Running: ${command}`, 'info');
                                     const result = await this.adbConnection.executeShellCommand(command);
                                     if (result.trim()) {
                                         this.uiManager.log(`Command output: ${result.trim()}`, 'info');
                                     }
+                                    
+                                    // Small delay between commands
+                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                    
                                 } catch (cmdError) {
                                     this.uiManager.log(`Command failed: ${command} - ${cmdError.message}`, 'warning');
                                 }
@@ -415,6 +442,177 @@ class JTechMDMInstaller {
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    async executeCommand() {
+        const commandInput = document.getElementById('commandInput');
+        const command = commandInput.value.trim();
+        
+        if (!command) {
+            return;
+        }
+
+        if (!this.device) {
+            this.logToConsole('ERROR: No device connected', 'error');
+            return;
+        }
+
+        const executeBtn = document.getElementById('executeBtn');
+        executeBtn.disabled = true;
+        executeBtn.innerHTML = `
+            <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+            </svg>
+            Running...
+        `;
+
+        try {
+            // Add to command history
+            this.commandHistory.push(command);
+            this.currentHistoryIndex = this.commandHistory.length;
+            
+            // Log the command being executed
+            this.logToConsole(`$ adb shell ${command}`, 'command');
+            
+            // Execute the command
+            const result = await this.adbConnection.executeShellCommand(command);
+            
+            // Log the result
+            if (result.trim()) {
+                this.logToConsole(result, 'output');
+            } else {
+                this.logToConsole('(no output)', 'info');
+            }
+            
+            // Update history display
+            this.updateCommandHistory();
+            
+        } catch (error) {
+            this.logToConsole(`ERROR: ${error.message}`, 'error');
+        }
+
+        // Reset button
+        executeBtn.disabled = false;
+        executeBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5,3 19,12 5,21"></polygon>
+            </svg>
+            Execute
+        `;
+
+        // Clear input
+        commandInput.value = '';
+    }
+
+    logToConsole(message, type = 'info') {
+        const consoleOutput = document.getElementById('consoleOutput');
+        if (!consoleOutput) return;
+
+        const timestamp = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = `console-entry ${type}`;
+        
+        if (type === 'command') {
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="command">${message}</span>`;
+        } else if (type === 'output') {
+            entry.innerHTML = `<pre class="output">${message}</pre>`;
+        } else {
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>`;
+        }
+        
+        consoleOutput.appendChild(entry);
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+
+    showPreviousCommand() {
+        if (this.commandHistory.length === 0) return;
+        
+        if (this.currentHistoryIndex > 0) {
+            this.currentHistoryIndex--;
+        }
+        
+        document.getElementById('commandInput').value = this.commandHistory[this.currentHistoryIndex] || '';
+    }
+
+    showNextCommand() {
+        if (this.commandHistory.length === 0) return;
+        
+        if (this.currentHistoryIndex < this.commandHistory.length - 1) {
+            this.currentHistoryIndex++;
+            document.getElementById('commandInput').value = this.commandHistory[this.currentHistoryIndex];
+        } else {
+            this.currentHistoryIndex = this.commandHistory.length;
+            document.getElementById('commandInput').value = '';
+        }
+    }
+
+    updateCommandHistory() {
+        const historyList = document.getElementById('historyList');
+        const historySection = document.getElementById('commandHistory');
+        
+        if (this.commandHistory.length > 0) {
+            historySection.classList.remove('hidden');
+            
+            historyList.innerHTML = this.commandHistory
+                .slice(-10) // Show last 10 commands
+                .reverse()
+                .map((cmd, index) => `
+                    <div class="history-item" onclick="document.getElementById('commandInput').value='${cmd.replace(/'/g, "\\'")}'; document.getElementById('commandInput').focus();">
+                        <code>${cmd}</code>
+                    </div>
+                `).join('');
+        }
+    }
+
+    clearConsole() {
+        const consoleOutput = document.getElementById('consoleOutput');
+        if (consoleOutput) {
+            consoleOutput.innerHTML = '';
+        }
+    }
+
+    downloadConsoleOutput() {
+        const consoleOutput = document.getElementById('consoleOutput');
+        if (!consoleOutput || consoleOutput.children.length === 0) {
+            this.uiManager.showWarning('No console output to download');
+            return;
+        }
+        
+        const content = Array.from(consoleOutput.children)
+            .map(entry => entry.textContent)
+            .join('\n');
+        
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `adb-console-output-${timestamp}.txt`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        this.uiManager.showSuccess('Console output downloaded');
+    }
+
+    async executeRawCommand(command) {
+        // Execute command without any quote processing - exactly as written in text file
+        if (!this.adbConnection || !this.adbConnection.adb) {
+            throw new Error('No device connected');
+        }
+
+        try {
+            const shell = await this.adbConnection.adb.shell(command);
+            const output = await this.adbConnection.receiveAll(shell);
+            await shell.close();
+            return output;
+        } catch (error) {
+            throw new Error(`Failed to execute command: ${error.message}`);
+        }
     }
 }
 
