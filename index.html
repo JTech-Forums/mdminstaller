@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JTech MDM Installer - Android Device Management</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>JTech MDM Installer</h1>
+                <span class="tagline">Enterprise Android Device Management</span>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn" id="helpBtn">Help</button>
+                <button class="nav-btn" id="aboutBtn">About</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Connection Status Card -->
+            <div class="card status-card">
+                <h2>Device Connection</h2>
+                <div class="device-status" id="deviceStatus">
+                    <div class="status-icon disconnected">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="status-info">
+                        <h3 id="statusTitle">No Device Connected</h3>
+                        <p id="statusMessage">Connect your Android device via USB to begin</p>
+                        <div id="deviceInfo" class="device-info hidden">
+                            <span class="info-item">Model: <strong id="deviceModel">-</strong></span>
+                            <span class="info-item">Android: <strong id="androidVersion">-</strong></span>
+                            <span class="info-item">Serial: <strong id="deviceSerial">-</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="connectBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                    </svg>
+                    Connect Device
+                </button>
+            </div>
+
+            <!-- APK Installation Card -->
+            <div class="card install-card" id="installCard">
+                <h2>Install MDM Applications</h2>
+                
+                <!-- Pre-configured MDM APKs -->
+                <div class="mdm-apps">
+                    <h3>Quick Install</h3>
+                    <div class="app-grid" id="presetApps">
+                        <button class="app-item" data-apk="workspace-one">
+                            <div class="app-icon">WS1</div>
+                            <span>Workspace ONE</span>
+                        </button>
+                        <button class="app-item" data-apk="intune">
+                            <div class="app-icon">MS</div>
+                            <span>Microsoft Intune</span>
+                        </button>
+                        <button class="app-item" data-apk="meraki">
+                            <div class="app-icon">SM</div>
+                            <span>Meraki SM</span>
+                        </button>
+                        <button class="app-item" data-apk="custom">
+                            <div class="app-icon">+</div>
+                            <span>Custom APK</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom APK Upload -->
+                <div class="upload-section hidden" id="uploadSection">
+                    <div class="upload-area" id="uploadArea">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Drop APK files here or click to browse</p>
+                        <input type="file" id="apkInput" accept=".apk" multiple hidden>
+                    </div>
+                </div>
+
+                <!-- APK Queue -->
+                <div class="apk-queue hidden" id="apkQueue">
+                    <h3>Installation Queue</h3>
+                    <div class="queue-list" id="queueList"></div>
+                    <div class="queue-actions">
+                        <button class="btn btn-secondary" id="clearQueueBtn">Clear All</button>
+                        <button class="btn btn-primary" id="installBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 11H5m14 0l-7 7m7-7l-7-7"></path>
+                            </svg>
+                            Install All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Card -->
+            <div class="card progress-card hidden" id="progressCard">
+                <h2>Installation Progress</h2>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span id="progressText">Preparing installation...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                </div>
+                <div class="log-container">
+                    <h3>Installation Log</h3>
+                    <div class="log-output" id="logOutput"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Help Modal -->
+    <div class="modal hidden" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>How to Use JTech MDM Installer</h2>
+                <button class="modal-close" id="closeHelpBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ol>
+                    <li>
+                        <strong>Enable Developer Options on your Android device:</strong>
+                        <ul>
+                            <li>Go to Settings → About Phone</li>
+                            <li>Tap "Build Number" 7 times</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Enable USB Debugging:</strong>
+                        <ul>
+                            <li>Go to Settings → Developer Options</li>
+                            <li>Enable "USB Debugging"</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Connect your device:</strong>
+                        <ul>
+                            <li>Connect via USB cable</li>
+                            <li>Click "Connect Device" button</li>
+                            <li>Authorize on your device when prompted</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Install MDM apps:</strong>
+                        <ul>
+                            <li>Select from quick install options or upload custom APKs</li>
+                            <li>Click "Install All" to begin</li>
+                        </ul>
+                    </li>
+                </ol>
+                <div class="warning">
+                    <strong>Note:</strong> This tool requires Chrome or Edge browser with WebUSB support.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal hidden" id="aboutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About JTech MDM Installer</h2>
+                <button class="modal-close" id="closeAboutBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>JTech MDM Installer is a web-based tool for deploying Mobile Device Management solutions to Android devices directly from your browser.</p>
+                <h3>Features</h3>
+                <ul>
+                    <li>Direct USB connection to Android devices</li>
+                    <li>Pre-configured MDM application profiles</li>
+                    <li>Batch APK installation support</li>
+                    <li>Real-time installation progress tracking</li>
+                    <li>No software installation required</li>
+                </ul>
+                <h3>Requirements</h3>
+                <ul>
+                    <li>Chrome or Edge browser (version 61+)</li>
+                    <li>Android device with USB debugging enabled</li>
+                    <li>USB cable for device connection</li>
+                </ul>
+                <p class="footer-text">© 2024 JTech Solutions. Version 1.0.0</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@yume-chan/adb@0.0.23/esm/index.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
