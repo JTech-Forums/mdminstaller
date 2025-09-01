@@ -1,0 +1,117 @@
+/* Styles for the application cards carousel */
+#kitsSwiper {
+  overflow: visible;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+}
+
+.swiper-slide {
+  opacity: 0.55;
+  width: 320px;
+}
+
+.swiper-slide-prev,
+.swiper-slide-next {
+  opacity: 0.85;
+}
+
+.swiper-slide-active {
+  opacity: 1;
+}
+
+.card-modern {
+  background: linear-gradient(180deg, #141a28 0%, #0f172a 100%);
+  color: #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  min-width: 260px;
+  max-width: 300px;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  border: 1px solid rgba(148,163,184,0.12);
+  box-shadow: 0 10px 24px rgba(2,6,23,0.35);
+  transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
+}
+
+.swiper-slide-prev .card-modern,
+.swiper-slide-next .card-modern {
+  filter: brightness(0.88) saturate(0.95);
+}
+
+.swiper-slide-active .card-modern {
+  transform: scale(1.03);
+  box-shadow: 0 16px 36px rgba(99,102,241,0.32);
+}
+
+.app-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-icon img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-top: 6px;
+  border-radius: 14px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+}
+
+.app-title {
+  font-weight: 700;
+  letter-spacing: .2px;
+  margin: 4px 0 8px;
+  color: #e5e7eb;
+}
+
+.action-bar {
+  width: 92%;
+  height: 48px;
+  margin: 16px auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(99,102,241,0.28);
+  background: #0b1221;
+  padding: 0;
+}
+
+.action-bar button {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.install-btn {
+  background: linear-gradient(90deg,#6d66f6,#7c6cf4);
+  color: #fff;
+}
+
+.install-btn:hover {
+  filter: brightness(1.07);
+}
+
+.info-btn {
+  background: rgba(99,102,241,0.10);
+  color: #c7d2fe;
+  border-left: 1px solid rgba(99,102,241,0.28);
+}
+
+.info-btn:hover {
+  background: rgba(99,102,241,0.16);
+}

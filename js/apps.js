@@ -1,7 +1,8 @@
-import { AdbConnection } from './adb-connection.js';
+import { AdbConnection } from './connections.js';
 import { ApkInstaller } from './apk-installer.js';
 import { UIManager } from './ui-manager.js';
 import KITS from './kits.js';
+import { renderKits } from './cards.js';
 
 class JTechMDMInstaller {
     constructor() {
@@ -263,59 +264,15 @@ class JTechMDMInstaller {
     }
 
     renderAvailableApks() {
-        const grid = document.getElementById('kitsGrid');
-        if (!grid) return;
+        if (this.swiper) {
+            this.swiper.destroy(true, true);
+            this.swiper = null;
+        }
 
-        grid.innerHTML = '';
-
-        this.availableApks.forEach((apk) => {
-            const slide = document.createElement('div');
-            slide.className = 'swiper-slide';
-            slide.innerHTML = `
-                <div class="app-item card-modern">
-                    <div class="app-icon">
-                        ${apk.image ? `<img src="${apk.image}" alt="${apk.title}">` : ''}
-                    </div>
-                    <span class="app-title">${apk.title}</span>
-                    <div class="action-bar">
-                        <button class="install-btn">Install</button>
-                        <button class="info-btn">View Info</button>
-                    </div>
-                </div>
-            `;
-
-            slide.querySelector('.install-btn')?.addEventListener('click', () => this.installKit(apk));
-            slide.querySelector('.info-btn')?.addEventListener('click', () => window.open(apk.infoUrl, '_blank'));
-
-            grid.appendChild(slide);
+        this.swiper = renderKits(this.availableApks, {
+            onInstall: (apk) => this.installKit(apk),
+            onInfo: (apk) => window.open(apk.infoUrl, '_blank')
         });
-
-        if (this.swiper) this.swiper.destroy(true, true);
-
-        const startIndex = this.availableApks.findIndex(a => a.key === 'MBsmart' || a.name === 'MBsmart');
-
-this.swiper = new Swiper('#kitsSwiper', {
-  effect: 'coverflow',
-  grabCursor: true,
-  centeredSlides: true,
-  slidesPerView: 'auto',
-  slideToClickedSlide: true,
-  spaceBetween: 40,
-  slidesOffsetBefore: 60,   // was 100
-  slidesOffsetAfter: 60,    // was 100
-  initialSlide: startIndex >= 0 ? startIndex : 0,
-  coverflowEffect: {
-    rotate: 8,
-    stretch: 0,
-    depth: 160,
-    modifier: 1,
-    slideShadows: false
-  },
-  watchSlidesProgress: true
-});
-
-
-
     }
 
     getPresetApkInfo(type) {
@@ -741,117 +698,6 @@ this.swiper = new Swiper('#kitsSwiper', {
     }
 }
 
-/* ----------- In-between balanced styles (taller, split actions, edge fade) ---------- */
-const style = document.createElement('style');
-style.textContent = `
-/* Wider inner window + allow overhangs to show */
-#kitsSwiper {
-  overflow: visible;
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-}
-
-
-/* Slightly wider slide to fit the bigger pill cleanly */
-.swiper-slide{ opacity: 0.55; width: 320px; }   /* was 280px */
-
-/* Card dimensions to match the slide */
-.card-modern{
-  max-width: 320px;              /* was 300px */
-  min-height: 380px;             /* a touch taller */
-}
-
-
-
-/* Base slide opacity; neighbors darker; center bright */
-.swiper-slide { opacity: 0.55; width: 300px; }            /* wider -> more vertical presence */
-.swiper-slide-prev, .swiper-slide-next { opacity: 0.85; }
-.swiper-slide-active { opacity: 1; }
-
-/* Card container: darker, taller */
-.card-modern {
-  background: linear-gradient(180deg, #141a28 0%, #0f172a 100%);
-  color: #e5e7eb;
-  border-radius: 16px;
-  padding: 20px;
-  min-width: 260px;
-  max-width: 300px;
-  min-height: 360px;             /* vertical stretch */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-align: center;
-  border: 1px solid rgba(148,163,184,0.12);
-  box-shadow: 0 10px 24px rgba(2,6,23,0.35);
-  transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-}
-
-/* Slightly darken the two neighbors */
-.swiper-slide-prev .card-modern,
-.swiper-slide-next .card-modern {
-  filter: brightness(0.88) saturate(0.95);
-}
-
-/* Center card: gentle lift */
-.swiper-slide-active .card-modern {
-  transform: scale(1.03);
-  box-shadow: 0 16px 36px rgba(99,102,241,0.32);
-}
-
-/* Inner layout */
-.app-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.app-icon img {
-  width: 80px; height: 80px; object-fit: contain; margin-top: 6px;
-  border-radius: 14px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
-}
-.app-title { font-weight: 700; letter-spacing: .2px; margin: 4px 0 8px; color: #e5e7eb; }
-
-/* Bigger, perfectly centered split pill */
-.action-bar{
-  width: 92%;                    /* fills the card nicely */
-  height: 48px;                  /* larger pill */
-  margin: 16px auto 0;           /* centered horizontally, spaced from title */
-  display: grid;
-  grid-template-columns: 1fr 1fr;/* exact halves */
-  align-items: stretch;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(99,102,241,0.28);
-  background: #0b1221;
-  padding: 0;                    /* ensure buttons fill fully */
-}
-
-.action-bar button{
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 0.95rem;
-  border: 0;
-  margin: 0;                     /* remove any UA offsets */
-  cursor: pointer;
-  line-height: 1;                /* no text clipping */
-}
-
-/* Left half: solid gradient, fully filled */
-.install-btn{
-  background: linear-gradient(90deg,#6d66f6,#7c6cf4);
-  color: #fff;
-}
-.install-btn:hover{ filter: brightness(1.07); }
-
-/* Right half */
-.info-btn{
-  background: rgba(99,102,241,0.10);
-  color: #c7d2fe;
-  border-left: 1px solid rgba(99,102,241,0.28);
-}
-.info-btn:hover{ background: rgba(99,102,241,0.16); }
-
-`;
-document.head.appendChild(style);
 
 /* ---------- Initialize app when DOM is ready ---------- */
 document.addEventListener('DOMContentLoaded', async () => {
