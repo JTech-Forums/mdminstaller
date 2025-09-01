@@ -175,6 +175,10 @@ class JTechMDMInstaller {
                 const consoleCard = document.getElementById('consoleCard');
                 if (installCard) installCard.classList.add('hidden');
                 if (consoleCard) consoleCard.classList.add('hidden');
+                if (this.glide) {
+                    this.glide.destroy();
+                    this.glide = null;
+                }
             } else {
                 // Connect
                 this.uiManager.log('Requesting USB device access...', 'info');
@@ -202,6 +206,7 @@ class JTechMDMInstaller {
                     const consoleCard = document.getElementById('consoleCard');
                     if (installCard) installCard.classList.remove('hidden');
                     if (consoleCard) consoleCard.classList.remove('hidden');
+                    this.renderAvailableApks();
                     this.uiManager.log('Device connected and ready', 'success');
                 }
             }
@@ -233,9 +238,8 @@ class JTechMDMInstaller {
         try {
             const response = await fetch('/api/apks');
             const apks = await response.json();
-            
+
             this.availableApks = apks;
-            this.renderAvailableApks();
         } catch (error) {
             console.error('Failed to load APKs:', error);
             this.uiManager.log('Failed to load APK files from server', 'warning');
@@ -249,7 +253,9 @@ class JTechMDMInstaller {
 
         grid.innerHTML = '';
 
-        this.availableApks.forEach((apk) => {
+
+        this.availableApks.slice(0, 5).forEach((apk) => {
+
             const slide = document.createElement('li');
             slide.className = 'glide__slide';
             slide.innerHTML = `
