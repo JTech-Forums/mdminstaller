@@ -252,7 +252,8 @@ class JTechMDMInstaller {
                     ...kit,
                     title: kit.title || apk.name,
                     infoUrl: kit.infoUrl || '#',
-                    key: kit.key || apk.name
+                    key: kit.key || apk.name,
+                    image: kit.image ? `/apk/${kit.key}/${kit.image}` : apk.image
                 };
             });
         } catch (error) {
@@ -296,13 +297,14 @@ class JTechMDMInstaller {
             this.swiper.destroy(true, true);
         }
 
-        const startIndex = this.availableApks.findIndex(a => a.key === 'TripleUMDM' || a.name === 'TripleUMDM');
+        const startIndex = this.availableApks.findIndex(a => a.key === 'MBsmart' || a.name === 'MBsmart');
 
         this.swiper = new Swiper('#kitsSwiper', {
             effect: 'coverflow',
             grabCursor: true,
             centeredSlides: true,
             slidesPerView: 'auto',
+            slideToClickedSlide: true,
             initialSlide: startIndex >= 0 ? startIndex : 0,
             coverflowEffect: {
                 rotate: 50,
