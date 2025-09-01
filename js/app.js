@@ -281,9 +281,29 @@ class JTechMDMInstaller {
             type: 'carousel',
             perView: 5,
             focusAt: 'center',
-            gap: 24
+            gap: 24,
+            animationDuration: 800,
+            animationTimingFunc: 'cubic-bezier(0.25, 0.8, 0.25, 1)'
         });
+
+        this.glide.on(['mount.after', 'run.after'], () => this.updateCarousel3D());
         this.glide.mount();
+        this.updateCarousel3D();
+    }
+
+    updateCarousel3D() {
+        if (!this.glide) return;
+        const slides = Array.from(document.querySelectorAll('#kitsGrid .glide__slide'));
+        const center = this.glide.index;
+        const total = slides.length;
+
+        slides.forEach(slide => slide.classList.remove('center', 'prev', 'next', 'prev2', 'next2'));
+
+        slides[center]?.classList.add('center');
+        slides[(center - 1 + total) % total]?.classList.add('prev');
+        slides[(center + 1) % total]?.classList.add('next');
+        slides[(center - 2 + total) % total]?.classList.add('prev2');
+        slides[(center + 2) % total]?.classList.add('next2');
     }
 
     getPresetApkInfo(type) {
