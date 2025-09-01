@@ -1,0 +1,2 @@
+dpm set-device-owner com.oss.egate/.a
+pm grant com.oss.egate android.permission.WRITE_SECURE_SETTINGS

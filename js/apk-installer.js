@@ -1,145 +1,128 @@
 export class ApkInstaller {
     constructor() {
         this.installPath = '/data/local/tmp/';
+        this.adbConnection = null;
+    }
+
+    setAdbConnection(connection) {
+        this.adbConnection = connection;
     }
 
     async installFromFile(device, apkFile) {
+        if (!this.adbConnection || !this.adbConnection.isConnected()) {
+            throw new Error('No ADB connection available');
+        }
+
         try {
             // Validate APK file
             if (!apkFile.name.toLowerCase().endsWith('.apk')) {
                 throw new Error('Invalid file type. Please select an APK file.');
             }
 
-            // Generate temp filename
-            const tempFileName = `temp_${Date.now()}.apk`;
-            const remotePath = this.installPath + tempFileName;
-
-            // Read file
-            const fileBuffer = await this.readFile(apkFile);
+            console.log(`Installing APK: ${apkFile.name}`);
             
-            // Push APK to device
-            console.log(`Pushing APK to device: ${remotePath}`);
-            await this.pushToDevice(device, fileBuffer, remotePath);
-
-            // Install APK using pm install
-            console.log('Installing APK...');
-            const installResult = await this.installApk(device, remotePath);
-
-            // Clean up temp file
-            await this.cleanupTempFile(device, remotePath);
-
-            return installResult;
+            // Use the ADB connection's installApk method which handles everything
+            const result = await this.adbConnection.installApk(apkFile);
+            
+            return result;
         } catch (error) {
             console.error('Installation error:', error);
-            throw error;
+            
+            // Parse and provide user-friendly error messages
+            const friendlyError = this.parseInstallError(error.message);
+            throw new Error(friendlyError);
         }
     }
 
-    async readFile(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = reject;
-            reader.readAsArrayBuffer(file);
-        });
-    }
-
-    async pushToDevice(device, fileBuffer, remotePath) {
-        // This is a simplified version
-        // Real implementation would use ADB sync protocol
-        
-        // Convert ArrayBuffer to Uint8Array
-        const data = new Uint8Array(fileBuffer);
-        
-        // In a real implementation:
-        // 1. Open sync service: "sync:"
-        // 2. Send SEND command with path and mode
-        // 3. Send file data in chunks
-        // 4. Send DONE with timestamp
-        
-        console.log(`File size: ${data.length} bytes`);
-        console.log(`Target path: ${remotePath}`);
-        
-        // Simulate push progress
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('File pushed successfully');
-                resolve(true);
-            }, 1000);
-        });
-    }
-
-    async installApk(device, apkPath) {
-        // Execute pm install command
-        const command = `pm install -r -t ${apkPath}`;
-        
-        // In real implementation, this would:
-        // 1. Open shell service
-        // 2. Execute pm install command
-        // 3. Parse output for success/failure
-        
-        console.log(`Executing: ${command}`);
-        
-        // Simulate installation
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                // Check for common installation errors
-                const random = Math.random();
-                if (random > 0.9) {
-                    reject(new Error('INSTALL_FAILED_INSUFFICIENT_STORAGE'));
-                } else if (random > 0.8) {
-                    reject(new Error('INSTALL_FAILED_VERSION_DOWNGRADE'));
-                } else {
-                    console.log('Package installed successfully');
-                    resolve({
-                        success: true,
-                        message: 'Success'
-                    });
-                }
-            }, 2000);
-        });
-    }
-
-    async cleanupTempFile(device, filePath) {
-        const command = `rm ${filePath}`;
-        console.log(`Cleaning up: ${command}`);
-        
-        // Execute rm command to remove temp file
-        return true;
-    }
-
     async getInstalledPackages(device) {
-        // List installed packages
-        const command = 'pm list packages';
-        
-        // This would execute the command and parse output
-        // Format: package:com.example.app
-        
-        return [];
+        if (!this.adbConnection || !this.adbConnection.isConnected()) {
+            throw new Error('No ADB connection available');
+        }
+
+        try {
+            const result = await this.adbConnection.executeShellCommand('pm list packages');
+            
+            // Parse the output (format: package:com.example.app)
+            const packages = result
+                .split('\n')
+                .filter(line => line.startsWith('package:'))
+                .map(line => line.replace('package:', '').trim());
+                
+            return packages;
+        } catch (error) {
+            console.error('Error getting installed packages:', error);
+            return [];
+        }
     }
 
     async uninstallPackage(device, packageName) {
-        const command = `pm uninstall ${packageName}`;
-        console.log(`Executing: ${command}`);
-        
-        // Execute uninstall command
-        return true;
+        if (!this.adbConnection || !this.adbConnection.isConnected()) {
+            throw new Error('No ADB connection available');
+        }
+
+        try {
+            const command = `pm uninstall ${packageName}`;
+            console.log(`Executing: ${command}`);
+            
+            const result = await this.adbConnection.executeShellCommand(command);
+            
+            if (result.includes('Success')) {
+                return {
+                    success: true,
+                    message: 'Package uninstalled successfully'
+                };
+            } else {
+                throw new Error(result);
+            }
+        } catch (error) {
+            console.error('Uninstall error:', error);
+            throw new Error(`Failed to uninstall package: ${error.message}`);
+        }
     }
 
     async getPackageInfo(device, packageName) {
-        const command = `dumpsys package ${packageName}`;
-        
-        // This would parse package info including:
-        // - Version
-        // - Permissions
-        // - Install date
-        // - Size
-        
-        return {
-            package: packageName,
-            version: 'Unknown',
-            permissions: []
-        };
+        if (!this.adbConnection || !this.adbConnection.isConnected()) {
+            throw new Error('No ADB connection available');
+        }
+
+        try {
+            const command = `dumpsys package ${packageName} | grep -E "versionName|versionCode|firstInstallTime"`;
+            const result = await this.adbConnection.executeShellCommand(command);
+            
+            // Parse the output to extract version info
+            const versionMatch = result.match(/versionName=([\S]+)/);
+            const versionCodeMatch = result.match(/versionCode=(\d+)/);
+            const installTimeMatch = result.match(/firstInstallTime=(.*)/);
+            
+            return {
+                package: packageName,
+                version: versionMatch ? versionMatch[1] : 'Unknown',
+                versionCode: versionCodeMatch ? versionCodeMatch[1] : 'Unknown',
+                installTime: installTimeMatch ? installTimeMatch[1] : 'Unknown'
+            };
+        } catch (error) {
+            console.error('Error getting package info:', error);
+            return {
+                package: packageName,
+                version: 'Unknown',
+                versionCode: 'Unknown',
+                installTime: 'Unknown'
+            };
+        }
+    }
+
+    async checkPackageInstalled(packageName) {
+        if (!this.adbConnection || !this.adbConnection.isConnected()) {
+            throw new Error('No ADB connection available');
+        }
+
+        try {
+            const result = await this.adbConnection.executeShellCommand(`pm list packages | grep ${packageName}`);
+            return result.includes(packageName);
+        } catch (error) {
+            console.error('Error checking package:', error);
+            return false;
+        }
     }
 
     parseInstallError(error) {
@@ -154,7 +137,17 @@ export class ApkInstaller {
             'INSTALL_FAILED_CPU_ABI_INCOMPATIBLE': 'App not compatible with device CPU',
             'INSTALL_FAILED_OLDER_SDK': 'App requires newer Android version',
             'INSTALL_FAILED_TEST_ONLY': 'App is marked as test-only',
-            'INSTALL_FAILED_INVALID_APK': 'Invalid or corrupted APK file'
+            'INSTALL_FAILED_INVALID_APK': 'Invalid or corrupted APK file',
+            'INSTALL_FAILED_CONFLICTING_PROVIDER': 'Conflicting content provider',
+            'INSTALL_FAILED_NEWER_SDK': 'App requires older Android version',
+            'INSTALL_FAILED_DEXOPT': 'Failed to optimize dex file',
+            'INSTALL_FAILED_CONTAINER_ERROR': 'Secure container mount error',
+            'INSTALL_FAILED_INVALID_INSTALL_LOCATION': 'Invalid installation location',
+            'INSTALL_FAILED_MEDIA_UNAVAILABLE': 'External media is not available',
+            'INSTALL_FAILED_INTERNAL_ERROR': 'Internal system error',
+            'INSTALL_FAILED_USER_RESTRICTED': 'User is restricted from installing apps',
+            'INSTALL_FAILED_DUPLICATE_PERMISSION': 'Duplicate custom permission',
+            'INSTALL_FAILED_NO_MATCHING_ABIS': 'No compatible CPU architecture'
         };
 
         for (const [key, message] of Object.entries(errorMap)) {
@@ -163,6 +156,16 @@ export class ApkInstaller {
             }
         }
 
-        return 'Installation failed: ' + error;
+        // Check for permission errors
+        if (error.includes('Permission denied') || error.includes('permission')) {
+            return 'Permission denied. Please ensure USB debugging is properly authorized.';
+        }
+
+        // Check for connection errors
+        if (error.includes('device offline') || error.includes('device not found')) {
+            return 'Device is offline or disconnected. Please reconnect and try again.';
+        }
+
+        return error || 'Installation failed for unknown reason';
     }
 }

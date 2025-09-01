@@ -9,13 +9,14 @@ class JTechMDMInstaller {
         this.uiManager = new UIManager();
         this.device = null;
         this.apkQueue = [];
-        this.init();
+        this.availableApks = [];
     }
 
-    init() {
+    async init() {
         this.setupEventListeners();
         this.checkWebUSBSupport();
         this.uiManager.updateConnectionStatus('disconnected');
+        await this.loadAvailableApks();
     }
 
     checkWebUSBSupport() {
@@ -97,22 +98,41 @@ class JTechMDMInstaller {
                 // Disconnect
                 await this.adbConnection.disconnect();
                 this.device = null;
+                this.apkInstaller.setAdbConnection(null);
                 this.uiManager.updateConnectionStatus('disconnected');
-                btn.textContent = 'Connect Device';
+                btn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                    </svg>
+                    Connect Device
+                `;
                 btn.disabled = false;
                 document.getElementById('installCard').classList.add('hidden');
             } else {
                 // Connect
                 this.uiManager.log('Requesting USB device access...', 'info');
+                this.uiManager.log('Please select your Android device from the browser prompt', 'info');
                 this.device = await this.adbConnection.connect();
                 
                 if (this.device) {
+                    // Link the ADB connection to the APK installer
+                    this.apkInstaller.setAdbConnection(this.adbConnection);
+                    
+                    this.uiManager.log('Device connected. Getting device information...', 'info');
+                    this.uiManager.log('If prompted on your device, tap "Allow" to authorize this computer', 'warning');
+                    
                     const deviceInfo = await this.adbConnection.getDeviceInfo();
                     this.uiManager.updateConnectionStatus('connected', deviceInfo);
-                    btn.textContent = 'Disconnect';
+                    btn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                            <line x1="12" y1="2" x2="12" y2="12"></line>
+                        </svg>
+                        Disconnect
+                    `;
                     btn.disabled = false;
                     document.getElementById('installCard').classList.remove('hidden');
-                    this.uiManager.log('Device connected successfully', 'success');
+                    this.uiManager.log('Device connected and ready', 'success');
                 }
             }
         } catch (error) {
@@ -139,29 +159,81 @@ class JTechMDMInstaller {
         }
     }
 
-    getPresetApkInfo(type) {
-        const presets = {
-            'workspace-one': {
-                name: 'VMware Workspace ONE',
-                package: 'com.airwatch.androidagent',
-                url: 'https://play.google.com/store/apps/details?id=com.airwatch.androidagent',
-                size: '45.2 MB'
-            },
-            'intune': {
-                name: 'Microsoft Intune Company Portal',
-                package: 'com.microsoft.windowsintune.companyportal',
-                url: 'https://play.google.com/store/apps/details?id=com.microsoft.windowsintune.companyportal',
-                size: '38.7 MB'
-            },
-            'meraki': {
-                name: 'Cisco Meraki Systems Manager',
-                package: 'com.meraki.sm',
-                url: 'https://play.google.com/store/apps/details?id=com.meraki.sm',
-                size: '28.5 MB'
-            }
-        };
+    async loadAvailableApks() {
+        try {
+            const response = await fetch('/api/apks');
+            const apks = await response.json();
+            
+            this.availableApks = apks;
+            this.updateApkButtons();
+        } catch (error) {
+            console.error('Failed to load APKs:', error);
+            this.uiManager.log('Failed to load APK files from server', 'warning');
+            this.availableApks = [];
+        }
+    }
 
-        return presets[type] || null;
+    updateApkButtons() {
+        const apkButtonsContainer = document.querySelector('.app-grid');
+        
+        // Clear existing buttons except custom upload
+        const existingButtons = apkButtonsContainer.querySelectorAll('.app-item:not([data-apk="custom"])');
+        existingButtons.forEach(btn => btn.remove());
+        
+        // Add buttons for each APK file
+        this.availableApks.forEach((apk, index) => {
+            const button = document.createElement('button');
+            button.className = 'app-item';
+            button.dataset.apk = `file-${index}`;
+            
+            // Show indicator if APK has post-install commands
+            const hasCommands = apk.postInstallCommands && apk.postInstallCommands.length > 0;
+            const commandIndicator = hasCommands ? '<span class="command-indicator" title="Has post-install commands">⚙️</span>' : '';
+            
+            button.innerHTML = `
+                <div class="app-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                    </svg>
+                    ${commandIndicator}
+                </div>
+                <div class="app-info">
+                    <h3>${apk.name.replace('.apk', '')}</h3>
+                    <p>${this.formatFileSize(apk.size)}${hasCommands ? ' • Custom Setup' : ''}</p>
+                </div>
+            `;
+            
+            button.addEventListener('click', (e) => this.handleAppSelection(e));
+            
+            // Insert before the custom upload button
+            const customButton = apkButtonsContainer.querySelector('[data-apk="custom"]');
+            apkButtonsContainer.insertBefore(button, customButton);
+        });
+    }
+
+    getPresetApkInfo(type) {
+        if (type === 'custom') {
+            return null; // Handle custom upload
+        }
+        
+        if (type.startsWith('file-')) {
+            const index = parseInt(type.replace('file-', ''));
+            const apk = this.availableApks[index];
+            
+            if (apk) {
+                return {
+                    name: apk.name.replace('.apk', ''),
+                    file: null, // Will be loaded when needed
+                    apkPath: apk.path,
+                    size: this.formatFileSize(apk.size),
+                    package: 'unknown',
+                    postInstallCommands: apk.postInstallCommands
+                };
+            }
+        }
+        
+        return null;
     }
 
     handleFileSelection(e) {
@@ -275,15 +347,45 @@ class JTechMDMInstaller {
             this.uiManager.log(`Installing ${apk.name}...`, 'info');
 
             try {
-                if (apk.file) {
-                    // Install from file
-                    await this.apkInstaller.installFromFile(this.device, apk.file);
-                } else if (apk.url) {
-                    // For preset APKs, we'd need to download first
-                    this.uiManager.log(`Preset APK installation requires manual download`, 'warning');
-                    this.uiManager.log(`Please download from: ${apk.url}`, 'info');
-                    failCount++;
-                    continue;
+                let fileToInstall = apk.file;
+                
+                // If it's an APK from the folder, fetch it
+                if (apk.apkPath && !apk.file) {
+                    this.uiManager.log(`Loading ${apk.name} from server...`, 'info');
+                    const response = await fetch(apk.apkPath);
+                    if (!response.ok) {
+                        throw new Error(`Failed to load APK file: ${response.statusText}`);
+                    }
+                    const arrayBuffer = await response.arrayBuffer();
+                    fileToInstall = new File([arrayBuffer], apk.name + '.apk', { type: 'application/vnd.android.package-archive' });
+                }
+                
+                if (fileToInstall) {
+                    // Install the APK file
+                    await this.apkInstaller.installFromFile(this.device, fileToInstall);
+                    
+                    // Execute post-install commands if they exist
+                    if (apk.postInstallCommands && apk.postInstallCommands.length > 0) {
+                        this.uiManager.log(`Executing post-install commands for ${apk.name}...`, 'info');
+                        
+                        for (const command of apk.postInstallCommands) {
+                            if (command.trim()) {
+                                try {
+                                    this.uiManager.log(`Running: ${command}`, 'info');
+                                    const result = await this.adbConnection.executeShellCommand(command);
+                                    if (result.trim()) {
+                                        this.uiManager.log(`Command output: ${result.trim()}`, 'info');
+                                    }
+                                } catch (cmdError) {
+                                    this.uiManager.log(`Command failed: ${command} - ${cmdError.message}`, 'warning');
+                                }
+                            }
+                        }
+                        
+                        this.uiManager.log(`Post-install setup completed for ${apk.name}`, 'success');
+                    }
+                } else {
+                    throw new Error('No APK file available for installation');
                 }
                 
                 successCount++;
@@ -300,11 +402,11 @@ class JTechMDMInstaller {
 
         document.getElementById('installBtn').disabled = false;
         
-        // Clear queue after installation
+        // Don't auto-hide progress card or clear logs - user can access them later
+        // Just clear the queue
         setTimeout(() => {
             this.clearQueue();
-            document.getElementById('progressCard').classList.add('hidden');
-        }, 3000);
+        }, 2000);
     }
 
     formatFileSize(bytes) {
@@ -317,6 +419,9 @@ class JTechMDMInstaller {
 }
 
 // Initialize app when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    new JTechMDMInstaller();
+document.addEventListener('DOMContentLoaded', async () => {
+    const app = new JTechMDMInstaller();
+    await app.init();
+    // Make UIManager globally accessible for modal buttons
+    window.uiManager = app.uiManager;
 });
