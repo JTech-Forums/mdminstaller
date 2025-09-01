@@ -56,57 +56,7 @@
             <!-- APK Installation Card -->
             <div class="card install-card" id="installCard">
                 <h2>Install MDM Applications</h2>
-                
-                <!-- Pre-configured MDM APKs -->
-                <div class="mdm-apps">
-                    <h3>Quick Install</h3>
-                    <div class="app-grid" id="presetApps">
-                        <button class="app-item" data-apk="workspace-one">
-                            <div class="app-icon">WS1</div>
-                            <span>Workspace ONE</span>
-                        </button>
-                        <button class="app-item" data-apk="intune">
-                            <div class="app-icon">MS</div>
-                            <span>Microsoft Intune</span>
-                        </button>
-                        <button class="app-item" data-apk="meraki">
-                            <div class="app-icon">SM</div>
-                            <span>Meraki SM</span>
-                        </button>
-                        <button class="app-item" data-apk="custom">
-                            <div class="app-icon">+</div>
-                            <span>Custom APK</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Custom APK Upload -->
-                <div class="upload-section hidden" id="uploadSection">
-                    <div class="upload-area" id="uploadArea">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
-                        <p>Drop APK files here or click to browse</p>
-                        <input type="file" id="apkInput" accept=".apk" multiple hidden>
-                    </div>
-                </div>
-
-                <!-- APK Queue -->
-                <div class="apk-queue hidden" id="apkQueue">
-                    <h3>Installation Queue</h3>
-                    <div class="queue-list" id="queueList"></div>
-                    <div class="queue-actions">
-                        <button class="btn btn-secondary" id="clearQueueBtn">Clear All</button>
-                        <button class="btn btn-primary" id="installBtn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 11H5m14 0l-7 7m7-7l-7-7"></path>
-                            </svg>
-                            Install All
-                        </button>
-                    </div>
-                </div>
+                <div class="app-grid" id="kitsGrid"></div>
             </div>
 
             <!-- Progress Card -->
