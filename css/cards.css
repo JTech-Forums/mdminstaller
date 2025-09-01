@@ -3,11 +3,16 @@
   overflow: visible;
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
   mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+  scrollbar-width: none; /* hide scrollbar in Firefox */
+}
+
+#kitsSwiper::-webkit-scrollbar {
+  display: none; /* hide scrollbar in WebKit browsers */
 }
 
 .swiper-slide {
   opacity: 0.55;
-  width: 320px;
+  width: 300px; /* fit within parent card without clipping */
 }
 
 .swiper-slide-prev,
@@ -24,9 +29,10 @@
   color: #e5e7eb;
   border-radius: 16px;
   padding: 20px;
+  width: 100%;
   min-width: 260px;
   max-width: 300px;
-  min-height: 360px;
+  min-height: 340px; /* slightly shorter to avoid clipping */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -73,10 +79,9 @@
   width: 92%;
   height: 48px;
   margin: 16px auto 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   align-items: stretch;
-  border-radius: 14px;
+  border-radius: 9999px; /* pill shape */
   overflow: hidden;
   border: 1px solid rgba(99,102,241,0.28);
   background: #0b1221;
@@ -84,7 +89,8 @@
 }
 
 .action-bar button {
-  width: 100%;
+  flex: 1;
+  width: auto;
   height: 100%;
   display: flex;
   align-items: center;
