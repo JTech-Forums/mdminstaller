@@ -31,11 +31,6 @@ class JTechMDMInstaller {
         // Connection button
         document.getElementById('connectBtn').addEventListener('click', () => this.handleConnect());
 
-        // MDM app buttons
-        document.querySelectorAll('.app-item').forEach(btn => {
-            btn.addEventListener('click', (e) => this.handleAppSelection(e));
-        });
-
         // File upload
         const uploadArea = document.getElementById('uploadArea');
         const apkInput = document.getElementById('apkInput');
@@ -178,7 +173,7 @@ class JTechMDMInstaller {
             const apks = await response.json();
             
             this.availableApks = apks;
-            this.updateApkButtons();
+            this.renderAvailableApks();
         } catch (error) {
             console.error('Failed to load APKs:', error);
             this.uiManager.log('Failed to load APK files from server', 'warning');
@@ -186,36 +181,26 @@ class JTechMDMInstaller {
         }
     }
 
-    updateApkButtons() {
-        const apkButtonsContainer = document.querySelector('.app-grid');
-        
-        // Clear existing buttons except custom upload
-        const existingButtons = apkButtonsContainer.querySelectorAll('.app-item:not([data-apk="custom"])');
-        existingButtons.forEach(btn => btn.remove());
+    renderAvailableApks() {
+        const grid = document.getElementById('kitsGrid');
+        if (!grid) return;
 
-        // Add buttons for each APK file
-        this.availableApks.forEach((apk, index) => {
-            const button = document.createElement('button');
-            button.className = 'app-item';
-            button.dataset.apk = `file-${index}`;
+        grid.innerHTML = '';
 
-            const hasCommands = apk.postInstallCommands && apk.postInstallCommands.length > 0;
-            const commandIndicator = hasCommands ? '<span class="command-indicator" title="Has post-install commands">⚙️</span>' : '';
-
-            const imageHtml = apk.image ? `<img src="${apk.image}" alt="${apk.name}">` : '';
-
-            button.innerHTML = `
+        this.availableApks.forEach((apk) => {
+            const item = document.createElement('div');
+            item.className = 'app-item';
+            item.innerHTML = `
                 <div class="app-icon">
-                    ${imageHtml}
-                    ${commandIndicator}
+                    ${apk.image ? `<img src="${apk.image}" alt="${apk.name}">` : ''}
                 </div>
                 <span>${apk.name}</span>
+                <button class="btn btn-primary install-btn">Install</button>
             `;
 
-            button.addEventListener('click', (e) => this.handleAppSelection(e));
+            item.querySelector('.install-btn').addEventListener('click', () => this.installKit(apk));
 
-            const customButton = apkButtonsContainer.querySelector('[data-apk="custom"]');
-            apkButtonsContainer.insertBefore(button, customButton);
+            grid.appendChild(item);
         });
     }
 
@@ -428,6 +413,73 @@ class JTechMDMInstaller {
         setTimeout(() => {
             this.clearQueue();
         }, 2000);
+    }
+
+    async installKit(apk) {
+        if (!this.device) {
+            this.uiManager.showError('Please connect a device first');
+            return;
+        }
+
+        document.getElementById('progressCard').classList.remove('hidden');
+        this.uiManager.updateProgress(0, `Installing ${apk.name}...`);
+        this.uiManager.log(`Installing ${apk.name}...`, 'info');
+
+        try {
+            let fileToInstall = apk.file;
+
+            if (apk.url && !apk.file) {
+                this.uiManager.log(`Downloading ${apk.name}...`, 'info');
+                const response = await fetch(apk.url);
+                if (!response.ok) {
+                    throw new Error(`Failed to load APK file: ${response.statusText}`);
+                }
+                const arrayBuffer = await response.arrayBuffer();
+                fileToInstall = new File([arrayBuffer], apk.name + '.apk', { type: 'application/vnd.android.package-archive' });
+            }
+
+            if (!fileToInstall) {
+                throw new Error('No APK file available for installation');
+            }
+
+            await this.apkInstaller.installFromFile(this.device, fileToInstall);
+
+            if (apk.postInstallCommands && apk.postInstallCommands.length > 0) {
+                this.uiManager.log(`Executing post-install commands for ${apk.name}...`, 'info');
+                this.uiManager.log('Waiting for app components to register...', 'info');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                for (const command of apk.postInstallCommands) {
+                    if (!command.trim()) continue;
+                    try {
+                        if (command.includes('dpm set-device-owner') || command.includes('device-admin')) {
+                            this.uiManager.log('Device admin command detected - waiting for component registration...', 'info');
+                            await new Promise(resolve => setTimeout(resolve, 3000));
+                        }
+
+                        this.uiManager.log(`Running: ${command}`, 'info');
+                        const result = await this.adbConnection.executeShellCommand(command);
+                        if (result.trim()) {
+                            this.uiManager.log(`Command output: ${result.trim()}`, 'info');
+                        }
+
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    } catch (cmdError) {
+                        this.uiManager.log(`Command failed: ${command} - ${cmdError.message}`, 'warning');
+                    }
+                }
+
+                this.uiManager.log(`Post-install setup completed for ${apk.name}`, 'success');
+            }
+
+            this.uiManager.updateProgress(100, 'Installation complete');
+            this.uiManager.log(`Successfully installed ${apk.name}`, 'success');
+            this.uiManager.showSuccess(`${apk.name} installed successfully`);
+        } catch (error) {
+            this.uiManager.updateProgress(100, 'Installation failed');
+            this.uiManager.log(`Failed to install ${apk.name}: ${error.message}`, 'error');
+            this.uiManager.showError(`Failed to install ${apk.name}: ${error.message}`);
+        }
     }
 
     formatFileSize(bytes) {
