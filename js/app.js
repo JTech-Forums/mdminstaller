@@ -254,6 +254,7 @@ class JTechMDMInstaller {
         grid.innerHTML = '';
 
         this.availableApks.forEach((apk) => {
+
             const slide = document.createElement('div');
             slide.className = 'swiper-slide';
             slide.innerHTML = `
