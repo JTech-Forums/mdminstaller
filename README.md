@@ -5,7 +5,7 @@ A web-based tool for installing Mobile Device Management (MDM) applications on A
 ## Features
 
 - 🔌 Direct USB connection to Android devices
-- 📱 Pre-configured MDM application profiles (Workspace ONE, Intune, Meraki)
+- 📱 Dynamic MDM kit grid sourced from `/apk`
 - 📦 Custom APK installation support
 - 🚀 Batch APK installation
 - 📊 Real-time installation progress tracking
@@ -50,10 +50,7 @@ Visit: [https://your-username.github.io/jtechmdminstaller](https://your-username
    - Authorize the connection on your device
 
 2. **Select MDM Applications**
-   - Choose from pre-configured MDM apps:
-     - VMware Workspace ONE
-     - Microsoft Intune
-     - Cisco Meraki SM
+   - Choose from available MDM kits discovered under `/apk`
    - Or upload custom APK files
 
 3. **Install Applications**
@@ -71,16 +68,19 @@ git clone https://github.com/your-username/jtechmdminstaller.git
 cd jtechmdminstaller
 ```
 
-2. Serve the files locally (requires HTTPS for WebUSB):
+2. Start the development server (exposes the `/api/apks` endpoint):
 ```bash
-# Using Python
-python -m http.server 8000
-
-# Or using Node.js
-npx http-server -S -C cert.pem
+npm start
+# or
+node server.js
 ```
 
-3. Access via `https://localhost:8000`
+3. Access via `http://localhost:8000`
+
+4. For HTTPS (required by WebUSB outside `localhost`):
+```bash
+npm run serve-https
+```
 
 ### Project Structure
 

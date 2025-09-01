@@ -255,7 +255,7 @@ body {
     background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
     border: 2px solid var(--border-color);
     border-radius: 0.5rem;
-    cursor: pointer;
+    cursor: default;
     transition: all 0.2s;
 }
 
@@ -270,6 +270,11 @@ body {
     background: linear-gradient(135deg, var(--success-gradient-start), var(--success-gradient-end));
     color: white;
     border-color: var(--success-color);
+}
+
+.app-item .install-btn {
+    margin-top: 0.5rem;
+    width: 100%;
 }
 
 .app-icon {
