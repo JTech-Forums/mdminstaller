@@ -170,8 +170,10 @@ class JTechMDMInstaller {
                     Connect Device
                 `;
                 btn.disabled = false;
-                document.getElementById('installCard').classList.add('hidden');
-                document.getElementById('consoleCard').classList.add('hidden');
+                const installCard = document.getElementById('installCard');
+                const consoleCard = document.getElementById('consoleCard');
+                if (installCard) installCard.classList.add('hidden');
+                if (consoleCard) consoleCard.classList.add('hidden');
             } else {
                 // Connect
                 this.uiManager.log('Requesting USB device access...', 'info');
@@ -195,8 +197,10 @@ class JTechMDMInstaller {
                         Disconnect
                     `;
                     btn.disabled = false;
-                    document.getElementById('installCard').classList.remove('hidden');
-                    document.getElementById('consoleCard').classList.remove('hidden');
+                    const installCard = document.getElementById('installCard');
+                    const consoleCard = document.getElementById('consoleCard');
+                    if (installCard) installCard.classList.remove('hidden');
+                    if (consoleCard) consoleCard.classList.remove('hidden');
                     this.uiManager.log('Device connected and ready', 'success');
                 }
             }
