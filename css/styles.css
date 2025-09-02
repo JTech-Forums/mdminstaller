@@ -44,7 +44,8 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: none;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -113,8 +114,9 @@ body {
 
 .layout-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 3fr 1fr;
     gap: 1.5rem;
+    align-items: stretch;
 }
 
 .left-column,
@@ -129,6 +131,7 @@ body {
 }
 
 .right-column .console-card {
+    flex: 1;
     height: 100%;
 }
 
@@ -176,8 +179,7 @@ body {
     overflow: hidden;
     display: flex;
     justify-content: center;
-    padding-top: 0;
-    padding-bottom: 0;
+    align-items: center;
 }
 
 /* Device Status */
