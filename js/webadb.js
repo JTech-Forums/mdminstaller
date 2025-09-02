@@ -1003,38 +1003,51 @@
 
 	function load_keys(db)
 	{
-		let transaction = db.transaction("keys");
-		let store = transaction.objectStore("keys");
-		let cursor = store.openCursor();
-		let keys = [];
+               let transaction = db.transaction("keys");
+               let store = transaction.objectStore("keys");
+               let cursor = store.openCursor();
+               let keys = [];
 
-		cursor.onsuccess = function (event) {
-			let result = event.target.result;
-			if (result != null) {
-				keys.push(result.value);
-				result.continue();
-			}
-		};
+               cursor.onsuccess = function (event) {
+                       let result = event.target.result;
+                       if (result != null) {
+                               keys.push(result.value);
+                               result.continue();
+                       }
+               };
 
-		return promisify(transaction, "oncomplete").then(function (result) {
-			if (Adb.Opt.debug)
-				console.log("DB: loaded " + keys.length + " keys");
-			return keys;
-		});
-	}
+               return promisify(transaction, "oncomplete").then(function (result) {
+                       if (Adb.Opt.debug)
+                               console.log("DB: loaded " + keys.length + " keys");
+                      if (keys.length > 1) {
+                              let last = keys[keys.length - 1];
+                              return clear_keys(db)
+                                      .then(() => {
+                                              let t = db.transaction("keys", "readwrite");
+                                              let s = t.objectStore('keys');
+                                              let req = s.put(last);
+                                              return promisify(req).then(() => [last]);
+                                      });
+                      }
+                      return keys;
+               });
+       }
 
-	function store_key(db, key)
-	{
-		let transaction = db.transaction("keys", "readwrite");
-		let store = transaction.objectStore('keys');
-		let request = store.put(key);
+       function store_key(db, key)
+       {
+               return clear_keys(db).catch(() => {})
+                       .then(() => {
+                               let transaction = db.transaction("keys", "readwrite");
+                               let store = transaction.objectStore('keys');
+                               let request = store.put(key);
 
-		return promisify(request).then(function (result) {
-			if (Adb.Opt.debug)
-				console.log("DB: stored key " + (result - 1));
-			return result;
-		});
-	}
+                               return promisify(request).then(function (result) {
+                                       if (Adb.Opt.debug)
+                                               console.log("DB: stored key " + (result - 1));
+                                       return result;
+                               });
+                       });
+       }
 
 	function clear_keys(db)
 	{
