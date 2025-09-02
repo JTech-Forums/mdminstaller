@@ -52,14 +52,14 @@ jobs:
       - name: Detect output directory
         id: detect
         run: |
-          for d in dist build out .next/out .output/public public; do
+          for d in dist build out .next/out .output/public public docs; do
             if [ -d "$d" ]; then
               echo "dir=$d" >> $GITHUB_OUTPUT
               echo "Detected output dir: $d"
               exit 0
             fi
           done
-          echo "ERROR: Could not find a build output directory (looked for dist, build, out, .next/out, .output/public, public)."
+          echo "ERROR: Could not find a build output directory (looked for dist, build, out, .next/out, .output/public, public, docs)."
           exit 1
 
       - name: List files (debug)
