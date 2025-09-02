@@ -7,7 +7,7 @@ const KITS = [
     infoUrl: "https://github.com/TripleU613/TripleUMDM_Public",
     apkName: "TripleUMDM.apk",
     cmdName: "command.txt",
-    image: "image.jpeg",
+    image: "tripleumdm.svg",
     badge: "Free",
   },
   {
@@ -18,7 +18,7 @@ const KITS = [
     infoUrl: "https://jtechforums.org/egate",
     apkName: "eGate.apk",
     cmdName: "command.txt",
-    image: "image.png",
+    image: "egate.svg",
   },
   {
     key: "GenTech",
@@ -28,7 +28,7 @@ const KITS = [
     infoUrl: "https://www.gentechsolution.com",
     apkName: "GenTech.apk",
     cmdName: "command.txt",
-    image: "icon.png",
+    image: "gentech.svg",
   },
   {
     key: "Kdroid",
@@ -38,7 +38,7 @@ const KITS = [
     infoUrl: "https://mitmachim.top/topic/63309/שיתוף-להכשיר-כמעט-כל-אנדרואיד-לוויז-ומייל-בלבוד-קיידרואיד-0-7-4-גרסת-בטא-ציבורית",
     apkName: "Kdroid.apk",
     cmdName: "command.txt",
-    image: "icon.png",
+    image: "kdroid.svg",
     badge: "Free",
   },
   {
@@ -49,7 +49,7 @@ const KITS = [
     infoUrl: "https://kosherplay.com",
     apkName: "KosherPlay.apk",
     cmdName: "command.txt",
-    image: "icon.png",
+    image: "kosherplay.svg",
   },
   {
     key: "Livigent",
@@ -59,7 +59,7 @@ const KITS = [
     infoUrl: "https://oldsite.gentechsolution.com/filterlg",
     apkName: "Livigent.apk",
     cmdName: "command.txt",
-    image: "icon.jpg",
+    image: "livigent.svg",
     badge: "Free",
   },
   {
@@ -70,7 +70,7 @@ const KITS = [
     infoUrl: "https://landing.mb-smart.net",
     apkName: "MBSmart.apk",
     cmdName: "command.txt",
-    image: "icon.png",
+    image: "mbsmart.svg",
   },
   {
     key: "Meshimer",
@@ -80,7 +80,7 @@ const KITS = [
     infoUrl: "https://www.meshimer.com",
     apkName: "Meshimer.apk",
     cmdName: "command.txt",
-    image: "icon.jpg",
+    image: "meshimer.svg",
   },
   {
     key: "Netfree",
@@ -90,7 +90,7 @@ const KITS = [
     infoUrl: "https://netfree.link",
     apkName: "Netfree.apk",
     cmdName: "command.txt",
-    image: "icon.svg",
+    image: "netfree.svg",
   },
   {
     key: "Netspark",
@@ -100,7 +100,7 @@ const KITS = [
     infoUrl: "https://www.netsparkmobile.com/",
     apkName: "NetSpark.apk",
     cmdName: "command.txt",
-    image: "icon.png",
+    image: "netspark.svg",
   },
   {
     key: "OfflineMDM",
@@ -110,7 +110,7 @@ const KITS = [
     infoUrl: "https://offlinemdm.com",
     apkName: "OfflineMDM.apk",
     cmdName: "command.txt",
-    image: "icon.png",
+    image: "offline.svg",
     badge: "Free",
   },
   {
@@ -121,7 +121,7 @@ const KITS = [
     infoUrl: "https://forums.jtechforums.org/t/oldmdm-the-livigent-alternitive-for-android-6/3692",
     apkName: "OldMDM.apk",
     cmdName: "command.txt",
-    image: "icon.png",
+    image: "oldmdm.svg",
     badge: "Free",
   },
   {
@@ -132,7 +132,7 @@ const KITS = [
     infoUrl: "https://github.com/sesese1234/SecureGuardMDM",
     apkName: "SecureGuardMDM.apk",
     cmdName: "command.txt",
-    image: "icon.jpeg",
+    image: "secureguard.svg",
     badge: "Free",
   },
   {
@@ -143,7 +143,7 @@ const KITS = [
     infoUrl: "https://www.techloq.com",
     apkName: "Techloq.apk",
     cmdName: "command.txt",
-    image: "icon.jpeg",
+    image: "techloq.svg",
   },
 ];
 
