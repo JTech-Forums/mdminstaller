@@ -102,7 +102,7 @@ export class AdbConnection {
         }
     }
 
-    async disconnect() {
+    async disconnect(clearCache = true) {
         if (this.adb) {
             try {
                 await this.adb.close?.();
@@ -115,7 +115,9 @@ export class AdbConnection {
             this.webusb = null;
             this.adb = null;
             this.device = null;
-            localStorage.removeItem('adbDevice');
+            if (clearCache) {
+                localStorage.removeItem('adbDevice');
+            }
         }
     }
 
