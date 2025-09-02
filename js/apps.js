@@ -127,6 +127,23 @@ class JTechMDMInstaller {
                 }
             });
         });
+
+        // Automatically handle USB device connection changes
+        if ('usb' in navigator) {
+            navigator.usb.addEventListener('disconnect', async () => {
+                this.uiManager.log('USB device disconnected', 'warning');
+                if (this.device) {
+                    await this.handleDisconnect();
+                }
+            });
+
+            navigator.usb.addEventListener('connect', async () => {
+                this.uiManager.log('USB device connected', 'info');
+                if (!this.device) {
+                    await this.tryAutoConnect();
+                }
+            });
+        }
     }
 
     showTutorialStep(index) {
@@ -164,28 +181,7 @@ class JTechMDMInstaller {
             if (btn) btn.disabled = true;
 
             if (this.device) {
-                // Disconnect
-                await this.adbConnection.disconnect();
-                this.device = null;
-                this.apkInstaller.setAdbConnection(null);
-                this.uiManager.updateConnectionStatus('disconnected');
-                if (btn) {
-                    btn.innerHTML = `
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
-                        </svg>
-                        Connect Device
-                    `;
-                    btn.disabled = false;
-                }
-                const installCard = document.getElementById('installCard');
-                const consoleCard = document.getElementById('consoleCard');
-                installCard?.classList.add('hidden');
-                consoleCard?.classList.add('hidden');
-                if (this.swiper) {
-                    this.swiper.destroy(true, true);
-                    this.swiper = null;
-                }
+                await this.handleDisconnect();
             } else {
                 // Connect
                 this.uiManager.log('Requesting USB device access...', 'info');
@@ -201,6 +197,34 @@ class JTechMDMInstaller {
             this.uiManager.showError(`Connection failed: ${error.message}`);
             const btn = document.getElementById('connectBtn');
             if (btn) btn.disabled = false;
+        }
+    }
+
+    async handleDisconnect() {
+        await this.adbConnection.disconnect();
+        this.device = null;
+        this.apkInstaller.setAdbConnection(null);
+        this.uiManager.updateConnectionStatus('disconnected');
+
+        const btn = document.getElementById('connectBtn');
+        if (btn) {
+            btn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                </svg>
+                Connect Device
+            `;
+            btn.disabled = false;
+        }
+
+        const installCard = document.getElementById('installCard');
+        const consoleCard = document.getElementById('consoleCard');
+        installCard?.classList.add('hidden');
+        consoleCard?.classList.add('hidden');
+
+        if (this.swiper) {
+            this.swiper.destroy(true, true);
+            this.swiper = null;
         }
     }
 
