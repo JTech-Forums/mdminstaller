@@ -196,7 +196,7 @@ body {
     padding: 1.5rem;
     background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
     border-radius: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     border: 1px solid var(--border-color);
 }
 

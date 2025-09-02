@@ -1,7 +1,14 @@
 export function renderKits(apks, { onInstall } = {}) {
     const grid = document.getElementById('kitsGrid');
-    const actions = document.getElementById('kitActions');
-    if (!grid || !actions) return null;
+    if (!grid) return null;
+
+    const actions = document.createElement('div');
+    actions.id = 'kitActions';
+    actions.className = 'kit-actions action-bar';
+    actions.innerHTML = `
+            <button class="install-btn" id="installKitBtn">Install</button>
+            <a class="info-btn" id="infoKitBtn" href="#" target="_blank" rel="noopener noreferrer">Info</a>
+        `;
 
     grid.innerHTML = '';
 
@@ -46,10 +53,19 @@ export function renderKits(apks, { onInstall } = {}) {
     const installBtn = actions.querySelector('.install-btn');
     const infoBtn = actions.querySelector('.info-btn');
 
+    function placeActions() {
+        const active = swiper.slides[swiper.activeIndex];
+        const content = active.querySelector('.app-content');
+        if (content && actions.parentNode !== content) {
+            content.appendChild(actions);
+        }
+    }
+
     function updateActions() {
         const apk = apks[swiper.realIndex];
         installBtn.onclick = () => onInstall && onInstall(apk);
         infoBtn.href = apk.infoUrl;
+        placeActions();
     }
 
     swiper.on('slideChange', updateActions);

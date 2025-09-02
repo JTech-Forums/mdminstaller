@@ -100,17 +100,14 @@
 
 .action-bar {
   width: 100%;
-  margin-top: 16px;
   display: flex;
   border: 1px solid rgba(99,102,241,0.28);
   border-radius: 9999px;
   overflow: hidden;
-
 }
 
 .kit-actions {
-  margin-top: 1.5rem;
-  max-width: 260px;
+  margin: 1rem -16px 0;
 }
 
 .action-bar > :first-child {
