@@ -127,22 +127,17 @@ body {
 
  /* position cards according to the new layout */
  .status-card {
-     grid-column: 1 / span 2;
+     grid-column: 1;
      grid-row: 1;
  }
 
  .console-card {
-     grid-column: 3 / span 2;
+     grid-column: 2 / span 3;
      grid-row: 1;
  }
 
  .install-card {
-     grid-column: 1 / span 3;
-     grid-row: 2;
- }
-
- .progress-card {
-     grid-column: 4;
+     grid-column: 1 / span 4;
      grid-row: 2;
  }
 
@@ -152,8 +147,7 @@ body {
     }
     .status-card,
     .console-card,
-    .install-card,
-    .progress-card {
+    .install-card {
         grid-column: 1;
         grid-row: auto;
     }
@@ -936,10 +930,6 @@ body.scaled {
     flex-wrap: wrap;
 }
 
-/* progress card within grid should not add extra top margin */
-.progress-card {
-    margin-top: 0;
-}
 
 /* Command History */
 .command-history {
