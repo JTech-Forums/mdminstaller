@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "serve-https": "npx http-server -S -C cert.pem -p 8443"
+    "serve-https": "npx http-server -S -C cert.pem -p 8443",
+    "build": "node build.js"
   },
   "keywords": [
     "mdm",

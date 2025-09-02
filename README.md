@@ -21,4 +21,18 @@
 `npm install`
 `npm run dev`
 
-No html opening please... 
+No html opening please...
+
+### Build and Deploy to GitHub Pages
+
+To publish a static version of the installer:
+
+1. Build the site into the `docs/` directory:
+
+   ```
+   npm run build
+   ```
+
+2. Commit the generated `docs/` folder and push to GitHub.
+3. In your repository settings, enable GitHub Pages from the **main** branch using the `/docs` folder.
+4. For a custom domain, keep the `CNAME` file and configure Cloudflare with a CNAME record pointing `installer.jtechforums.org` to your GitHub Pages domain.
