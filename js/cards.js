@@ -1,4 +1,4 @@
-export function renderKits(apks, { onInstall, onInfo } = {}) {
+export function renderKits(apks, { onInstall } = {}) {
     const grid = document.getElementById('kitsGrid');
     if (!grid) return null;
 
@@ -15,15 +15,14 @@ export function renderKits(apks, { onInstall, onInfo } = {}) {
                 <div class="app-content">
                     <span class="app-title">${apk.title}</span>
                     <div class="action-bar">
+                        <a class="info-btn" href="${apk.infoUrl}" target="_blank" rel="noopener noreferrer">Info</a>
                         <button class="install-btn">Install</button>
-                        <button class="info-btn">View Info</button>
                     </div>
                 </div>
             </div>
         `;
 
         slide.querySelector('.install-btn')?.addEventListener('click', () => onInstall && onInstall(apk));
-        slide.querySelector('.info-btn')?.addEventListener('click', () => onInfo && onInfo(apk));
 
         grid.appendChild(slide);
     });

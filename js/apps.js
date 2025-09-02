@@ -270,8 +270,7 @@ class JTechMDMInstaller {
         }
 
         this.swiper = renderKits(this.availableApks, {
-            onInstall: (apk) => this.installKit(apk),
-            onInfo: (apk) => window.open(apk.infoUrl, '_blank')
+            onInstall: (apk) => this.installKit(apk)
         });
     }
 
