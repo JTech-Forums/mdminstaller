@@ -729,6 +729,11 @@ body {
     display: none !important;
 }
 
+.disabled-card {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .header .container {

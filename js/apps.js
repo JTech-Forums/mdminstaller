@@ -24,6 +24,7 @@ class JTechMDMInstaller {
         this.checkWebUSBSupport();
         this.uiManager.updateConnectionStatus('disconnected');
         await this.loadAvailableApks();
+        this.renderAvailableApks(); // Initialize Swiper here
         await this.tryAutoConnect();
     }
 
@@ -179,7 +180,7 @@ class JTechMDMInstaller {
         this.currentTutorialStep = index;
 
         const prevBtn = document.getElementById('prevStepBtn');
-        const nextBtn = document.getElementById('nextStepBtn');
+        const nextBtn = document.getElementById('nextBtn');
 
         if (prevBtn) {
             prevBtn.disabled = index === 0;
@@ -197,7 +198,8 @@ class JTechMDMInstaller {
 
             if (this.device) {
                 await this.handleDisconnect();
-            } else {
+            }
+            else {
                 // Connect
                 this.uiManager.log('Requesting USB device access...', 'info');
                 this.uiManager.log('Please select your Android device from the browser prompt', 'info');
@@ -236,9 +238,7 @@ class JTechMDMInstaller {
         }
 
         const installCard = document.getElementById('installCard');
-        const consoleCard = document.getElementById('consoleCard');
-        installCard?.classList.add('hidden');
-        consoleCard?.classList.add('hidden');
+        installCard?.classList.add('disabled-card');
 
         if (this.swiper) {
             this.swiper.destroy(true, true);
@@ -265,10 +265,7 @@ class JTechMDMInstaller {
             btn.disabled = false;
         }
         const installCard = document.getElementById('installCard');
-        const consoleCard = document.getElementById('consoleCard');
-        installCard?.classList.remove('hidden');
-        consoleCard?.classList.remove('hidden');
-        this.renderAvailableApks();
+        installCard?.classList.remove('disabled-card');
         this.uiManager.log('Device connected and ready', 'success');
     }
 
@@ -369,7 +366,7 @@ class JTechMDMInstaller {
                     postInstallCommands: apk.postInstallCommands
                 };
             }
-        }
+            }
         return null;
     }
 
@@ -595,7 +592,9 @@ class JTechMDMInstaller {
 
                         this.uiManager.log(`Running: ${command}`, 'info');
                         const result = await this.adbConnection.executeShellCommand(command);
-                        if (result.trim()) this.uiManager.log(`Command output: ${result.trim()}`, 'info');
+                        if (result.trim()) {
+                            this.uiManager.log(`Command output: ${result.trim()}`, 'info');
+                        }
 
                         await new Promise(resolve => setTimeout(resolve, 500));
                     } catch (cmdError) {
@@ -681,8 +680,6 @@ class JTechMDMInstaller {
             entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="command">${message}</span>`;
         } else if (type === 'output') {
             entry.innerHTML = `<pre class="output">${message}</pre>`;
-        } else {
-            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>`;
         }
 
         consoleOutput.appendChild(entry);
@@ -719,7 +716,7 @@ class JTechMDMInstaller {
                 .slice(-10)
                 .reverse()
                 .map((cmd) => `
-                    <div class="history-item" onclick="document.getElementById('commandInput').value='${cmd.replace(/'/g, "\\'")}'; document.getElementById('commandInput').focus();">
+                    <div class="history-item" onclick="document.getElementById('commandInput').value='${cmd.replace(/'/g, "\'" )}'; document.getElementById('commandInput').focus();">
                         <code>${cmd}</code>
                     </div>
                 `).join('');
@@ -742,7 +739,7 @@ class JTechMDMInstaller {
             .map(entry => entry.textContent)
             .join('\n');
 
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-') ;
         const filename = `adb-console-output-${timestamp}.txt`;
 
         const blob = new Blob([content], { type: 'text/plain' });
