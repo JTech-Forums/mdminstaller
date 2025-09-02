@@ -1,187 +1,24 @@
-# JTech MDM Installer
 
-A web-based tool for installing Mobile Device Management (MDM) applications on Android devices directly from your browser using WebUSB API.
 
-## Features
+### TODO
 
-- 🔌 Direct USB connection to Android devices
-- 📱 Dynamic MDM kit grid sourced from `/apk`
-- 📦 Custom APK installation support
-- 🚀 Batch APK installation
-- 📊 Real-time installation progress tracking
-- 🌐 No software installation required - runs entirely in the browser
-- 🔒 Secure WebUSB implementation
+* Redesign **Install / View Info** button to look more standard and polished
+* Normalize **container sizes** so everything matches nicely
+* Expand **ADB console black screen** to fill unused space
+* Investigate and fix **ADB vendor key expiration** (why they renew every time the page reloads or loses focus)
+* Rewrite **tutorial** to be larger, clearer, and more “for dummies” friendly
+* Add **JTech metadata and logo** integration
+* Improve **MDM install log page** — bigger layout, more useful info
+* Smooth out **USB device detection** for a seamless experience
+* Update overall **color scheme** → switch from purple to blue
+* Add a **Privacy Policy** page with acceptance checkbox
+* Display **install counts per filter** directly on each MDM card
+* Add a **Sign Up** button to encourage joining JTech Forums
+* Add a **Contact Us** option (simple: email you or FlipAdmin)
+* Implement a **cursor trail / smoke effect** for flair
 
-## Live Demo
+### Run
+`npm install`
+`npm run dev`
 
-Visit: [https://your-username.github.io/jtechmdminstaller](https://your-username.github.io/jtechmdminstaller)
-
-## Requirements
-
-### Browser Requirements
-- Chrome or Edge browser (version 61+)
-- WebUSB API support enabled
-
-### Device Requirements
-- Android device with Developer Options enabled
-- USB Debugging enabled
-- USB cable for connection
-
-## Setup Instructions
-
-### Enable Developer Options on Android
-
-1. Go to **Settings** → **About Phone**
-2. Tap **Build Number** 7 times
-3. You'll see "You are now a developer!" message
-
-### Enable USB Debugging
-
-1. Go to **Settings** → **Developer Options**
-2. Enable **USB Debugging**
-3. When prompted on device, allow USB debugging for your computer
-
-## Usage
-
-1. **Connect Device**
-   - Connect your Android device via USB
-   - Click "Connect Device" button
-   - Select your device from the browser prompt
-   - Authorize the connection on your device
-
-2. **Select MDM Applications**
-   - Choose from available MDM kits discovered under `/apk`
-   - Or upload custom APK files
-
-3. **Install Applications**
-   - Review installation queue
-   - Click "Install All" to begin
-   - Monitor progress in real-time
-
-## Development
-
-### Local Development
-
-1. Clone the repository:
-```bash
-git clone https://github.com/your-username/jtechmdminstaller.git
-cd jtechmdminstaller
-```
-
-2. Start the development server (exposes the `/api/apks` endpoint):
-```bash
-npm run dev
-```
-
-3. Access via `http://localhost:8000`
-
-4. For HTTPS (required by WebUSB outside `localhost`):
-```bash
-npm run serve-https
-```
-
-### Project Structure
-
-```
-jtechmdminstaller/
-├── template.html        # HTML template served by the server
-├── css/
-│   ├── styles.css       # Core styling
-│   └── cards.css        # Styles for app cards carousel
-├── js/
-│   ├── apps.js          # Main application logic
-│   ├── connections.js   # WebUSB/ADB connection handling
-│   ├── apk-installer.js # APK installation logic
-│   ├── cards.js         # UI rendering for app cards
-│   └── ui-manager.js    # UI updates and notifications
-└── .github/
-    └── workflows/
-        └── deploy.yml  # GitHub Pages deployment
-```
-
-## Deployment
-
-The site automatically deploys to GitHub Pages when changes are pushed to the main branch.
-
-### Manual Deployment
-
-1. Fork this repository
-2. Enable GitHub Pages in repository settings
-3. Select "Deploy from a branch" → "main" → "/ (root)"
-4. Your site will be available at `https://[username].github.io/jtechmdminstaller`
-
-## Security Considerations
-
-- WebUSB requires HTTPS for security
-- Users must manually enable USB debugging
-- Browser shows permission prompts for device access
-- Cannot bypass Android security features
-- No sensitive data is stored or transmitted
-
-## Browser Compatibility
-
-| Browser | Support |
-|---------|---------|
-| Chrome Desktop | ✅ Full Support (v61+) |
-| Edge | ✅ Full Support (v79+) |
-| Chrome Android | ✅ Full Support |
-| Firefox | ❌ No WebUSB Support |
-| Safari | ❌ No WebUSB Support |
-
-## Troubleshooting
-
-### Device Not Detected
-- Ensure USB Debugging is enabled
-- Try different USB cable/port
-- Restart ADB: `adb kill-server && adb start-server`
-- Check device authorization
-
-### Installation Fails
-- Check available storage space
-- Verify APK compatibility with device
-- Ensure no conflicting app versions
-- Check device logs: `adb logcat`
-
-### USB Transfer Errors
-- Ensure your device is properly connected via USB
-- Check that USB debugging is enabled on your Android device
-- Try using a different USB cable or port
-- Make sure your device is not in sleep mode during the connection process
-- Verify that you're using Chrome or Edge browser (Firefox and Safari do not support WebUSB)
-- Check that you're accessing the application via HTTPS (required for WebUSB)
-- Try restarting your device's ADB service: `adb kill-server && adb start-server`
-- On your Android device, go to Settings → Developer Options → Revoke USB debugging authorizations, then reconnect
-
-### Browser Issues
-- Use Chrome or Edge browser
-- Enable WebUSB flag if disabled
-- Clear browser cache
-- Try incognito/private mode
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- WebUSB API documentation and examples
-- Android Debug Bridge (ADB) protocol
-- MDM vendors for their Android management solutions
-
-## Support
-
-For issues, questions, or suggestions, please open an issue on GitHub.
-
----
-
-© 2025 JTech Solutions. Built with WebUSB technology.
+No html opening please... 
