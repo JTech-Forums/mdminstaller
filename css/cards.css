@@ -5,7 +5,7 @@
   mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
   scrollbar-width: none; /* hide scrollbar in Firefox */
   width: 100%;
-  max-width: none;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
