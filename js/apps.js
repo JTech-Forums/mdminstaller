@@ -24,6 +24,7 @@ class JTechMDMInstaller {
         this.checkWebUSBSupport();
         this.uiManager.updateConnectionStatus('disconnected');
         await this.loadAvailableApks();
+        this.renderAvailableApks();
         await this.tryAutoConnect();
     }
 
@@ -237,8 +238,8 @@ class JTechMDMInstaller {
 
         const installCard = document.getElementById('installCard');
         const consoleCard = document.getElementById('consoleCard');
-        installCard?.classList.add('hidden');
-        consoleCard?.classList.add('hidden');
+        installCard?.classList.remove('hidden');
+        consoleCard?.classList.remove('hidden');
 
         if (this.swiper) {
             this.swiper.destroy(true, true);

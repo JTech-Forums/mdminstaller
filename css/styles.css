@@ -119,13 +119,14 @@ body {
 }
 
 .left-panel {
-    flex: 1;
+    flex: 0 0 420px;
     display: flex;
     flex-direction: column;
 }
 
 .right-panel {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
 }
@@ -137,6 +138,11 @@ body {
 @media (max-width: 900px) {
     .layout {
         flex-direction: column;
+    }
+    .left-panel,
+    .right-panel {
+        flex: 1 1 auto;
+        width: 100%;
     }
 }
 
