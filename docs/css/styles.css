@@ -115,13 +115,30 @@ body {
 
 .layout-grid {
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 1fr 2fr;
     gap: 1.5rem;
     align-items: start;
 }
 
+/* ensure cards don't add extra spacing inside grid */
 .layout-grid .card {
-    margin-bottom: 0;
+    margin: 0;
+}
+
+/* stack install card below connection card while console spans two rows */
+.status-card {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.console-card {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+}
+
+.install-card {
+    grid-column: 1;
+    grid-row: 2;
 }
 
 @media (max-width: 900px) {
@@ -800,7 +817,7 @@ body.scaled {
 
 /* Console Styles */
 .console-card {
-    margin-top: 1.5rem;
+    margin-top: 0;
 }
 
 .command-input-container {
