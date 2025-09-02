@@ -24,7 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Upload the repo root (must contain index.html)
+      # Optional but recommended: prepares Pages config (base path, etc.)
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      # ⬇️ Change this to the directory that contains index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
