@@ -65,7 +65,7 @@ jobs:
       - name: List files (debug)
         run: ls -la "${{ steps.detect.outputs.dir }}"
 
-      - name: Preflight: ensure index.html exists
+      - name: "Preflight: ensure index.html exists"
         run: |
           if [ ! -f "${{ steps.detect.outputs.dir }}/index.html" ]; then
             echo "ERROR: No index.html found in ${{ steps.detect.outputs.dir }}."
