@@ -117,7 +117,7 @@ body {
     display: grid;
     grid-template-columns: 3fr 1fr;
     gap: 1.5rem;
-    align-items: stretch;
+    align-items: start;
 }
 
 .left-column,
@@ -128,12 +128,7 @@ body {
 }
 
 .right-column {
-    height: 100%;
-}
-
-.right-column .console-card {
-    flex: 1;
-    height: 100%;
+    height: auto;
 }
 
 .layout-grid .card {
