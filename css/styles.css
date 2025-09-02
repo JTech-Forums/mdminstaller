@@ -179,9 +179,13 @@ body {
 .install-card {
     overflow: hidden;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    padding: 0 2rem;
+    padding: 2rem;
+}
+
+.progress-card {
+    margin-top: 1.5rem;
 }
 
 /* Device Status */

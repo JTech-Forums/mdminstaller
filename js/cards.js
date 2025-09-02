@@ -1,6 +1,7 @@
 export function renderKits(apks, { onInstall } = {}) {
     const grid = document.getElementById('kitsGrid');
-    if (!grid) return null;
+    const actions = document.getElementById('kitActions');
+    if (!grid || !actions) return null;
 
     grid.innerHTML = '';
 
@@ -14,22 +15,15 @@ export function renderKits(apks, { onInstall } = {}) {
                 </div>
                 <div class="app-content">
                     <span class="app-title">${apk.title}</span>
-                    <div class="action-bar">
-                        <a class="info-btn" href="${apk.infoUrl}" target="_blank" rel="noopener noreferrer">Info</a>
-                        <button class="install-btn">Install</button>
-                    </div>
                 </div>
             </div>
         `;
-
-        slide.querySelector('.install-btn')?.addEventListener('click', () => onInstall && onInstall(apk));
-
         grid.appendChild(slide);
     });
 
     const startIndex = apks.findIndex(a => a.key === 'MBsmart' || a.name === 'MBsmart');
 
-    return new Swiper('#kitsSwiper', {
+    const swiper = new Swiper('#kitsSwiper', {
         effect: 'coverflow',
         grabCursor: true,
         centeredSlides: true,
@@ -48,4 +42,18 @@ export function renderKits(apks, { onInstall } = {}) {
         watchSlidesProgress: true,
         loop: true
     });
+
+    const installBtn = actions.querySelector('.install-btn');
+    const infoBtn = actions.querySelector('.info-btn');
+
+    function updateActions() {
+        const apk = apks[swiper.realIndex];
+        installBtn.onclick = () => onInstall && onInstall(apk);
+        infoBtn.href = apk.infoUrl;
+    }
+
+    swiper.on('slideChange', updateActions);
+    updateActions();
+
+    return swiper;
 }
