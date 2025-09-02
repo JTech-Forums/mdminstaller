@@ -132,14 +132,14 @@ class JTechMDMInstaller {
         // Automatically handle USB device connection changes
         if ('usb' in navigator) {
             navigator.usb.addEventListener('disconnect', async () => {
-                this.uiManager.log('USB device disconnected', 'warning');
+                this.uiManager.logToConsole('USB device disconnected', 'warning');
                 if (this.device) {
                     await this.handleDisconnect();
                 }
             });
 
             navigator.usb.addEventListener('connect', async () => {
-                this.uiManager.log('USB device connected', 'info');
+                this.uiManager.logToConsole('USB device connected', 'info');
                 if (!this.device) {
                     await this.tryAutoConnect();
                 }
@@ -201,8 +201,8 @@ class JTechMDMInstaller {
             }
             else {
                 // Connect
-                this.uiManager.log('Requesting USB device access...', 'info');
-                this.uiManager.log('Please select your Android device from the browser prompt', 'info');
+                this.uiManager.logToConsole('Requesting USB device access...', 'info');
+                this.uiManager.logToConsole('Please select your Android device from the browser prompt', 'info');
                 this.device = await this.adbConnection.connect(this.uiManager);
 
                 if (this.device) {
@@ -251,8 +251,8 @@ class JTechMDMInstaller {
     async finalizeConnection() {
         const btn = document.getElementById('connectBtn');
         this.apkInstaller.setAdbConnection(this.adbConnection);
-        this.uiManager.log('Device connected. Getting device information...', 'info');
-        this.uiManager.log('If prompted on your device, tap "Allow" to authorize this computer', 'warning');
+        this.uiManager.logToConsole('Device connected. Getting device information...', 'info');
+        this.uiManager.logToConsole('If prompted on your device, tap "Allow" to authorize this computer', 'warning');
 
         const deviceInfo = await this.adbConnection.getDeviceInfo();
         this.uiManager.updateConnectionStatus('connected', deviceInfo);
@@ -270,7 +270,7 @@ class JTechMDMInstaller {
         installCard?.classList.remove('disabled-card');
         const consoleCard = document.getElementById('consoleCard');
         consoleCard?.classList.remove('disabled-card');
-        this.uiManager.log('Device connected and ready', 'success');
+        this.uiManager.logToConsole('Device connected and ready', 'success');
     }
 
     async tryAutoConnect(retries = 5, delay = 1000) {
@@ -344,7 +344,7 @@ class JTechMDMInstaller {
             });
         } catch (error) {
             console.error('Failed to load APKs:', error);
-            this.uiManager.log('Failed to load APK files from server', 'warning');
+            this.uiManager.logToConsole('Failed to load APK files from server', 'warning');
             this.availableApks = [];
         }
     }
@@ -479,7 +479,6 @@ class JTechMDMInstaller {
             return;
         }
 
-        document.getElementById('progressCard')?.classList.remove('hidden');
         const installBtn = document.getElementById('installBtn');
         if (installBtn) installBtn.disabled = true;
 
@@ -491,13 +490,12 @@ class JTechMDMInstaller {
             const progress = ((i + 1) / this.apkQueue.length) * 100;
 
             this.uiManager.updateProgress(progress, `Installing ${apk.name}...`);
-            this.uiManager.log(`Installing ${apk.name}...`, 'info');
 
             try {
                 let fileToInstall = apk.file;
 
                 if (apk.url && !apk.file) {
-                    this.uiManager.log(`Downloading ${apk.name}...`, 'info');
+                    this.uiManager.logToConsole(`Downloading ${apk.name}...`, 'info');
                     const response = await fetch(apk.url);
                     if (!response.ok) {
                         throw new Error(`Failed to load APK file: ${response.statusText}`);
@@ -510,48 +508,48 @@ class JTechMDMInstaller {
                     await this.apkInstaller.installFromFile(this.device, fileToInstall);
 
                     if (apk.postInstallCommands && apk.postInstallCommands.length > 0) {
-                        this.uiManager.log(`Executing post-install commands for ${apk.name}...`, 'info');
-                        this.uiManager.log('Waiting for app components to register...', 'info');
+                        this.uiManager.logToConsole(`Executing post-install commands for ${apk.name}...`, 'info');
+                        this.uiManager.logToConsole('Waiting for app components to register...', 'info');
                         await new Promise(resolve => setTimeout(resolve, 2000));
 
                         for (const command of apk.postInstallCommands) {
                             if (command.trim()) {
                                 try {
                                     if (command.includes('dpm set-device-owner') || command.includes('device-admin')) {
-                                        this.uiManager.log('Device admin command detected - waiting for component registration...', 'info');
+                                        this.uiManager.logToConsole('Device admin command detected - waiting for component registration...', 'info');
                                         await new Promise(resolve => setTimeout(resolve, 3000));
                                     }
 
-                                    this.uiManager.log(`Running: ${command}`, 'info');
+                                    this.uiManager.logToConsole(`Running: ${command}`, 'info');
                                     const result = await this.adbConnection.executeShellCommand(command);
                                     if (result.trim()) {
-                                        this.uiManager.log(`Command output: ${result.trim()}`, 'info');
+                                        this.uiManager.logToConsole(`Command output: ${result.trim()}`, 'info');
                                     }
 
                                     await new Promise(resolve => setTimeout(resolve, 500));
 
                                 } catch (cmdError) {
-                                    this.uiManager.log(`Command failed: ${command} - ${cmdError.message}`, 'warning');
+                                    this.uiManager.logToConsole(`Command failed: ${command} - ${cmdError.message}`, 'warning');
                                 }
                             }
                         }
 
-                        this.uiManager.log(`Post-install setup completed for ${apk.name}`, 'success');
+                        this.uiManager.logToConsole(`Post-install setup completed for ${apk.name}`, 'success');
                     }
                 } else {
                     throw new Error('No APK file available for installation');
                 }
 
                 successCount++;
-                this.uiManager.log(`Successfully installed ${apk.name}`, 'success');
+                this.uiManager.logToConsole(`Successfully installed ${apk.name}`, 'success');
             } catch (error) {
                 failCount++;
-                this.uiManager.log(`Failed to install ${apk.name}: ${error.message}`, 'error');
+                this.uiManager.logToConsole(`Failed to install ${apk.name}: ${error.message}`, 'error');
             }
         }
 
         this.uiManager.updateProgress(100, 'Installation complete');
-        this.uiManager.log(`Installation complete: ${successCount} succeeded, ${failCount} failed`,
+        this.uiManager.logToConsole(`Installation complete: ${successCount} succeeded, ${failCount} failed`,
             failCount > 0 ? 'warning' : 'success');
 
         if (installBtn) installBtn.disabled = false;
@@ -567,15 +565,13 @@ class JTechMDMInstaller {
             return;
         }
 
-        document.getElementById('progressCard')?.classList.remove('hidden');
         this.uiManager.updateProgress(0, `Installing ${apk.title || apk.name}...`);
-        this.uiManager.log(`Installing ${apk.title || apk.name}...`, 'info');
 
         try {
             let fileToInstall = apk.file;
 
             if (apk.url && !apk.file) {
-                this.uiManager.log(`Downloading ${apk.title || apk.name}...`, 'info');
+                this.uiManager.logToConsole(`Downloading ${apk.title || apk.name}...`, 'info');
                 const response = await fetch(apk.url);
                 if (!response.ok) {
                     throw new Error(`Failed to load APK file: ${response.statusText}`);
@@ -589,39 +585,39 @@ class JTechMDMInstaller {
             await this.apkInstaller.installFromFile(this.device, fileToInstall);
 
             if (apk.postInstallCommands && apk.postInstallCommands.length > 0) {
-                this.uiManager.log(`Executing post-install commands for ${apk.title || apk.name}...`, 'info');
-                this.uiManager.log('Waiting for app components to register...', 'info');
+                this.uiManager.logToConsole(`Executing post-install commands for ${apk.title || apk.name}...`, 'info');
+                this.uiManager.logToConsole('Waiting for app components to register...', 'info');
                 await new Promise(resolve => setTimeout(resolve, 2000));
 
                 for (const command of apk.postInstallCommands) {
                     if (!command.trim()) continue;
                     try {
                         if (command.includes('dpm set-device-owner') || command.includes('device-admin')) {
-                            this.uiManager.log('Device admin command detected - waiting for component registration...', 'info');
+                            this.uiManager.logToConsole('Device admin command detected - waiting for component registration...', 'info');
                             await new Promise(resolve => setTimeout(resolve, 3000));
                         }
 
-                        this.uiManager.log(`Running: ${command}`, 'info');
+                        this.uiManager.logToConsole(`Running: ${command}`, 'info');
                         const result = await this.adbConnection.executeShellCommand(command);
                         if (result.trim()) {
-                            this.uiManager.log(`Command output: ${result.trim()}`, 'info');
+                            this.uiManager.logToConsole(`Command output: ${result.trim()}`, 'info');
                         }
 
                         await new Promise(resolve => setTimeout(resolve, 500));
                     } catch (cmdError) {
-                        this.uiManager.log(`Command failed: ${command} - ${cmdError.message}`, 'warning');
+                        this.uiManager.logToConsole(`Command failed: ${command} - ${cmdError.message}`, 'warning');
                     }
                 }
 
-                this.uiManager.log(`Post-install setup completed for ${apk.title || apk.name}`, 'success');
+                this.uiManager.logToConsole(`Post-install setup completed for ${apk.title || apk.name}`, 'success');
             }
 
             this.uiManager.updateProgress(100, 'Installation complete');
-            this.uiManager.log(`Successfully installed ${apk.title || apk.name}`, 'success');
+            this.uiManager.logToConsole(`Successfully installed ${apk.title || apk.name}`, 'success');
             this.uiManager.showSuccess(`${apk.title || apk.name} installed successfully`);
         } catch (error) {
             this.uiManager.updateProgress(100, 'Installation failed');
-            this.uiManager.log(`Failed to install ${apk.title || apk.name}: ${error.message}`, 'error');
+            this.uiManager.logToConsole(`Failed to install ${apk.title || apk.name}: ${error.message}`, 'error');
             this.uiManager.showError(`Failed to install ${apk.title || apk.name}: ${error.message}`);
         }
     }
@@ -640,7 +636,7 @@ class JTechMDMInstaller {
         if (!command) return;
 
         if (!this.device) {
-            this.logToConsole('ERROR: No device connected', 'error');
+            this.uiManager.logToConsole('ERROR: No device connected', 'error');
             return;
         }
 
@@ -658,13 +654,13 @@ class JTechMDMInstaller {
         try {
             this.commandHistory.push(command);
             this.currentHistoryIndex = this.commandHistory.length;
-            this.logToConsole(`$ adb shell ${command}`, 'command');
+            this.uiManager.logToConsole(`$ adb shell ${command}`, 'command');
             const result = await this.adbConnection.executeShellCommand(command);
-            if (result.trim()) this.logToConsole(result, 'output');
-            else this.logToConsole('(no output)', 'info');
+            if (result.trim()) this.uiManager.logToConsole(result, 'output');
+            else this.uiManager.logToConsole('(no output)', 'info');
             this.updateCommandHistory();
         } catch (error) {
-            this.logToConsole(`ERROR: ${error.message}`, 'error');
+            this.uiManager.logToConsole(`ERROR: ${error.message}`, 'error');
         }
 
         if (executeBtn) {
@@ -679,23 +675,6 @@ class JTechMDMInstaller {
         if (commandInput) commandInput.value = '';
     }
 
-    logToConsole(message, type = 'info') {
-        const consoleOutput = document.getElementById('consoleOutput');
-        if (!consoleOutput) return;
-
-        const timestamp = new Date().toLocaleTimeString();
-        const entry = document.createElement('div');
-        entry.className = `console-entry ${type}`;
-
-        if (type === 'command') {
-            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="command">${message}</span>`;
-        } else if (type === 'output') {
-            entry.innerHTML = `<pre class="output">${message}</pre>`;
-        }
-
-        consoleOutput.appendChild(entry);
-        consoleOutput.scrollTop = consoleOutput.scrollHeight;
-    }
 
     showPreviousCommand() {
         if (this.commandHistory.length === 0) return;

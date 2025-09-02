@@ -29,95 +29,74 @@
     <main class="main">
         <div class="container">
             <div class="layout-grid">
-                <div class="left-column">
-                    <!-- Connection Status Card -->
-                    <div class="card status-card">
-                        <h2>Device Connection</h2>
-                        <div class="device-status" id="deviceStatus">
-                            <div class="status-icon disconnected">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                                </svg>
-                            </div>
-                            <div class="status-info">
-                                <h3 id="statusTitle">No Device Connected</h3>
-                                <p id="statusMessage">Connect your Android device via USB to begin</p>
-                                <div id="deviceInfo" class="device-info hidden">
-                                    <span class="info-item">Model: <strong id="deviceModel">-</strong></span>
-                                    <span class="info-item">Android: <strong id="androidVersion">-</strong></span>
-                                    <span class="info-item">Serial: <strong id="deviceSerial">-</strong></span>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" id="connectBtn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                <!-- Connection Status Card -->
+                <div class="card status-card">
+                    <h2>Device Connection</h2>
+                    <div class="device-status" id="deviceStatus">
+                        <div class="status-icon disconnected">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                <line x1="12" y1="18" x2="12.01" y2="18"></line>
                             </svg>
-                            Connect Device
-                        </button>
-                    </div>
-
-                    <!-- APK Installation Card -->
-                    <div class="card install-card disabled-card" id="installCard">
-                        <div class="swiper mySwiper" id="kitsSwiper">
-                            <div class="swiper-wrapper" id="kitsGrid"></div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="right-column">
-                    <!-- ADB Console Card -->
-                    <div class="card console-card disabled-card" id="consoleCard">
-                        <h2>ADB Console</h2>
-                        <p class="card-description">Execute ADB shell commands directly on the connected device</p>
-
-                        <div class="command-input-container">
-                            <div class="input-group">
-                                <span class="input-prefix">adb shell</span>
-                                <input type="text" id="commandInput" class="command-input" placeholder="Enter ADB command..." autocomplete="off">
-                                <button class="btn btn-primary" id="executeBtn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5,3 19,12 5,21"></polygon>
-                                    </svg>
-                                    Execute
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="command-history hidden" id="commandHistory">
-                            <h3>Command History</h3>
-                            <div class="history-list" id="historyList"></div>
-                        </div>
-
-                        <div class="console-output-container">
-                            <h3>Console Output</h3>
-                            <div class="console-output" id="consoleOutput"></div>
-                            <div class="console-actions">
-                                <button class="btn btn-small btn-secondary" id="clearConsoleBtn">Clear Output</button>
-                                <button class="btn btn-small btn-secondary" id="downloadConsoleBtn">Download Output</button>
+                        <div class="status-info">
+                            <h3 id="statusTitle">No Device Connected</h3>
+                            <p id="statusMessage">Connect your Android device via USB to begin</p>
+                            <div id="deviceInfo" class="device-info hidden">
+                                <span class="info-item">Model: <strong id="deviceModel">-</strong></span>
+                                <span class="info-item">Android: <strong id="androidVersion">-</strong></span>
+                                <span class="info-item">Serial: <strong id="deviceSerial">-</strong></span>
                             </div>
                         </div>
                     </div>
+                    <button class="btn btn-primary" id="connectBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                        </svg>
+                        Connect Device
+                    </button>
                 </div>
-            </div>
 
-            <!-- Progress Card -->
-            <div class="card progress-card hidden" id="progressCard">
-                <h2>Installation Progress</h2>
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <div class="progress-info">
-                        <span id="progressText">Preparing installation...</span>
-                        <span id="progressPercent">0%</span>
+                <!-- APK Installation Card -->
+                <div class="card install-card disabled-card" id="installCard">
+                    <div class="swiper mySwiper" id="kitsSwiper">
+                        <div class="swiper-wrapper" id="kitsGrid"></div>
                     </div>
                 </div>
-                <div class="log-container">
-                    <h3>Installation Log</h3>
-                    <div class="log-output" id="logOutput"></div>
+
+                <!-- ADB Console Card -->
+                <div class="card console-card disabled-card" id="consoleCard">
+                    <h2>ADB Console</h2>
+                    <p class="card-description">Execute ADB shell commands directly on the connected device</p>
+
+                    <div class="command-input-container">
+                        <div class="input-group">
+                            <span class="input-prefix">adb shell</span>
+                            <input type="text" id="commandInput" class="command-input" placeholder="Enter ADB command..." autocomplete="off">
+                            <button class="btn btn-primary" id="executeBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5,3 19,12 5,21"></polygon>
+                                </svg>
+                                Execute
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="command-history hidden" id="commandHistory">
+                        <h3>Command History</h3>
+                        <div class="history-list" id="historyList"></div>
+                    </div>
+
+                    <div class="console-output-container">
+                        <h3>Console Output</h3>
+                        <div class="console-output" id="consoleOutput"></div>
+                        <div class="console-actions">
+                            <button class="btn btn-small btn-secondary" id="clearConsoleBtn">Clear Output</button>
+                            <button class="btn btn-small btn-secondary" id="downloadConsoleBtn">Download Output</button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </main>
