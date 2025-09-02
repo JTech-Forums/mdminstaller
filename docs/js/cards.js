@@ -11,13 +11,11 @@ export function renderKits(apks, { onInstall } = {}) {
             <div class="app-item card-modern">
                 <div class="app-icon">
                     ${apk.image ? `<img src="${apk.image}" alt="${apk.title}">` : ''}
+                    ${apk.infoUrl ? `<a class="info-overlay" href="${apk.infoUrl}" target="_blank" rel="noopener noreferrer">View Info</a>` : ''}
                 </div>
                 <div class="app-content">
                     <span class="app-title">${apk.title}</span>
-                    <div class="action-bar">
-                        <a class="info-btn" href="${apk.infoUrl}" target="_blank" rel="noopener noreferrer">Info</a>
-                        <button class="install-btn">Install</button>
-                    </div>
+                    <button class="install-btn">Install</button>
                 </div>
             </div>
         `;

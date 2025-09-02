@@ -69,6 +69,7 @@
   width: 100%;
   height: 50%;
   overflow: hidden;
+  position: relative;
 }
 
 .app-icon img {
@@ -98,53 +99,47 @@
 }
 
 
-.action-bar {
+.install-btn {
+  display: block;
   width: 100%;
   margin-top: 16px;
-  display: flex;
-  border: 1px solid rgba(99,102,241,0.28);
-  border-radius: 9999px;
-  overflow: hidden;
-
-}
-
-.action-bar > :first-child {
-  border-right: 1px solid rgba(99,102,241,0.28);
-}
-
-.action-bar button,
-.action-bar a {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0.5rem 0;
   font-weight: 600;
   font-size: 0.8rem;
   font-family: 'Inter', sans-serif;
-  padding: 0.5rem 0;
-  cursor: pointer;
   line-height: 1;
+  cursor: pointer;
   white-space: nowrap;
   border: none;
-  background: transparent;
-  text-decoration: none;
-}
-
-.install-btn {
+  border-radius: 9999px;
   background: linear-gradient(90deg,#6d66f6,#7c6cf4);
   color: #fff;
+  text-decoration: none;
 }
 
 .install-btn:hover {
   filter: brightness(1.07);
 }
 
-.info-btn {
-  background: rgba(99,102,241,0.10);
-  color: #c7d2fe;
+.info-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity .2s ease;
 }
 
-.info-btn:hover {
-  background: rgba(99,102,241,0.16);
+.app-item:hover .info-overlay {
+  opacity: 1;
 }
 
