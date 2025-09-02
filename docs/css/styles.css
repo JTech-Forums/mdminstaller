@@ -120,22 +120,6 @@ body {
     align-items: stretch;
 }
 
-.left-column,
-.right-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.right-column {
-    height: 100%;
-}
-
-.right-column .console-card {
-    flex: 1;
-    height: 100%;
-}
-
 .layout-grid .card {
     margin-bottom: 0;
 }
@@ -867,8 +851,8 @@ body.scaled {
     border: 2px solid var(--border-color);
     border-radius: 0.5rem;
     padding: 1rem;
-    min-height: 200px;
-    max-height: 400px;
+    min-height: 300px;
+    max-height: 500px;
     overflow-y: auto;
     font-family: 'Courier New', monospace;
     font-size: 0.875rem;
@@ -916,6 +900,10 @@ body.scaled {
     gap: 0.5rem;
     margin-top: 1rem;
     flex-wrap: wrap;
+}
+
+.progress-card {
+    margin-top: 2rem;
 }
 
 /* Command History */
