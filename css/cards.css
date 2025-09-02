@@ -105,7 +105,12 @@
 
 }
 
-.action-bar button {
+.action-bar > :first-child {
+  border-right: 1px solid rgba(99,102,241,0.28);
+}
+
+.action-bar button,
+.action-bar a {
   flex: 1;
   display: flex;
   align-items: center;
@@ -119,6 +124,7 @@
   white-space: nowrap;
   border: none;
   background: transparent;
+  text-decoration: none;
 }
 
 .install-btn {
