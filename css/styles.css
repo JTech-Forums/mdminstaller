@@ -117,13 +117,14 @@ body {
      display: grid;
      grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
-    align-items: start;
-}
+    align-items: stretch; /* ensure cards match heights */
+ }
 
 /* ensure cards fill their grid cells without extra spacing */
 .layout-grid .card {
     margin: 0;
-}
+    height: 100%; /* stabilize card height */
+ }
 
  /* position cards according to the new layout */
  .status-card {
