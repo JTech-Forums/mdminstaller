@@ -1,5 +1,5 @@
 (function() {
-    const BASE_WIDTH = 1600;
+    const BASE_WIDTH = 1920;
     function adjustScale() {
         const scale = Math.min(window.innerWidth / BASE_WIDTH, 1);
         document.body.style.setProperty('--page-scale', scale.toString());
