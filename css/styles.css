@@ -113,37 +113,50 @@ body {
     padding: 2rem 0;
 }
 
-.layout-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 1.5rem;
-    align-items: start;
-}
+ .layout-grid {
+     display: grid;
+     grid-template-columns: repeat(4, 1fr);
+     gap: 1.5rem;
+     align-items: stretch;
+ }
 
-/* ensure cards don't add extra spacing inside grid */
-.layout-grid .card {
-    margin: 0;
-}
+ /* ensure cards fill their grid cells without extra spacing */
+ .layout-grid .card {
+     margin: 0;
+     height: 100%;
+ }
 
-/* place install card on the right spanning two rows, console below connection */
-.status-card {
-    grid-column: 1;
-    grid-row: 1;
-}
+ /* position cards according to the new layout */
+ .status-card {
+     grid-column: 1 / span 2;
+     grid-row: 1;
+ }
 
-.install-card {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-}
+ .console-card {
+     grid-column: 3 / span 2;
+     grid-row: 1;
+ }
 
-.console-card {
-    grid-column: 1;
-    grid-row: 2;
-}
+ .install-card {
+     grid-column: 1 / span 3;
+     grid-row: 2;
+ }
+
+ .progress-card {
+     grid-column: 4;
+     grid-row: 2;
+ }
 
 @media (max-width: 900px) {
     .layout-grid {
         grid-template-columns: 1fr;
+    }
+    .status-card,
+    .console-card,
+    .install-card,
+    .progress-card {
+        grid-column: 1;
+        grid-row: auto;
     }
 }
 
@@ -919,8 +932,9 @@ body.scaled {
     flex-wrap: wrap;
 }
 
+/* progress card within grid should not add extra top margin */
 .progress-card {
-    margin-top: 2rem;
+    margin-top: 0;
 }
 
 /* Command History */
