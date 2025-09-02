@@ -94,9 +94,9 @@
     ]
   },
   {
-    "name": "SecureGuard",
-    "image": "/apk/SecureGuard/secureguard.svg",
-    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/SecureGuard.apk",
+    "name": "SecureGuardMDM",
+    "image": "/apk/SecureGuardMDM/secureguard.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/SecureGuardMDM.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.secureguard.mdm/com.secureguard.mdm.SecureGuardDeviceAdminReceiver",
       "pm grant com.secureguard.mdm ",
