@@ -10,7 +10,21 @@ export class AdbConnection {
             // Open WebUSB connection only once and reuse existing device
             if (!this.webusb) {
                 const devices = await navigator.usb.getDevices();
-                if (devices.length > 0) {
+                const cached = JSON.parse(localStorage.getItem('adbDevice') || 'null');
+                let target = null;
+
+                if (cached) {
+                    target = devices.find(d =>
+                        d.vendorId === cached.vendorId &&
+                        d.productId === cached.productId &&
+                        (!cached.serialNumber || d.serialNumber === cached.serialNumber)
+                    );
+                }
+
+                if (target) {
+                    await target.open();
+                    this.webusb = new window.Adb.WebUSB.Transport(target);
+                } else if (devices.length > 0) {
                     await devices[0].open();
                     this.webusb = new window.Adb.WebUSB.Transport(devices[0]);
                 } else {
@@ -23,6 +37,17 @@ export class AdbConnection {
 
                 // Store the device reference
                 this.device = this.webusb.device;
+
+                // Cache device identifiers for future sessions
+                try {
+                    localStorage.setItem('adbDevice', JSON.stringify({
+                        vendorId: this.device.vendorId,
+                        productId: this.device.productId,
+                        serialNumber: this.device.serialNumber || null
+                    }));
+                } catch (e) {
+                    console.warn('Failed to cache device info', e);
+                }
             }
 
             let authNotification = null;
@@ -80,9 +105,9 @@ export class AdbConnection {
     async disconnect() {
         if (this.adb) {
             try {
-                // Close ADB connection
+                await this.adb.close?.();
                 if (this.webusb) {
-                    this.webusb.close();
+                    await this.webusb.close();
                 }
             } catch (error) {
                 console.error('Disconnect error:', error);
@@ -90,6 +115,7 @@ export class AdbConnection {
             this.webusb = null;
             this.adb = null;
             this.device = null;
+            localStorage.removeItem('adbDevice');
         }
     }
 

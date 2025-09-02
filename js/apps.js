@@ -24,6 +24,7 @@ class JTechMDMInstaller {
         this.checkWebUSBSupport();
         this.uiManager.updateConnectionStatus('disconnected');
         await this.loadAvailableApks();
+        await this.tryAutoConnect();
     }
 
     checkWebUSBSupport() {
@@ -192,28 +193,7 @@ class JTechMDMInstaller {
                 this.device = await this.adbConnection.connect(this.uiManager);
 
                 if (this.device) {
-                    this.apkInstaller.setAdbConnection(this.adbConnection);
-                    this.uiManager.log('Device connected. Getting device information...', 'info');
-                    this.uiManager.log('If prompted on your device, tap "Allow" to authorize this computer', 'warning');
-
-                    const deviceInfo = await this.adbConnection.getDeviceInfo();
-                    this.uiManager.updateConnectionStatus('connected', deviceInfo);
-                    if (btn) {
-                        btn.innerHTML = `
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-                                <line x1="12" y1="2" x2="12" y2="12"></line>
-                            </svg>
-                            Disconnect
-                        `;
-                        btn.disabled = false;
-                    }
-                    const installCard = document.getElementById('installCard');
-                    const consoleCard = document.getElementById('consoleCard');
-                    installCard?.classList.remove('hidden');
-                    consoleCard?.classList.remove('hidden');
-                    this.renderAvailableApks();
-                    this.uiManager.log('Device connected and ready', 'success');
+                    await this.finalizeConnection();
                 }
             }
         } catch (error) {
@@ -221,6 +201,53 @@ class JTechMDMInstaller {
             this.uiManager.showError(`Connection failed: ${error.message}`);
             const btn = document.getElementById('connectBtn');
             if (btn) btn.disabled = false;
+        }
+    }
+
+    async finalizeConnection() {
+        const btn = document.getElementById('connectBtn');
+        this.apkInstaller.setAdbConnection(this.adbConnection);
+        this.uiManager.log('Device connected. Getting device information...', 'info');
+        this.uiManager.log('If prompted on your device, tap "Allow" to authorize this computer', 'warning');
+
+        const deviceInfo = await this.adbConnection.getDeviceInfo();
+        this.uiManager.updateConnectionStatus('connected', deviceInfo);
+        if (btn) {
+            btn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                    <line x1="12" y1="2" x2="12" y2="12"></line>
+                </svg>
+                Disconnect
+            `;
+            btn.disabled = false;
+        }
+        const installCard = document.getElementById('installCard');
+        const consoleCard = document.getElementById('consoleCard');
+        installCard?.classList.remove('hidden');
+        consoleCard?.classList.remove('hidden');
+        this.renderAvailableApks();
+        this.uiManager.log('Device connected and ready', 'success');
+    }
+
+    async tryAutoConnect() {
+        const cached = JSON.parse(localStorage.getItem('adbDevice') || 'null');
+        if (!cached) return;
+        const devices = await navigator.usb.getDevices();
+        const match = devices.find(d =>
+            d.vendorId === cached.vendorId &&
+            d.productId === cached.productId &&
+            (!cached.serialNumber || d.serialNumber === cached.serialNumber)
+        );
+        if (!match) {
+            localStorage.removeItem('adbDevice');
+            return;
+        }
+        try {
+            await this.handleConnect();
+        } catch (error) {
+            console.error('Auto-connect failed:', error);
+            localStorage.removeItem('adbDevice');
         }
     }
 
