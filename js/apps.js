@@ -321,8 +321,15 @@ class JTechMDMInstaller {
 
     async loadAvailableApks() {
         try {
-            const response = await fetch('/api/apks');
-            const apks = await response.json();
+            let apks = [];
+            try {
+                const res = await fetch('apks.json');
+                if (!res.ok) throw new Error('apks.json not found');
+                apks = await res.json();
+            } catch (err) {
+                const res = await fetch('/api/apks');
+                apks = await res.json();
+            }
 
             this.availableApks = apks.map(apk => {
                 const kit = KITS.find(k => k.key === apk.name) || {};
