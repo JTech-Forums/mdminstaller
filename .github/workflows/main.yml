@@ -1,4 +1,4 @@
-name: Deploy static site to GitHub Pages
+name: Build & Deploy to GitHub Pages
 
 on:
   push:
@@ -24,26 +24,63 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      # 🔎 Preflight: ensure index.html is at the artifact root (repo root in this setup)
-      - name: Preflight index.html
+      # Ensure a build script exists
+      - name: Verify build script
         run: |
-          if [ ! -f "index.html" ]; then
-            echo "ERROR: index.html not found at repo root. Set path accordingly or move files."
+          if ! npm run | grep -qE '^  build'; then
+            echo "ERROR: No npm 'build' script found."
+            echo "Add a build script to package.json (e.g. Vite: \"build\": \"vite build\", Next: \"build\": \"next build && next export\")."
             exit 1
           fi
 
-      # ✅ Write CNAME so GitHub binds the custom domain
-      - name: Add CNAME
-        run: echo "installer.jtechforums.org" > CNAME
+      - name: Install dependencies
+        run: npm ci
 
-      # ⬇️ If your site lives in a different dir, change path: accordingly
+      - name: Build site
+        run: npm run build
+
+      # Detect common static output directories
+      - name: Detect output directory
+        id: detect
+        run: |
+          for d in dist build out .next/out .output/public public; do
+            if [ -d "$d" ]; then
+              echo "dir=$d" >> $GITHUB_OUTPUT
+              echo "Detected output dir: $d"
+              exit 0
+            fi
+          done
+          echo "ERROR: Could not find a build output directory (looked for dist, build, out, .next/out, .output/public, public)."
+          exit 1
+
+      - name: List files (debug)
+        run: ls -la "${{ steps.detect.outputs.dir }}"
+
+      - name: Preflight: ensure index.html exists
+        run: |
+          if [ ! -f "${{ steps.detect.outputs.dir }}/index.html" ]; then
+            echo "ERROR: No index.html found in ${{ steps.detect.outputs.dir }}."
+            echo "If you're using Next.js, make sure you ran 'next export' (not just next build)."
+            exit 1
+          fi
+
+      # Write the CNAME so GitHub binds your custom domain
+      - name: Add CNAME
+        run: echo "installer.jtechforums.org" > "${{ steps.detect.outputs.dir }}/CNAME"
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ${{ steps.detect.outputs.dir }}
 
       - name: Deploy to GitHub Pages
         id: deployment
