@@ -44,7 +44,8 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: none;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -111,6 +112,39 @@ body {
     padding: 2rem 0;
 }
 
+.layout-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 1.5rem;
+    align-items: stretch;
+}
+
+.left-column,
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.right-column {
+    height: 100%;
+}
+
+.right-column .console-card {
+    flex: 1;
+    height: 100%;
+}
+
+.layout-grid .card {
+    margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+    .layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .card {
     background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
     border-radius: 0.75rem;
@@ -143,6 +177,10 @@ body {
 /* ensure swiper cards stay within the install card bounds */
 .install-card {
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 2rem;
 }
 
 /* Device Status */
@@ -264,8 +302,10 @@ body {
 /* MDM Apps Slider */
 #kitsSwiper {
     width: 100%;
+    max-width: 600px;
     padding-top: 50px;
     padding-bottom: 50px;
+    margin: 0 auto;
 }
 
 #kitsSwiper .swiper-slide {
@@ -906,7 +946,3 @@ body {
     font-size: 0.875rem;
 }
 
-.install-card {
-    padding-top: 0;
-    padding-bottom: 0;
-}
