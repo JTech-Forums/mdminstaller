@@ -99,7 +99,10 @@
   width: 100%;
   margin-top: 16px;
   display: flex;
-  gap: 8px;
+  border: 1px solid rgba(99,102,241,0.28);
+  border-radius: 9999px;
+  overflow: hidden;
+
 }
 
 .action-bar button {
@@ -110,19 +113,12 @@
   font-weight: 600;
   font-size: 0.8rem;
   font-family: 'Inter', sans-serif;
-  border: 1px solid rgba(99,102,241,0.28);
-  border-radius: 9999px;
   padding: 0.5rem 0;
   cursor: pointer;
   line-height: 1;
   white-space: nowrap;
-  background: #0b1221;
-}
-
-/* reset old install button styles so gradient fills entire half */
-.action-bar .install-btn,
-.action-bar .info-btn {
-  margin-top: 0;
+  border: none;
+  background: transparent;
 }
 
 .install-btn {
@@ -142,3 +138,4 @@
 .info-btn:hover {
   background: rgba(99,102,241,0.16);
 }
+
