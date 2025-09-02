@@ -144,6 +144,21 @@ class JTechMDMInstaller {
                 }
             });
         }
+
+        // Release ADB connection when tab is hidden and reconnect when visible
+        document.addEventListener('visibilitychange', async () => {
+            if (document.hidden) {
+                if (this.device) {
+                    await this.adbConnection.disconnect(false);
+                    this.device = null;
+                    this.apkInstaller.setAdbConnection(null);
+                }
+            } else {
+                if (!this.device) {
+                    await this.tryAutoConnect();
+                }
+            }
+        });
     }
 
     showTutorialStep(index) {
@@ -175,7 +190,7 @@ class JTechMDMInstaller {
         }
     }
 
-    async handleConnect() {
+    async handleConnect(silent = false) {
         try {
             const btn = document.getElementById('connectBtn');
             if (btn) btn.disabled = true;
@@ -194,9 +209,12 @@ class JTechMDMInstaller {
             }
         } catch (error) {
             console.error('Connection error:', error);
-            this.uiManager.showError(`Connection failed: ${error.message}`);
+            if (!silent) {
+                this.uiManager.showError(`Connection failed: ${error.message}`);
+            }
             const btn = document.getElementById('connectBtn');
             if (btn) btn.disabled = false;
+            throw error;
         }
     }
 
@@ -254,9 +272,10 @@ class JTechMDMInstaller {
         this.uiManager.log('Device connected and ready', 'success');
     }
 
-    async tryAutoConnect() {
+    async tryAutoConnect(retries = 5, delay = 1000) {
         const cached = JSON.parse(localStorage.getItem('adbDevice') || 'null');
         if (!cached) return;
+
         const devices = await navigator.usb.getDevices();
         const match = devices.find(d =>
             d.vendorId === cached.vendorId &&
@@ -267,11 +286,19 @@ class JTechMDMInstaller {
             localStorage.removeItem('adbDevice');
             return;
         }
-        try {
-            await this.handleConnect();
-        } catch (error) {
-            console.error('Auto-connect failed:', error);
-            localStorage.removeItem('adbDevice');
+
+        for (let attempt = 0; attempt < retries; attempt++) {
+            try {
+                await this.handleConnect(true);
+                return;
+            } catch (error) {
+                if (!error.message.includes('another ADB instance')) {
+                    console.error('Auto-connect failed:', error);
+                    localStorage.removeItem('adbDevice');
+                    return;
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
         }
     }
 
