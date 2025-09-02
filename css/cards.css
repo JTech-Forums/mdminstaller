@@ -102,6 +102,7 @@
   border: 1px solid rgba(99,102,241,0.28);
   border-radius: 9999px;
   overflow: hidden;
+
 }
 
 .action-bar button {
@@ -132,7 +133,6 @@
 .info-btn {
   background: rgba(99,102,241,0.10);
   color: #c7d2fe;
-  border-left: 1px solid rgba(99,102,241,0.28);
 }
 
 .info-btn:hover {
