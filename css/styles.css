@@ -111,6 +111,32 @@ body {
     padding: 2rem 0;
 }
 
+/* Layout for combined MDM installer and ADB console */
+.layout {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.left-panel {
+    flex: 2;
+}
+
+.right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-panel .console-card {
+    flex: 1;
+}
+
+@media (max-width: 900px) {
+    .layout {
+        flex-direction: column;
+    }
+}
+
 .card {
     background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
     border-radius: 0.75rem;
