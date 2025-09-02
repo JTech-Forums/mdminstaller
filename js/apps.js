@@ -239,6 +239,8 @@ class JTechMDMInstaller {
 
         const installCard = document.getElementById('installCard');
         installCard?.classList.add('disabled-card');
+        const consoleCard = document.getElementById('consoleCard');
+        consoleCard?.classList.add('disabled-card');
 
         if (this.swiper) {
             this.swiper.destroy(true, true);
@@ -266,6 +268,8 @@ class JTechMDMInstaller {
         }
         const installCard = document.getElementById('installCard');
         installCard?.classList.remove('disabled-card');
+        const consoleCard = document.getElementById('consoleCard');
+        consoleCard?.classList.remove('disabled-card');
         this.uiManager.log('Device connected and ready', 'success');
     }
 
