@@ -125,18 +125,18 @@ body {
     margin: 0;
 }
 
-/* stack install card below connection card while console spans two rows */
+/* place install card on the right spanning two rows, console below connection */
 .status-card {
     grid-column: 1;
     grid-row: 1;
 }
 
-.console-card {
+.install-card {
     grid-column: 2;
     grid-row: 1 / span 2;
 }
 
-.install-card {
+.console-card {
     grid-column: 1;
     grid-row: 2;
 }
