@@ -12,10 +12,12 @@ export function renderKits(apks, { onInstall, onInfo } = {}) {
                 <div class="app-icon">
                     ${apk.image ? `<img src="${apk.image}" alt="${apk.title}">` : ''}
                 </div>
-                <span class="app-title">${apk.title}</span>
-                <div class="action-bar">
-                    <button class="install-btn">Install</button>
-                    <button class="info-btn">View Info</button>
+                <div class="app-content">
+                    <span class="app-title">${apk.title}</span>
+                    <div class="action-bar">
+                        <button class="install-btn">Install</button>
+                        <button class="info-btn">View Info</button>
+                    </div>
                 </div>
             </div>
         `;
