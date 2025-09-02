@@ -24,11 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ⬇️ Change this if your site is in another folder
+      # Upload the repo root (must contain index.html)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
