@@ -66,7 +66,7 @@ const KITS = [
     key: "MBsmart",
     title: "MBsmart",
     description: "A subscription filter for Android and iOS with secure, low-impact controls and responsive tech support.",
-    baseUrl: "/MBsmart",
+    baseUrl: "/MBSmart",
     infoUrl: "https://landing.mb-smart.net",
     apkName: "MBSmart.apk",
     cmdName: "command.txt",
