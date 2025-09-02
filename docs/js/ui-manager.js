@@ -6,6 +6,7 @@ export class UIManager {
         this.progressPercent = document.getElementById('progressPercent');
         this.installationLogs = [];
         this.setupLogControls();
+        this.showLogPlaceholder();
     }
 
     updateConnectionStatus(status, deviceInfo = null) {
@@ -66,6 +67,10 @@ export class UIManager {
 
     log(message, type = 'info') {
         if (!this.logOutput) return;
+
+        if (this.logOutput.firstChild && this.logOutput.firstChild.classList.contains('log-placeholder')) {
+            this.logOutput.innerHTML = '';
+        }
 
         const timestamp = new Date().toLocaleTimeString();
         const fullTimestamp = new Date().toISOString();
@@ -149,8 +154,17 @@ export class UIManager {
     clearLog() {
         if (this.logOutput) {
             this.logOutput.innerHTML = '';
+            this.showLogPlaceholder();
         }
         this.installationLogs = [];
+    }
+
+    showLogPlaceholder() {
+        if (!this.logOutput) return;
+        const placeholder = document.createElement('div');
+        placeholder.className = 'log-placeholder';
+        placeholder.textContent = 'No installation logs yet.';
+        this.logOutput.appendChild(placeholder);
     }
 
     showLogModal() {

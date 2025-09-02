@@ -116,15 +116,14 @@ body {
  .layout-grid {
      display: grid;
      grid-template-columns: repeat(4, 1fr);
-     gap: 1.5rem;
-     align-items: stretch;
- }
+    gap: 1.5rem;
+    align-items: start;
+}
 
- /* ensure cards fill their grid cells without extra spacing */
- .layout-grid .card {
-     margin: 0;
-     height: 100%;
- }
+/* ensure cards fill their grid cells without extra spacing */
+.layout-grid .card {
+    margin: 0;
+}
 
  /* position cards according to the new layout */
  .status-card {
@@ -650,6 +649,11 @@ body {
     overflow-y: auto;
     line-height: 1.5;
     border: 1px solid var(--border-color);
+}
+
+.log-placeholder {
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
 .log-entry {
