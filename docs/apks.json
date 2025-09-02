@@ -1,0 +1,137 @@
+[
+  {
+    "name": "GenTech",
+    "image": "/apk/GenTech/gentech.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/GenTech.apk",
+    "postInstallCommands": [
+      "dpm set-active-admin com.livigent.mdm.gt/com.livigent.mdm.backoffice.receivers.DevAdminReceiver",
+      "pm grant com.livigent.mdm.gt ",
+      "android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "Kdroid",
+    "image": "/apk/Kdroid/kdroid.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Kdroid.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.kdroid.filter/com.kdroid.filter.listener.AdminListener",
+      "pm grant com.kdroid.filter android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "KosherPlay",
+    "image": "/apk/KosherPlay/kosherplay.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/KosherPlay.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.shapsplus.kmarket/com.shapsplus.kmarket.receivers.DeviceAdminPermissionReceiver",
+      "pm grant com.shapsplus.kmarket android.permission.WRITE_SECURE_SETTINGS",
+      "settings put secure enabled_accessibility_services \"com.shapsplus.kmarket/com.shapsplus.kmarket.services.AccessService\""
+    ]
+  },
+  {
+    "name": "Livigent",
+    "image": "/apk/Livigent/livigent.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Livigent.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.lge.livigent.lglitemdm/com.lge.livigent.lglitemdm.receivers.DevAdmin",
+      "pm grant com.lge.livigent.lglitemdm android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "MBsmart",
+    "image": "/apk/MBsmart/mbsmart.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/MBsmart.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.com.babor/com.com.babor.AdminReciever",
+      "pm grant com.com.babor android.permission.WRITE_SECURE_SETTINGS",
+      "settings put secure enabled_accessibility_services \"com.com.babor/com.com.babor.accesibillity2\""
+    ]
+  },
+  {
+    "name": "Meshimer",
+    "image": "/apk/Meshimer/meshimer.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Meshimer.apk",
+    "postInstallCommands": [
+      "dpm set-active-admin com.livigent.mdm.meshimer/com.livigent.mdm.backoffice.receivers.DevAdminReceiver",
+      "pm grant com.livigent.mdm.meshimer ",
+      "android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "Netfree",
+    "image": "/apk/Netfree/netfree.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Netfree.apk",
+    "postInstallCommands": [
+      "dpm set-active-admin com.netfree.wifreemobile/com.netfree.wifreemobile.receivers.MyAdminReceiver",
+      "pm grant com.netfree.wifreemobile android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "Netspark",
+    "image": "/apk/Netspark/netspark.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Netspark.apk",
+    "postInstallCommands": [
+      "dpm set-active-admin con.netspark.mobile/com.netspark.android.netsvpn.SetAdmin\\$MyAdmin",
+      "pm grant com.netspark.mobile android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "OfflineMDM",
+    "image": "/apk/OfflineMDM/offline.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/OfflineMDM.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.rrivenllc.offlinemdm/com.rrivenllc.offlinemdm.receivers.DeviceOwnerReceiver",
+      "pm grant com.rrivenllc.offlinemdm android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "OldMDM",
+    "image": "/apk/OldMDM/oldmdm.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/OldMDM.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.android.cts.tripleu.oldmdm/.MyDeviceAdminReceiver",
+      "pm grant com.android.cts.tripleu.oldmdm android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "SecureGuard",
+    "image": "/apk/SecureGuard/secureguard.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/SecureGuard.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.secureguard.mdm/com.secureguard.mdm.SecureGuardDeviceAdminReceiver",
+      "pm grant com.secureguard.mdm ",
+      "android.permission.WRITE_SECURE_SETTINGS"
+    ]
+  },
+  {
+    "name": "Techloq",
+    "image": "/apk/Techloq/techloq.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Techloq.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.techloq.agent/com.techloq.agent.sdk.watchdog.admin.AdminReceiver",
+      "pm grant com.techloq.agent ",
+      "android.permission.WRITE_SECURE_SETTINGS",
+      "settings put secure enabled_accessibility_services \"com.techloq.agent/com.techloq.agent.sdk.watchdog.accessibility.ScreenTrackingService\""
+    ]
+  },
+  {
+    "name": "TripleUMDM",
+    "image": "/apk/TripleUMDM/tripleumdm.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/TripleUMDM.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.tripleu.mdm/com.tripleu.mdm.helper.DeviceAdminReceiver",
+      "pm grant com.tripleu.mdm android.permission.WRITE_SECURE_SETTINGS",
+      "settings put secure enabled_accessibility_services \"com.tripleu.mdm/com.tripleu.mdm.helper.AppBlockAccessibilityService\""
+    ]
+  },
+  {
+    "name": "eGate",
+    "image": "/apk/eGate/egate.svg",
+    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/eGate.apk",
+    "postInstallCommands": [
+      "dpm set-device-owner com.oss.egate/com.oss.egate.a",
+      "pm grant com.oss.egate android.permission.WRITE_SECURE_SETTINGS",
+      "settings put secure enabled_accessibility_services \"com.oss.egate/com.oss.egate.MyAccessibilityService\""
+    ]
+  }
+]

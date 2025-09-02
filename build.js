@@ -38,4 +38,50 @@ for (const item of items) {
   copyRecursive(srcPath, destPath);
 }
 
+// generate APK metadata for static builds
+function generateApkMetadata() {
+  const apkDir = path.join(root, 'apk');
+  const entries = fs.readdirSync(apkDir, { withFileTypes: true });
+
+  const apps = entries
+    .filter((e) => e.isDirectory() && e.name !== 'blog')
+    .map((dir) => {
+      const dirPath = path.join(apkDir, dir.name);
+
+      let postInstallCommands = null;
+      const commandPath = path.join(dirPath, 'command.txt');
+      if (fs.existsSync(commandPath)) {
+        const content = fs.readFileSync(commandPath, 'utf8');
+        postInstallCommands = content
+          .trim()
+          .split('\n')
+          .filter((c) => c.trim());
+      }
+
+      let imageFile = null;
+      for (const file of fs.readdirSync(dirPath)) {
+        if (/\.(png|jpe?g|svg)$/i.test(file)) {
+          imageFile = `/apk/${dir.name}/${file}`;
+          break;
+        }
+      }
+
+      const apkUrl = `https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/${dir.name}.apk`;
+
+      return {
+        name: dir.name,
+        image: imageFile,
+        url: apkUrl,
+        postInstallCommands
+      };
+    });
+
+  fs.writeFileSync(
+    path.join(outDir, 'apks.json'),
+    JSON.stringify(apps, null, 2)
+  );
+}
+
+generateApkMetadata();
+
 console.log(`Built static site in ${outDir}`);
