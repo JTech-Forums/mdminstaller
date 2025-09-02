@@ -24,11 +24,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Optional but recommended: prepares Pages config (base path, etc.)
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      # ⬇️ Change this to the directory that contains index.html
+      # 🔎 Preflight: ensure index.html is at the artifact root (repo root in this setup)
+      - name: Preflight index.html
+        run: |
+          if [ ! -f "index.html" ]; then
+            echo "ERROR: index.html not found at repo root. Set path accordingly or move files."
+            exit 1
+          fi
+
+      # ✅ Write CNAME so GitHub binds the custom domain
+      - name: Add CNAME
+        run: echo "installer.jtechforums.org" > CNAME
+
+      # ⬇️ If your site lives in a different dir, change path: accordingly
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
