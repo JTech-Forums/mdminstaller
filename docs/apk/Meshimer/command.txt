@@ -1,0 +1,3 @@
+dpm set-active-admin com.livigent.mdm.meshimer/com.livigent.mdm.backoffice.receivers.DevAdminReceiver
+pm grant com.livigent.mdm.meshimer 
+android.permission.WRITE_SECURE_SETTINGS
