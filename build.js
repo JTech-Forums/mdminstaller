@@ -26,6 +26,8 @@ fs.mkdirSync(outDir, { recursive: true });
 const items = [
   { src: 'template.html', dest: 'index.html' },
   { src: 'console.html', dest: 'console.html' },
+  { src: 'privacy.html', dest: 'privacy.html' },
+  { src: 'privacy.txt', dest: 'privacy.txt' },
   { src: 'css', dest: 'css' },
   { src: 'js', dest: 'js' },
   { src: 'apk', dest: 'apk' },

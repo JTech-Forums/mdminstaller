@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: #333;
+}
+
+.policy-container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 80%;
+    max-width: 900px;
+}
+
+.policy-content {
+    white-space: pre-wrap;
+    height: 60vh;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.policy-actions {
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.policy-actions label {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.policy-actions button {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.policy-actions button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
