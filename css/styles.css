@@ -778,17 +778,25 @@ body {
 #privacyModal .modal-content {
     max-width: 900px;
     max-height: 85vh;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 #privacyText {
     white-space: pre-wrap;
     height: 60vh;
     overflow-y: auto;
+    overflow-x: hidden;
     margin-bottom: 1.5rem;
     font-size: 1rem;
     line-height: 1.6;
     scrollbar-width: none;
     -ms-overflow-style: none;
+}
+
+#privacyModal .modal-content::-webkit-scrollbar {
+    display: none;
 }
 
 #privacyText::-webkit-scrollbar {
