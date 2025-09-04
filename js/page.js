@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <title>JTech MDM Installer - Android Device Management</title>
         <link rel="stylesheet" href="css/styles.css">
         <link rel="stylesheet" href="css/cards.css">
-        <link rel="stylesheet" href="css/cursor-trail.css">
+        <link rel="stylesheet" href="css/fluid-cursor.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     [
         "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js",
         "js/ui/auto-scale.js",
-        "js/ui/cursor-trail.js",
+        "js/ui/fluid-cursor.js",
         "js/privacy.js",
         { src: "js/apps.js", type: "module" }
     ].forEach(item => {

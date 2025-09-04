@@ -29,5 +29,10 @@
   },
   "engines": {
     "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "fluidcursor": "^1.0.1",
+    "gsap": "^3.12.5",
+    "undici": "^6.19.8"
   }
 }
