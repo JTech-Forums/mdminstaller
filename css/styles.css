@@ -116,7 +116,7 @@ body {
 
 .nav-btn {
     background: transparent;
-    border: 1px solid var(--border-color);
+    border: 1px solid transparent; /* no visible casing by default */
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     cursor: pointer;
@@ -127,13 +127,21 @@ body {
 }
 
 .nav-btn:hover {
-    background: linear-gradient(135deg, var(--secondary-gradient-start), var(--secondary-gradient-end));
+    background: transparent; /* show only ring on hover */
     border-color: var(--primary-color);
-    color: white;
+    box-shadow: 0 0 0 1px var(--primary-color), 0 0 12px rgba(59, 130, 246, 0.45);
+    color: var(--text-primary);
 }
 
 .nav-btn:visited {
     color: var(--text-primary);
+}
+
+/* Keyboard focus accessibility */
+.nav-btn:focus-visible {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color), 0 0 14px rgba(59, 130, 246, 0.5);
 }
 
 /* Main Content */
