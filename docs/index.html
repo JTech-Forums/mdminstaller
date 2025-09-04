@@ -5,11 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JTech MDM Installer - Android Device Management</title>
-    <script>
-        if (!localStorage.getItem('privacyAccepted') && !window.location.search.includes('preview')) {
-            window.location.replace('privacy.html');
-        }
-    </script>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/cards.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -105,6 +100,29 @@
             </div>
         </div>
     </main>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal hidden" id="privacyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Privacy Policy</h2>
+            </div>
+            <div class="modal-body">
+                <div id="privacyText" class="policy-content"></div>
+                <div class="policy-actions">
+                    <label><input type="checkbox" id="policyCheck"> I agree to the Privacy Policy</label>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="rejectPolicyBtn">Reject</button>
+                    <button class="btn btn-primary" id="acceptPolicyBtn" disabled>Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="policyBlocker" class="policy-blocker hidden">
+        <p>Privacy policy not accepted. Refresh to try again.</p>
+    </div>
 
     <!-- Welcome Modal -->
     <div class="modal hidden" id="welcomeModal">
@@ -204,6 +222,7 @@
     <script src="js/adb/webadb.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="js/ui/auto-scale.js"></script>
+    <script src="js/privacy.js"></script>
     <script src="js/apps.js" type="module"></script>
 </body>
 </html>
