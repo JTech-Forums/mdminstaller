@@ -213,7 +213,11 @@ class JTechMDMInstaller {
         } catch (error) {
             console.error('Connection error:', error);
             if (!silent) {
-                this.uiManager.showError(`Connection failed: ${error.message}`);
+                if (error.message && error.message.includes('Unable to claim interface')) {
+                    this.uiManager.showError("Connection failed: another ADB server might already be using the device. Run `adb kill-server` in your command prompt and then retry.");
+                } else {
+                    this.uiManager.showError(`Connection failed: ${error.message}`);
+                }
             }
             const btn = document.getElementById('connectBtn');
             if (btn) btn.disabled = false;
