@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <nav class="nav">
                     <button class="nav-btn" id="tutorialBtn">Tutorial</button>
                     <button class="nav-btn" id="aboutBtn">About</button>
+                    <a class="nav-btn" id="forumsBtn" href="https://forums.jtechforums.org/signup" target="_blank" rel="noopener noreferrer">Jtech Forums</a>
                     <a class="nav-btn" id="contactBtn" href="https://jtechforums.org/contact-us" target="_blank" rel="noopener noreferrer">Contact Us</a>
                 </nav>
             </div>
