@@ -775,6 +775,12 @@ body {
     margin-top: 1.5rem;
 }
 
+#mobileWarningModal {
+    padding: 0;
+    align-items: stretch;
+    z-index: 1100;
+}
+
 #mobileWarningModal .modal-content {
     max-width: none;
     width: 100%;
