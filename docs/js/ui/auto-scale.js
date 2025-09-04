@@ -12,3 +12,4 @@
     window.addEventListener('load', adjustScale);
     window.addEventListener('resize', adjustScale);
 })();
+

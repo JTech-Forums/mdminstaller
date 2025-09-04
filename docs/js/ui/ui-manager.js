@@ -234,3 +234,4 @@ export class UIManager {
         this.logToConsole(message, 'warning');
     }
 }
+
