@@ -33,7 +33,7 @@
 }
 
 .card-modern {
-  background: linear-gradient(180deg, #141a28 0%, #0f172a 100%);
+  background: linear-gradient(180deg, #0a0f1a 0%, #000000 100%);
   color: #e5e7eb;
   border-radius: 16px;
   width: 100%;
@@ -55,7 +55,7 @@
 
 .swiper-slide-active .card-modern {
   transform: scale(1.03);
-  box-shadow: 0 16px 36px rgba(99,102,241,0.32);
+  box-shadow: 0 16px 36px rgba(59,130,246,0.38);
 }
 
 .app-item {
@@ -112,7 +112,7 @@
   white-space: nowrap;
   border: none;
   border-radius: 9999px;
-  background: linear-gradient(90deg,#6d66f6,#7c6cf4);
+  background: linear-gradient(90deg,#3b82f6,#2563eb);
   color: #fff;
   text-decoration: none;
 }

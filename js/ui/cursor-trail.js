@@ -1,7 +1,7 @@
 class CursorTrail {
     constructor() {
         const rootStyles = getComputedStyle(document.documentElement);
-        this.color = rootStyles.getPropertyValue('--primary-color').trim() || '#8b5cf6';
+        this.color = rootStyles.getPropertyValue('--primary-color').trim() || '#3b82f6';
         const { r, g, b } = this.hexToRgb(this.color);
         this.rgbColor = `${r}, ${g}, ${b}`;
         this.particles = [];
