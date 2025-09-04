@@ -779,10 +779,7 @@ class JTechMDMInstaller {
         }
 
         try {
-            const shell = await this.adbConnection.adb.shell(command);
-            const output = await this.adbConnection.receiveAll(shell);
-            await shell.close();
-            return output;
+            return await this.adbConnection.adb.subprocess.spawnWaitText(command);
         } catch (error) {
             throw new Error(`Failed to execute command: ${error.message}`);
         }
