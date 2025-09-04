@@ -16,6 +16,18 @@
     <meta property="og:image" content="icon.png">
 </head>
 <body>
+    <div class="modal hidden" id="mobileWarningModal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Desktop Browser Only</h2>
+                <p>This site is for desktop browsers and may not work well on mobile devices. Do you wish to proceed?</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="mobileLeaveBtn">Go Back</button>
+                    <button class="btn btn-primary" id="mobileProceedBtn">Proceed Anyway</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <header class="header">
         <div class="container">
             <div class="logo">
@@ -225,6 +237,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="js/mobile-warning.js"></script>
     <script src="js/ui/auto-scale.js"></script>
     <script src="js/ui/cursor-trail.js"></script>
     <script src="js/privacy.js"></script>
