@@ -1,26 +1,6 @@
 import { Adb, AdbDaemonTransport } from 'https://cdn.jsdelivr.net/npm/@yume-chan/adb@2.1.0/+esm';
 import { AdbDaemonWebUsbDeviceManager } from 'https://cdn.jsdelivr.net/npm/@yume-chan/adb-daemon-webusb@2.1.0/+esm';
-
-const STATIC_PRIVATE_KEY_B64 = 'MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCjKztWbYwjKI6qa1eOr10yYSMoMMJvGRp40zWeD7SncxN3piurZiFngF+I+NdEikEvLGfXg1uRSgxrIpwYbrU9b1KQUxkTYSR7mdSG7sn5BbpSZuoXSAztwxhM3EpPZfd3xkFTtr8RmHv/jjfNJda/aM5SxwYBSU3wIb/T0SJokskC33CZzxC7AL1XuXOMoXntus6L9xM+QEZBvDypItME/iLV+Cwu1ZcPJQBRfuB1JRR5hRMX41nfpbXHxHaDNQKUaEsFpSyu/YE+2/hkKQqMapjTFX4cTiJohIAyPu4kJdEY+4o34m6I0njKHb+9wV+ORMO0HIw9pZ7h2D9AKfbAgMBAAECggEAB5UbOU127S1Vz+KUG4vXq18rOJNnfa0vdzztaW52aS+mUHGW5uykkcA78EwMCOHZ3JzWKIQwraRAxpn1hvprqbjPtpMpPyIBDp0DDSQ/wr9NN0MV6jGFrRGNEDlJQW7cz1EuQvpin8WPiI0KTIkPnYla2+87G3yluZ0HSPcAitq+P3kuhUCI4DR6CWA3LU1LEaApf2uKnt0r7wvRxmBJIVLNP+GESpZzo2BV/oEsuIr71JEEAza+z36cEOMi31HnVshV1ebiJAotrZpqU/oy6K8ub2kwv8oProVAP+OOpe6peLiANwmykHcPRDlXA3cLOn7JGTD8o81O3qfa0exxqQKBgQDlKc6uCgWDVx62Fk7upd1ZVzPbLNWc9jOnx/GFJ9ISF6ig6xQbSSZwJ5PCG70BQJ0azqZ6IWjJyDT2OrBh6WUWcrG3FY06PJbUQ+knbsHUb1tgxkEXTMV8BPqIVXInKVX3HEL4HXouKZZs2tEQtdmro/p8+8sucTyFcp7E/6mCuQKBgQC2RvJgz4kCSLLtejaLOZv2T8R96N4secx4BZPxrlI95HGDsweHXFbjHCiZgb5V8bjkrth/dcEXPX4IYaiU60CWZ8ff0B6C8S4GE0XRDW5dKwFmRQYwFpEtJk3zZy8cDVUndWw9qLf6gWjIahepzQogmv1D0zaJfj/qSXJXVR4FMwKBgQCaPxmua3BqhylUxo86csoaaGevDu55R/5c4GfgiH0NUH9gUNqnwwTsWLdL3//H6AXXFWFYs0QlDW0Yj0hJnx87jNexs//rQv0CwvMcZ6BvrMSEzuzhEfubDn7TZTAAzAHg4lTxTGYAzF1Dx8UQylZJAYaIubJ5AB8Mc6oKT0t5gQKBgQCtX84rRzuKcJvARf6bbrBqGHVNTbIFm9RgVO3jc2vGcwOFwUPn/GyomKAFYuMn3EOBQM2sbtS6xkKatkkjXKCSbyQuPkbHRaABJ1PBBIV1GPK70+uO0ehEiaqbWgn1JLlaTtYlz9Uu8Og5uK/JUr3PRZygZsX5AZzJvBKF/vAPAQKBgAq6uyV0AsB0S5whnJmjRUn15SMNPD4odIaVs16L7xlaWD6rGjXw78zTCnTbD9obK9CrcnIg2sEAutX65U624pkhiYeEvzkq8tqHmFDiKXB5iFV/SfZV+1qEdIoC22/gXzbiCC+ZP6/gtSAt7V4/lvleetU+EuYa9FB/vi4vlotE';
-const PRIVATE_KEY_STORAGE_KEY = 'adbPrivateKey';
-
-function fromB64(b64) {
-    return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-}
-
-function getPersistedKey() {
-    try {
-        let keyB64 = localStorage.getItem(PRIVATE_KEY_STORAGE_KEY);
-        if (!keyB64) {
-            keyB64 = STATIC_PRIVATE_KEY_B64;
-            localStorage.setItem(PRIVATE_KEY_STORAGE_KEY, keyB64);
-        }
-        return fromB64(keyB64);
-    } catch (e) {
-        console.warn('Failed to access stored ADB key', e);
-        return fromB64(STATIC_PRIVATE_KEY_B64);
-    }
-}
+import AdbWebCredentialStore from 'https://cdn.jsdelivr.net/npm/@yume-chan/adb-credential-web@2.1.0/+esm';
 
 export class AdbConnection {
     constructor() {
@@ -28,6 +8,7 @@ export class AdbConnection {
         this.device = null;
         this.transport = null;
         this.adb = null;
+        this.credentialStore = new AdbWebCredentialStore('WebADB Key');
     }
 
     async connect(uiManager = null) {
@@ -66,16 +47,10 @@ export class AdbConnection {
 
             const connection = await target.connect();
 
-            const privateKey = getPersistedKey();
-            const credentialStore = {
-                async generateKey() { return { buffer: privateKey }; },
-                iterateKeys() { return [{ buffer: privateKey }]; }
-            };
-
             this.transport = await AdbDaemonTransport.authenticate({
                 serial: target.serial,
                 connection,
-                credentialStore
+                credentialStore: this.credentialStore
             });
 
             this.adb = new Adb(this.transport);
