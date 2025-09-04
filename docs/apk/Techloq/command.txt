@@ -1,4 +1,3 @@
 dpm set-device-owner com.techloq.agent/com.techloq.agent.sdk.watchdog.admin.AdminReceiver
-pm grant com.techloq.agent 
-android.permission.WRITE_SECURE_SETTINGS
+pm grant com.techloq.agent android.permission.WRITE_SECURE_SETTINGS
 settings put secure enabled_accessibility_services "com.techloq.agent/com.techloq.agent.sdk.watchdog.accessibility.ScreenTrackingService"

@@ -625,6 +625,7 @@ class JTechMDMInstaller {
                 this.uiManager.logToConsole('Accounts detected - temporarily disabling account apps...', 'warning');
                 const disabled = await disableAccountApps(this.adbConnection);
                 try {
+                    this.uiManager.logToConsole('Retrying device owner command...', 'info');
                     result = await this.adbConnection.executeShellCommand(command);
                 } finally {
                     await reenablePackages(this.adbConnection, disabled);
