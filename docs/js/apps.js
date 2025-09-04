@@ -204,6 +204,7 @@ class JTechMDMInstaller {
                 // Connect
                 this.uiManager.logToConsole('Requesting USB device access...', 'info');
                 this.uiManager.logToConsole('Please select your Android device from the browser prompt', 'info');
+                this.uiManager.showWarning('Tap allow on your device');
                 this.device = await this.adbConnection.connect(this.uiManager);
 
                 if (this.device) {
