@@ -22,10 +22,31 @@
 
 	// Set this to false for new devices (post Dec 2017) if
 	// autodetection doesn't handle it automatically.
-	Adb.Opt.use_checksum = true;
+        Adb.Opt.use_checksum = true;
 
-	let db = init_db();
-	let keys = db.then(load_keys);
+        const STATIC_PRIVATE_KEY_B64 = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCjKztWbYwjKI6qa1eOr10yYSMoMMJvGRp40zWeD7SncxN3piurZiFngF+I+NdEikEvLGfXg1uRSgxrIpwYbrU9b1KQUxkTYSR7mdSG7sn5BbpSZuoXSAztwxhM3EpPZfd3xkFTtr8RmHv/jjfNJda/aM5SxwYBSU3wIb/T0SJokskC33CZzxC7AL1XuXOMoXntus6L9xM+QEZBvDypItME/iLV+Cwu1ZcPJQBRfuB1JRR5hRMX41nfpbXHxHaDNQKUaEsFpSyu/YE+2/hkKQqMapjTFX4cTiJohIAyPu4kJdEY+4o34m6I0njKHb+9wV+ORMO0HIw9pZ7h2D9AKfbAgMBAAECggEAB5UbOU127S1Vz+KUG4vXq18rOJNnfa0vdzztaW52aS+mUHGW5uykkcA78EwMCOHZ3JzWKIQwraRAxpn1hvprqbjPtpMpPyIBDp0DDSQ/wr9NN0MV6jGFrRGNEDlJQW7cz1EuQvpin8WPiI0KTIkPnYla2+87G3yluZ0HSPcAitq+P3kuhUCI4DR6CWA3LU1LEaApf2uKnt0r7wvRxmBJIVLNP+GESpZzo2BV/oEsuIr71JEEAza+z36cEOMi31HnVshV1ebiJAotrZpqU/oy6K8ub2kwv8oProVAP+OOpe6peLiANwmykHcPRDlXA3cLOn7JGTD8o81O3qfa0exxqQKBgQDlKc6uCgWDVx62Fk7upd1ZVzPbLNWc9jOnx/GFJ9ISF6ig6xQbSSZwJ5PCG70BQJ0azqZ6IWjJyDT2OrBh6WUWcrG3FY06PJbUQ+knbsHUb1tgxkEXTMV8BPqIVXInKVX3HEL4HXouKZZs2tEQtdmro/p8+8sucTyFcp7E/6mCuQKBgQC2RvJgz4kCSLLtejaLOZv2T8R96N4secx4BZPxrlI95HGDsweHXFbjHCiZgb5V8bjkrth/dcEXPX4IYaiU60CWZ8ff0B6C8S4GE0XRDW5dKwFmRQYwFpEtJk3zZy8cDVUndWw9qLf6gWjIahepzQogmv1D0zaJfj/qSXJXVR4FMwKBgQCaPxmua3BqhylUxo86csoaaGevDu55R/5c4GfgiH0NUH9gUNqnwwTsWLdL3//H6AXXFWFYs0QlDW0Yj0hJnx87jNexs//rQv0CwvMcZ6BvrMSEzuzhEfubDn7TZTAAzAHg4lTxTGYAzF1Dx8UQylZJAYaIubJ5AB8Mc6oKT0t5gQKBgQCtX84rRzuKcJvARf6bbrBqGHVNTbIFm9RgVO3jc2vGcwOFwUPn/GyomKAFYuMn3EOBQM2sbtS6xkKatkkjXKCSbyQuPkbHRaABJ1PBBIV1GPK70+uO0ehEiaqbWgn1JLlaTtYlz9Uu8Og5uK/JUr3PRZygZsX5AZzJvBKF/vAPAQKBgAq6uyV0AsB0S5whnJmjRUn15SMNPD4odIaVs16L7xlaWD6rGjXw78zTCnTbD9obK9CrcnIg2sEAutX65U624pkhiYeEvzkq8tqHmFDiKXB5iFV/SfZV+1qEdIoC22/gXzbiCC+ZP6/gtSAt7V4/lvleetU+EuYa9FB/vi4vlotE";
+        const STATIC_PUBLIC_KEY_B64 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoys7Vm2MIyiOqmtXjq9dMmEjKDDCbxkaeNM1ng+0p3MTd6Yrq2YhZ4BfiPjXRIpBLyxn14NbkUoMbayKcGG61PW9SkFMZE2Eke5nUhu7J+QW6UmbqF0gM7cMYTNxKT2X3d8ZBU7a/EZh7/443zSXWv2jOUscGAUlN8CG/09EiaJLJAt9wmc8QuwC9V7lzjKF57brOi/cTPkBGQbw8qSLTBP4i1fgsLtWXDyUAUX7gdSUUeYUTF+NZ36W1x8R2gzUClGhLBaUsrv2BPtv4ZCkKjGqY0xV+HE4iaISAMj7uJCXRGPuKN+JuiNJ4yh2/vcFfjkTDtByMPaWe4dg/QCn2wIDAQAB";
+
+        function fromB64(b64) {
+                return Uint8Array.from(atob(b64), c => c.charCodeAt(0)).buffer;
+        }
+
+        let keys = Promise.all([
+                crypto.subtle.importKey(
+                        "spki",
+                        fromB64(STATIC_PUBLIC_KEY_B64),
+                        { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } },
+                        false,
+                        ["verify"]
+                ),
+                crypto.subtle.importKey(
+                        "pkcs8",
+                        fromB64(STATIC_PRIVATE_KEY_B64),
+                        { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } },
+                        false,
+                        ["sign"]
+                )
+        ]).then(([publicKey, privateKey]) => [{ publicKey, privateKey }]);
 
 	Adb.open = function(transport) {
 		if (transport == "WebUSB")
