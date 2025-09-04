@@ -2,20 +2,42 @@
     position: fixed;
     top: 0;
     left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10000;
+    filter: url(#gooey);
+}
+
+.fluid-cursor .cursor-dot,
+.fluid-cursor .cursor-follow,
+.fluid-cursor .cursor-trail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    background-color: rgba(139, 92, 246, 0.4);
+}
+
+.fluid-cursor .cursor-dot {
+    width: 8px;
+    height: 8px;
+    background-color: rgba(139, 92, 246, 0.9);
+}
+
+.fluid-cursor .cursor-follow {
+    width: 24px;
+    height: 24px;
+    background-color: rgba(139, 92, 246, 0.5);
+}
+
+.fluid-cursor .cursor-trail {
     width: 40px;
     height: 40px;
-    margin-left: -20px;
-    margin-top: -20px;
-    pointer-events: none;
-    border-radius: 50%;
-    background-color: rgba(139, 92, 246, 0.2);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
-    backdrop-filter: blur(10px);
-    mix-blend-mode: multiply;
-    transition: width 0.2s ease, height 0.2s ease, background-color 0.3s ease;
-    z-index: 10000;
+    background-color: rgba(139, 92, 246, 0.3);
 }
 
 .hide-cursor {
     cursor: none;
 }
+
