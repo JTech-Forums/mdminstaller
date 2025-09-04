@@ -204,7 +204,15 @@ class JTechMDMInstaller {
                 // Connect
                 this.uiManager.logToConsole('Requesting USB device access...', 'info');
                 this.uiManager.logToConsole('Please select your Android device from the browser prompt', 'info');
-                this.device = await this.adbConnection.connect(this.uiManager);
+                const connectPromise = this.adbConnection.connect(this.uiManager);
+                let dismissAllow = null;
+                const allowTimer = setTimeout(() => {
+                    dismissAllow = this.uiManager.showWarning('Tap allow on your device');
+                }, 1000);
+                this.device = await connectPromise.finally(() => {
+                    clearTimeout(allowTimer);
+                    if (dismissAllow) dismissAllow();
+                });
 
                 if (this.device) {
                     await this.finalizeConnection();
@@ -216,7 +224,8 @@ class JTechMDMInstaller {
                 if (error.message && error.message.includes('Unable to claim interface')) {
                     this.uiManager.showError("Connection failed: another ADB server might already be using the device. Run `adb kill-server` in your command prompt and then retry.");
                 } else {
-                    this.uiManager.showError(`Connection failed: ${error.message}`);
+                    const errorText = error?.message || error?.name || String(error);
+                    this.uiManager.showError(`Connection failed: ${errorText}`);
                 }
             }
             const btn = document.getElementById('connectBtn');
@@ -778,10 +787,7 @@ class JTechMDMInstaller {
         }
 
         try {
-            const shell = await this.adbConnection.adb.shell(command);
-            const output = await this.adbConnection.receiveAll(shell);
-            await shell.close();
-            return output;
+            return await this.adbConnection.adb.subprocess.spawnWaitText(command);
         } catch (error) {
             throw new Error(`Failed to execute command: ${error.message}`);
         }

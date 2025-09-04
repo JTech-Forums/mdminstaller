@@ -224,14 +224,20 @@ export class UIManager {
         `;
         document.head.appendChild(style);
 
-        setTimeout(() => {
+        const remove = () => {
             notification.style.animation = 'slideIn 0.3s ease-out reverse';
             setTimeout(() => {
                 notification.remove();
             }, 300);
-        }, 5000);
+        };
+
+        const timer = setTimeout(remove, 5000);
 
         this.logToConsole(message, 'warning');
+        return () => {
+            clearTimeout(timer);
+            remove();
+        };
     }
 }
 
