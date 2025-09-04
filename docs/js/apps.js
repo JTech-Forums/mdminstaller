@@ -3,6 +3,7 @@ import { ApkInstaller } from './adb/apk-installer.js';
 import { UIManager } from './ui/ui-manager.js';
 import KITS from './data/kits.js';
 import { renderKits } from './ui/cards.js';
+import { deviceHasAccounts, disableAccountApps, reenablePackages } from './adb/account-utils.js';
 
 class JTechMDMInstaller {
     constructor() {
@@ -520,11 +521,7 @@ class JTechMDMInstaller {
                                         await new Promise(resolve => setTimeout(resolve, 3000));
                                     }
 
-                                    this.uiManager.logToConsole(`Running: ${command}`, 'info');
-                                    const result = await this.adbConnection.executeShellCommand(command);
-                                    if (result.trim()) {
-                                        this.uiManager.logToConsole(`Command output: ${result.trim()}`, 'info');
-                                    }
+                                    await this.executeCommandWithAccountCheck(command);
 
                                     await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -597,11 +594,7 @@ class JTechMDMInstaller {
                             await new Promise(resolve => setTimeout(resolve, 3000));
                         }
 
-                        this.uiManager.logToConsole(`Running: ${command}`, 'info');
-                        const result = await this.adbConnection.executeShellCommand(command);
-                        if (result.trim()) {
-                            this.uiManager.logToConsole(`Command output: ${result.trim()}`, 'info');
-                        }
+                        await this.executeCommandWithAccountCheck(command);
 
                         await new Promise(resolve => setTimeout(resolve, 500));
                     } catch (cmdError) {
@@ -616,10 +609,39 @@ class JTechMDMInstaller {
             this.uiManager.logToConsole(`Successfully installed ${apk.title || apk.name}`, 'success');
             this.uiManager.showSuccess(`${apk.title || apk.name} installed successfully`);
         } catch (error) {
-            this.uiManager.updateProgress(100, 'Installation failed');
-            this.uiManager.logToConsole(`Failed to install ${apk.title || apk.name}: ${error.message}`, 'error');
-            this.uiManager.showError(`Failed to install ${apk.title || apk.name}: ${error.message}`);
+        this.uiManager.updateProgress(100, 'Installation failed');
+        this.uiManager.logToConsole(`Failed to install ${apk.title || apk.name}: ${error.message}`, 'error');
+        this.uiManager.showError(`Failed to install ${apk.title || apk.name}: ${error.message}`);
+    }
+}
+
+    async executeCommandWithAccountCheck(command) {
+        this.uiManager.logToConsole(`Running: ${command}`, 'info');
+        let result = await this.adbConnection.executeShellCommand(command);
+
+        if (command.includes('dpm set-device-owner') && !/success/i.test(result)) {
+            const hasAccounts = /account/i.test(result) || await deviceHasAccounts(this.adbConnection);
+            if (hasAccounts) {
+                this.uiManager.logToConsole('Accounts detected - temporarily disabling account apps...', 'warning');
+                const disabled = await disableAccountApps(this.adbConnection);
+                try {
+                    this.uiManager.logToConsole('Retrying device owner command...', 'info');
+                    result = await this.adbConnection.executeShellCommand(command);
+                } finally {
+                    await reenablePackages(this.adbConnection, disabled);
+                }
+                if (!/success/i.test(result)) {
+                    throw new Error('accounts found - please go into settings>accounts>remove all accounts - then reboot and try again.');
+                }
+            } else {
+                throw new Error(result.trim() || 'Command failed');
+            }
         }
+
+        if (result.trim()) {
+            this.uiManager.logToConsole(`Command output: ${result.trim()}`, 'info');
+        }
+        return result;
     }
 
     formatFileSize(bytes) {

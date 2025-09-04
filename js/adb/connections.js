@@ -65,10 +65,19 @@ export class AdbConnection {
             this.adb = await connectWithAuth();
 
             // Wait until the device is authorized
+            let attempt = 0;
             while (this.adb && this.adb.mode === 'unauthorized') {
                 console.log('Waiting for device authorization...');
                 await new Promise(resolve => setTimeout(resolve, 1000));
+                try {
+                    await this.adb.close();
+                } catch {}
                 this.adb = await connectWithAuth();
+                if (++attempt >= 10) break;
+            }
+
+            if (this.adb?.mode === 'unauthorized') {
+                throw new Error('Device authorization required. Please check your Android device and tap "Allow".');
             }
 
             if (authNotification && uiManager) {

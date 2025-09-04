@@ -5,8 +5,7 @@
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/GenTech.apk",
     "postInstallCommands": [
       "dpm set-active-admin com.livigent.mdm.gt/com.livigent.mdm.backoffice.receivers.DevAdminReceiver",
-      "pm grant com.livigent.mdm.gt ",
-      "android.permission.WRITE_SECURE_SETTINGS"
+      "pm grant com.livigent.mdm.gt android.permission.WRITE_SECURE_SETTINGS"
     ]
   },
   {
@@ -53,8 +52,7 @@
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Meshimer.apk",
     "postInstallCommands": [
       "dpm set-active-admin com.livigent.mdm.meshimer/com.livigent.mdm.backoffice.receivers.DevAdminReceiver",
-      "pm grant com.livigent.mdm.meshimer ",
-      "android.permission.WRITE_SECURE_SETTINGS"
+      "pm grant com.livigent.mdm.meshimer android.permission.WRITE_SECURE_SETTINGS"
     ]
   },
   {
@@ -99,8 +97,7 @@
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/SecureGuardMDM.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.secureguard.mdm/com.secureguard.mdm.SecureGuardDeviceAdminReceiver",
-      "pm grant com.secureguard.mdm ",
-      "android.permission.WRITE_SECURE_SETTINGS"
+      "pm grant com.secureguard.mdm android.permission.WRITE_SECURE_SETTINGS"
     ]
   },
   {
@@ -109,8 +106,7 @@
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Techloq.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.techloq.agent/com.techloq.agent.sdk.watchdog.admin.AdminReceiver",
-      "pm grant com.techloq.agent ",
-      "android.permission.WRITE_SECURE_SETTINGS",
+      "pm grant com.techloq.agent android.permission.WRITE_SECURE_SETTINGS",
       "settings put secure enabled_accessibility_services \"com.techloq.agent/com.techloq.agent.sdk.watchdog.accessibility.ScreenTrackingService\""
     ]
   },
