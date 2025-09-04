@@ -1,6 +1,6 @@
 'use strict';
 
-const canvas = document.querySelector('#fluid-banner canvas');
+const canvas = document.getElementById('fluid-canvas');
 canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
 
@@ -56,7 +56,7 @@ function getWebGLContext(canvas) {
     supportLinearFiltering = gl.getExtension('OES_texture_half_float_linear');
   }
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
   const halfFloatTexType = isWebGL2 ? gl.HALF_FLOAT : halfFloat.HALF_FLOAT_OES;
   let formatRGBA;
@@ -638,33 +638,30 @@ function resizeCanvas() {
   }
 }
 
-canvas.addEventListener('mousemove', e => {
-  pointers[0].moved = pointers[0].down;
-  pointers[0].dx = (e.offsetX - pointers[0].x) * 10.0;
-  pointers[0].dy = (e.offsetY - pointers[0].y) * 10.0;
-  pointers[0].x = e.offsetX;
-  pointers[0].y = e.offsetY;
+window.addEventListener('mousemove', e => {
+  pointers[0].down = true;
+  pointers[0].moved = true;
+  pointers[0].dx = (e.clientX - pointers[0].x) * 10.0;
+  pointers[0].dy = (e.clientY - pointers[0].y) * 10.0;
+  pointers[0].x = e.clientX;
+  pointers[0].y = e.clientY;
+  pointers[0].color = [Math.random() + 0.2, Math.random() + 0.2, Math.random() + 0.2];
 });
 
-canvas.addEventListener('touchmove', e => {
+window.addEventListener('touchmove', e => {
   e.preventDefault();
   const touches = e.targetTouches;
   for (let i = 0; i < touches.length; i++) {
     let pointer = pointers[i];
-    pointer.moved = pointer.down;
-    pointer.dx = (touches[i].pageX - pointer.x) * 10.0;
-    pointer.dy = (touches[i].pageY - pointer.y) * 10.0;
-    pointer.x = touches[i].pageX;
-    pointer.y = touches[i].pageY;
+    pointer.moved = true;
+    pointer.dx = (touches[i].clientX - pointer.x) * 10.0;
+    pointer.dy = (touches[i].clientY - pointer.y) * 10.0;
+    pointer.x = touches[i].clientX;
+    pointer.y = touches[i].clientY;
   }
 }, false);
 
-canvas.addEventListener('mousemove', () => {
-  pointers[0].down = true;
-  pointers[0].color = [Math.random() + 0.2, Math.random() + 0.2, Math.random() + 0.2];
-});
-
-canvas.addEventListener('touchstart', e => {
+window.addEventListener('touchstart', e => {
   e.preventDefault();
   const touches = e.targetTouches;
   for (let i = 0; i < touches.length; i++) {
@@ -673,8 +670,8 @@ canvas.addEventListener('touchstart', e => {
 
     pointers[i].id = touches[i].identifier;
     pointers[i].down = true;
-    pointers[i].x = touches[i].pageX;
-    pointers[i].y = touches[i].pageY;
+    pointers[i].x = touches[i].clientX;
+    pointers[i].y = touches[i].clientY;
     pointers[i].color = [Math.random() + 0.2, Math.random() + 0.2, Math.random() + 0.2];
   }
 });

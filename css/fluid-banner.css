@@ -1,22 +1,21 @@
-/* Fluid banner reveal effect */
-#fluid-banner {
-    position: relative;
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-}
+/* Fluid page overlay effect */
 
-#fluid-banner canvas {
+#fluid-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     display: block;
+    pointer-events: none;
+    z-index: 0;
 }
 
-#fluid-banner .banner-text {
-    position: absolute;
-    top: 50%;
+.banner-text {
+    position: fixed;
+    top: 20px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     color: transparent;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -26,4 +25,6 @@
     filter: drop-shadow(2px 4px 6px black);
     font-size: 2rem;
     text-align: center;
+    z-index: 1;
 }
+
