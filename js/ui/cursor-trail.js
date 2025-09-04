@@ -83,9 +83,17 @@ class CursorTrail {
         const particle = document.createElement('div');
         particle.className = 'cursor-trail-particle';
         
-        // Random icon from MDM collection
+        // Create an img element for better control
+        const img = document.createElement('img');
         const randomIcon = this.icons[Math.floor(Math.random() * this.icons.length)];
-        particle.style.backgroundImage = `url('${randomIcon}')`;
+        img.src = randomIcon;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        particle.appendChild(img);
+        
+        // Ensure transparent background
+        particle.style.backgroundColor = 'transparent';
         
         // Position at mouse with larger random spread for smoke effect
         const offsetX = (Math.random() - 0.5) * 40;
@@ -98,7 +106,7 @@ class CursorTrail {
         particle.style.transform = `translate(-50%, -50%) scale(${scale})`;
         
         // Add initial opacity
-        particle.style.opacity = '0.7';
+        particle.style.opacity = '0.8';
         
         // Track particle data with smoke-like properties
         const particleData = {

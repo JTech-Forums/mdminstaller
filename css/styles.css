@@ -777,30 +777,47 @@ body {
 
 #privacyModal .modal-content {
     max-width: 900px;
-    max-height: 85vh;
-    overflow: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    max-height: calc(100vh - 4rem);
+    margin: 2rem auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 #privacyText {
     white-space: pre-wrap;
-    height: 60vh;
+    max-height: calc(100vh - 16rem);
     overflow-y: auto;
     overflow-x: hidden;
     margin-bottom: 1.5rem;
     font-size: 1rem;
     line-height: 1.6;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+    padding-right: 0.5rem;
 }
 
-#privacyModal .modal-content::-webkit-scrollbar {
-    display: none;
+#privacyModal .modal-body {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 #privacyText::-webkit-scrollbar {
-    display: none;
+    width: 8px;
+}
+
+#privacyText::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#privacyText::-webkit-scrollbar-thumb {
+    background-color: rgba(99, 102, 241, 0.3);
+    border-radius: 4px;
+}
+
+#privacyText::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(99, 102, 241, 0.5);
 }
 
 .policy-actions {
@@ -811,6 +828,25 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* Responsive fixes for privacy modal */
+@media (max-height: 700px) {
+    #privacyModal .modal-content {
+        max-height: calc(100vh - 2rem);
+        margin: 1rem auto;
+    }
+    
+    #privacyText {
+        max-height: calc(100vh - 12rem);
+    }
+}
+
+@media (max-width: 768px) {
+    #privacyModal .modal-content {
+        max-width: calc(100vw - 2rem);
+        margin: 1rem;
+    }
 }
 
 .policy-blocker {
