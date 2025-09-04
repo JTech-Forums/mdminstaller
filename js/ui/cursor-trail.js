@@ -38,31 +38,33 @@ class CursorTrail {
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
         const vx = dx / dist;
         const vy = dy / dist;
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 2; i++) {
             this.createParticle(vx, vy);
         }
     }
 
     createParticle(vx, vy) {
-        const speed = 0.5 + Math.random() * 0.5;
-        const angle = Math.atan2(vy, vx) + (Math.random() - 0.5) * 0.5;
+        const speed = 0.1 + Math.random() * 0.3;
+        const angle = Math.atan2(vy, vx) + (Math.random() - 0.5) * 0.2;
         const particle = {
             x: this.mouseX,
             y: this.mouseY,
-            vx: Math.cos(angle) * speed + vx * 2,
-            vy: Math.sin(angle) * speed + vy * 2,
+            vx: Math.cos(angle) * speed + vx * 0.3,
+            vy: Math.sin(angle) * speed + vy * 0.3,
             life: 1,
-            decay: 0.02 + Math.random() * 0.02,
-            size: 8 + Math.random() * 8
+            decay: 0.01 + Math.random() * 0.01,
+            size: 2 + Math.random() * 2
         };
         this.particles.push(particle);
-        if (this.particles.length > 100) {
+        if (this.particles.length > 150) {
             this.particles.shift();
         }
     }
 
     animate() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.globalCompositeOperation = 'lighter';
+        this.ctx.filter = 'blur(8px)';
         for (let i = this.particles.length - 1; i >= 0; i--) {
             const p = this.particles[i];
             p.life -= p.decay;
@@ -72,11 +74,11 @@ class CursorTrail {
             }
             p.x += p.vx;
             p.y += p.vy;
-            p.vx *= 0.98;
-            p.vy *= 0.98;
-            p.vy -= 0.02;
-            const alpha = p.life * 0.4;
-            const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+            p.vx *= 0.96;
+            p.vy *= 0.96;
+            p.vy -= 0.01;
+            const alpha = p.life * 0.5;
+            const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 2);
             gradient.addColorStop(0, `rgba(${this.rgbColor}, ${alpha})`);
             gradient.addColorStop(1, `rgba(${this.rgbColor}, 0)`);
             this.ctx.fillStyle = gradient;
@@ -84,6 +86,8 @@ class CursorTrail {
             this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             this.ctx.fill();
         }
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.filter = 'none';
         requestAnimationFrame(() => this.animate());
     }
 
