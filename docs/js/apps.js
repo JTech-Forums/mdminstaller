@@ -1,8 +1,8 @@
-import { AdbConnection } from './connections.js';
-import { ApkInstaller } from './apk-installer.js';
-import { UIManager } from './ui-manager.js';
-import KITS from './kits.js';
-import { renderKits } from './cards.js';
+import { AdbConnection } from './adb/connections.js';
+import { ApkInstaller } from './adb/apk-installer.js';
+import { UIManager } from './ui/ui-manager.js';
+import KITS from './data/kits.js';
+import { renderKits } from './ui/cards.js';
 
 class JTechMDMInstaller {
     constructor() {
