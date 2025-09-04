@@ -105,7 +105,7 @@ export class AdbConnection {
             processedCommand = command.replace(/([\w.]+\/[\w.]+)/g, "'$1'");
         }
         try {
-            return await this.adb.subprocess.spawnWaitText(processedCommand);
+            return await this.adb.subprocess.noneProtocol.spawnWaitText(processedCommand);
         } catch (error) {
             console.error('Shell command error:', error);
             throw new Error(`Failed to execute command: ${error.message}`);
