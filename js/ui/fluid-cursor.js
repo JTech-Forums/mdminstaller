@@ -23,8 +23,16 @@ class FluidCursor {
     }
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new FluidCursor());
-} else {
+function init() {
     new FluidCursor();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = FluidCursor;
+} else {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 }

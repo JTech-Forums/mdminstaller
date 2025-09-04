@@ -7,7 +7,8 @@
     "start": "node server.js",
     "dev": "node server.js",
     "serve-https": "npx http-server -S -C cert.pem -p 8443",
-    "build": "node build.js"
+    "build": "node build.js",
+    "test": "node test/fluid-cursor.test.js"
   },
   "keywords": [
     "mdm",
@@ -25,7 +26,8 @@
     "url": "https://github.com/your-username/jtechmdminstaller.git"
   },
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "jsdom": "^26.1.0"
   },
   "engines": {
     "node": ">=14.0.0"
