@@ -779,6 +779,12 @@ body {
     padding: 0;
     align-items: stretch;
     z-index: 1100;
+    right: auto;
+    bottom: auto;
+    width: calc(100% * var(--page-scale));
+    height: calc(100% * var(--page-scale));
+    transform: scale(calc(1 / var(--page-scale)));
+    transform-origin: top left;
 }
 
 #mobileWarningModal .modal-content {
