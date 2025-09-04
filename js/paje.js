@@ -1,0 +1,236 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const headContent = `
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>JTech MDM Installer - Android Device Management</title>
+        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="css/cards.css">
+        <link rel="stylesheet" href="css/cursor-trail.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/png" href="/icon.png">
+        <meta property="og:image" content="/icon.png">
+    `;
+    document.head.innerHTML = headContent;
+
+    const bodyContent = `
+        <header class="header">
+            <div class="container">
+                <div class="logo">
+                    <h1>JTech MDM Installer</h1>
+                    <span class="tagline">Enterprise Android Device Management</span>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn" id="tutorialBtn">Tutorial</button>
+                    <button class="nav-btn" id="aboutBtn">About</button>
+                    <a class="nav-btn" id="contactBtn" href="https://jtechforums.org/contact-us" target="_blank" rel="noopener noreferrer">Contact Us</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <div class="layout-grid">
+                    <div class="card status-card">
+                        <h2>Device Connection</h2>
+                        <div class="device-status" id="deviceStatus">
+                            <div class="status-icon disconnected">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                                </svg>
+                            </div>
+                            <div class="status-info">
+                                <h3 id="statusTitle">No Device Connected</h3>
+                                <p id="statusMessage">Connect your Android device via USB to begin</p>
+                                <div id="deviceInfo" class="device-info hidden">
+                                    <span class="info-item">Model: <strong id="deviceModel">-</strong></span>
+                                    <span class="info-item">Android: <strong id="androidVersion">-</strong></span>
+                                    <span class="info-item">Serial: <strong id="deviceSerial">-</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="connectBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                            </svg>
+                            Connect Device
+                        </button>
+                    </div>
+
+                    <div class="card install-card" id="installCard">
+                        <div class="swiper mySwiper" id="kitsSwiper">
+                            <div class="swiper-wrapper" id="kitsGrid"></div>
+                        </div>
+                    </div>
+
+                    <div class="card console-card disabled-card" id="consoleCard">
+                        <h2>ADB Console</h2>
+                        <p class="card-description">Execute ADB shell commands directly on the connected device</p>
+
+                        <div class="command-input-container">
+                            <div class="input-group">
+                                <span class="input-prefix">adb shell</span>
+                                <input type="text" id="commandInput" class="command-input" placeholder="Enter ADB command..." autocomplete="off">
+                                <button class="btn btn-primary" id="executeBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="5,3 19,12 5,21"></polygon>
+                                    </svg>
+                                    Execute
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="command-history hidden" id="commandHistory">
+                            <h3>Command History</h3>
+                            <div class="history-list" id="historyList"></div>
+                        </div>
+
+                        <div class="console-output-container">
+                            <h3>Console Output</h3>
+                            <div class="console-output" id="consoleOutput"></div>
+                            <div class="console-actions">
+                                <button class="btn btn-small btn-secondary" id="clearConsoleBtn">Clear Output</button>
+                                <button class="btn btn-small btn-secondary" id="downloadConsoleBtn">Download Output</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="modal hidden" id="privacyModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Privacy Policy</h2>
+                </div>
+                <div class="modal-body">
+                    <div id="privacyText" class="policy-content"></div>
+                    <div class="policy-actions">
+                        <label><input type="checkbox" id="policyCheck"> I agree to the Privacy Policy</label>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="rejectPolicyBtn">Reject</button>
+                        <button class="btn btn-primary" id="acceptPolicyBtn" disabled>Accept</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="policyBlocker" class="policy-blocker hidden">
+            <p>Privacy policy not accepted. Refresh to try again.</p>
+        </div>
+
+        <div class="modal hidden" id="welcomeModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Welcome to JTech MDM Installer</h2>
+                    <button class="modal-close" id="closeWelcomeBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Let's start by connecting your device.</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="skipTutorialBtn">Skip Tutorial</button>
+                        <button class="btn btn-primary" id="startTutorialBtn">Start Tutorial</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal hidden" id="tutorialModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>How to Use JTech MDM Installer</h2>
+                    <button class="modal-close" id="closeTutorialBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="tutorial-container" id="tutorialContainer">
+                        <div class="tutorial-step active">
+                            <h3>Step 1: Enable Developer Options</h3>
+                            <ul>
+                                <li>Go to Settings → About Phone</li>
+                                <li>Tap "Build Number" 7 times</li>
+                            </ul>
+                        </div>
+                        <div class="tutorial-step">
+                            <h3>Step 2: Enable USB Debugging</h3>
+                            <ul>
+                                <li>Go to Settings → Developer Options</li>
+                                <li>Enable "USB Debugging"</li>
+                            </ul>
+                        </div>
+                        <div class="tutorial-step">
+                            <h3>Step 3: Connect Your Device</h3>
+                            <ul>
+                                <li>Connect via USB cable</li>
+                                <li>Click "Connect Device" in this app</li>
+                                <li>If prompted on your device, tap "Allow" to authorize the connection</li>
+                            </ul>
+                        </div>
+                        <div class="tutorial-step">
+                            <h3>Step 4: Install MDM Apps</h3>
+                            <ul>
+                                <li>Select from quick install options or upload custom APKs</li>
+                                <li>Click "Install All" to begin</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tutorial-navigation">
+                        <button class="btn btn-secondary" id="prevStepBtn">Previous</button>
+                        <button class="btn btn-primary" id="nextStepBtn">Next</button>
+                    </div>
+                    <div class="warning">
+                        <strong>Note:</strong> This tool requires Chrome or Edge browser with WebUSB support.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal hidden" id="aboutModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>About JTech MDM Installer</h2>
+                    <button class="modal-close" id="closeAboutBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>JTech MDM Installer is a web-based tool for deploying Mobile Device Management solutions to Android devices directly from your browser.</p>
+                    <h3>Features</h3>
+                    <ul>
+                        <li>Direct USB connection to Android devices</li>
+                        <li>Pre-configured MDM application profiles</li>
+                        <li>Batch APK installation support</li>
+                        <li>Real-time installation progress tracking</li>
+                        <li>No software installation required</li>
+                    </ul>
+                    <h3>Requirements</h3>
+                    <ul>
+                        <li>Chrome or Edge browser (version 61+)</li>
+                        <li>Android device with USB debugging enabled</li>
+                        <li>USB cable for device connection</li>
+                    </ul>
+                    <p class="footer-text">© 2024 JTech Solutions. Version 1.0.0</p>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.innerHTML = bodyContent;
+
+    [
+        "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js",
+        "js/ui/auto-scale.js",
+        "js/ui/cursor-trail.js",
+        "js/privacy.js",
+        { src: "js/apps.js", type: "module" }
+    ].forEach(item => {
+        const script = document.createElement('script');
+        if (typeof item === 'string') {
+            script.src = item;
+        } else {
+            script.src = item.src;
+            if (item.type) script.type = item.type;
+        }
+        document.body.appendChild(script);
+    });
+});
