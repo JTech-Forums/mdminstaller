@@ -639,39 +639,51 @@ function resizeCanvas() {
 }
 
 window.addEventListener('mousemove', e => {
-  pointers[0].down = true;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const inside = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height;
+  pointers[0].down = inside;
+  if (!inside) return;
   pointers[0].moved = true;
-  pointers[0].dx = (e.clientX - pointers[0].x) * 10.0;
-  pointers[0].dy = (e.clientY - pointers[0].y) * 10.0;
-  pointers[0].x = e.clientX;
-  pointers[0].y = e.clientY;
+  pointers[0].dx = (x - pointers[0].x) * 10.0;
+  pointers[0].dy = (y - pointers[0].y) * 10.0;
+  pointers[0].x = x;
+  pointers[0].y = y;
   pointers[0].color = [Math.random() + 0.2, Math.random() + 0.2, Math.random() + 0.2];
 });
 
 window.addEventListener('touchmove', e => {
   e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
   const touches = e.targetTouches;
   for (let i = 0; i < touches.length; i++) {
     let pointer = pointers[i];
-    pointer.moved = true;
-    pointer.dx = (touches[i].clientX - pointer.x) * 10.0;
-    pointer.dy = (touches[i].clientY - pointer.y) * 10.0;
-    pointer.x = touches[i].clientX;
-    pointer.y = touches[i].clientY;
+    const x = touches[i].clientX - rect.left;
+    const y = touches[i].clientY - rect.top;
+    pointer.down = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height;
+    pointer.moved = pointer.down;
+    pointer.dx = (x - pointer.x) * 10.0;
+    pointer.dy = (y - pointer.y) * 10.0;
+    pointer.x = x;
+    pointer.y = y;
   }
-}, false);
+}, { passive: false });
 
 window.addEventListener('touchstart', e => {
   e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
   const touches = e.targetTouches;
   for (let i = 0; i < touches.length; i++) {
     if (i >= pointers.length)
-    pointers.push(new pointerPrototype());
+      pointers.push(new pointerPrototype());
 
+    const x = touches[i].clientX - rect.left;
+    const y = touches[i].clientY - rect.top;
     pointers[i].id = touches[i].identifier;
-    pointers[i].down = true;
-    pointers[i].x = touches[i].clientX;
-    pointers[i].y = touches[i].clientY;
+    pointers[i].down = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height;
+    pointers[i].x = x;
+    pointers[i].y = y;
     pointers[i].color = [Math.random() + 0.2, Math.random() + 0.2, Math.random() + 0.2];
   }
 });

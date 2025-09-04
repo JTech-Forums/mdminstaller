@@ -1,7 +1,12 @@
-/* Fluid page overlay effect */
+/* Fluid banner effect scoped to the header */
+
+.header {
+    position: relative;
+    overflow: hidden;
+}
 
 #fluid-canvas {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -12,10 +17,10 @@
 }
 
 .banner-text {
-    position: fixed;
-    top: 20px;
+    position: absolute;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     color: transparent;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -26,5 +31,10 @@
     font-size: 2rem;
     text-align: center;
     z-index: 1;
+}
+
+.header .container {
+    position: relative;
+    z-index: 2;
 }
 
