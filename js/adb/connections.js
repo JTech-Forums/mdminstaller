@@ -147,6 +147,26 @@ export class AdbConnection {
         }
     }
 
+    async getDeviceInfo() {
+        if (!this.adb) {
+            throw new Error('No device connected');
+        }
+        try {
+            const [model, androidVersion] = await Promise.all([
+                this.executeShellCommand('getprop ro.product.model'),
+                this.executeShellCommand('getprop ro.build.version.release')
+            ]);
+            return {
+                model: model.trim(),
+                androidVersion: androidVersion.trim(),
+                serial: this.transport?.serial || this.device?.serial || ''
+            };
+        } catch (error) {
+            console.error('Get device info error:', error);
+            throw new Error(`Failed to get device info: ${error.message}`);
+        }
+    }
+
     isConnected() {
         return this.adb !== null;
     }
