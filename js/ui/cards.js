@@ -25,7 +25,8 @@ export function renderKits(apks, { onInstall } = {}) {
         grid.appendChild(slide);
     });
 
-    const startIndex = apks.findIndex(a => a.key === 'MBsmart' || a.name === 'MBsmart');
+    // Start with eGate as the prominent option
+    const startIndex = apks.findIndex(a => a.key === 'eGate' || a.name === 'eGate');
 
     return new Swiper('#kitsSwiper', {
         effect: 'coverflow',

@@ -117,8 +117,14 @@
   text-decoration: none;
 }
 
-.install-btn:hover {
+.install-btn:hover:not(:disabled) {
   filter: brightness(1.07);
+}
+
+.install-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
 }
 
 .info-overlay {

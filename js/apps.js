@@ -251,15 +251,12 @@ class JTechMDMInstaller {
             btn.disabled = false;
         }
 
-        const installCard = document.getElementById('installCard');
-        installCard?.classList.add('disabled-card');
+        // Keep install card interactive but disable buttons only
         const consoleCard = document.getElementById('consoleCard');
         consoleCard?.classList.add('disabled-card');
 
-        if (this.swiper) {
-            this.swiper.destroy(true, true);
-            this.swiper = null;
-        }
+        // Keep swiper active but update button states
+        this.updateInstallButtonStates();
     }
 
     async finalizeConnection() {
@@ -280,11 +277,13 @@ class JTechMDMInstaller {
             `;
             btn.disabled = false;
         }
-        const installCard = document.getElementById('installCard');
-        installCard?.classList.remove('disabled-card');
+        // Install card stays interactive, buttons are enabled via updateInstallButtonStates
         const consoleCard = document.getElementById('consoleCard');
         consoleCard?.classList.remove('disabled-card');
         this.uiManager.logToConsole('Device connected and ready', 'success');
+        
+        // Update install button states when connected
+        this.updateInstallButtonStates();
     }
 
     async tryAutoConnect(retries = 5, delay = 1000) {
@@ -356,6 +355,14 @@ class JTechMDMInstaller {
                     image: kit.image ? `/apk/${kit.key}/${kit.image}` : apk.image
                 };
             });
+            
+            // Sort to make eGate and TripleUMDM most prominent
+            this.availableApks.sort((a, b) => {
+                const priority = { 'eGate': 1, 'TripleUMDM': 2 };
+                const aPriority = priority[a.key] || 999;
+                const bPriority = priority[b.key] || 999;
+                return aPriority - bPriority;
+            });
         } catch (error) {
             console.error('Failed to load APKs:', error);
             this.uiManager.logToConsole('Failed to load APK files from server', 'warning');
@@ -371,6 +378,17 @@ class JTechMDMInstaller {
 
         this.swiper = renderKits(this.availableApks, {
             onInstall: (apk) => this.installKit(apk)
+        });
+        
+        // Set initial button states based on connection status
+        this.updateInstallButtonStates();
+    }
+    
+    updateInstallButtonStates() {
+        const installButtons = document.querySelectorAll('.install-btn');
+        installButtons.forEach(btn => {
+            btn.disabled = !this.device;
+            btn.textContent = 'Install';
         });
     }
 
