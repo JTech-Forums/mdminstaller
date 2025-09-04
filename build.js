@@ -27,6 +27,7 @@ const items = [
   { src: 'template.html', dest: 'index.html' },
   { src: 'console.html', dest: 'console.html' },
   { src: 'privacy.txt', dest: 'privacy.txt' },
+  { src: 'logo2.png', dest: 'logo2.png' },
   { src: 'css', dest: 'css' },
   { src: 'js', dest: 'js' },
   { src: 'apk', dest: 'apk' },
