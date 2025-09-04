@@ -7,14 +7,17 @@
     <link rel="stylesheet" href="css/privacy.css">
 </head>
 <body>
-    <div class="policy-container">
-        <h1>Privacy Policy & Terms of Service</h1>
-        <div id="policyContent" class="policy-content"></div>
-        <div class="policy-actions">
-            <label>
-                <input type="checkbox" id="agreeCheckbox"> I have read and agree to the terms
-            </label>
-            <button id="acceptBtn" disabled>Accept</button>
+    <iframe src="index.html?preview" class="background-frame" tabindex="-1"></iframe>
+    <div class="overlay">
+        <div class="policy-container">
+            <h1>Privacy Policy & Terms of Service</h1>
+            <div id="policyContent" class="policy-content"></div>
+            <div class="policy-actions">
+                <label>
+                    <input type="checkbox" id="agreeCheckbox"> I have read and agree to the terms
+                </label>
+                <button id="acceptBtn" disabled>Accept</button>
+            </div>
         </div>
     </div>
     <script>

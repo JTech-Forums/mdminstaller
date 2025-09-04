@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JTech MDM Installer - Android Device Management</title>
     <script>
-        if (!localStorage.getItem('privacyAccepted')) {
+        if (!localStorage.getItem('privacyAccepted') && !window.location.search.includes('preview')) {
             window.location.replace('privacy.html');
         }
     </script>
