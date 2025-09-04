@@ -205,8 +205,14 @@ class JTechMDMInstaller {
                 this.uiManager.logToConsole('Requesting USB device access...', 'info');
                 this.uiManager.logToConsole('Please select your Android device from the browser prompt', 'info');
                 const connectPromise = this.adbConnection.connect(this.uiManager);
-                const allowTimer = setTimeout(() => this.uiManager.showWarning('Tap allow on your device'), 1000);
-                this.device = await connectPromise.finally(() => clearTimeout(allowTimer));
+                let dismissAllow = null;
+                const allowTimer = setTimeout(() => {
+                    dismissAllow = this.uiManager.showWarning('Tap allow on your device');
+                }, 1000);
+                this.device = await connectPromise.finally(() => {
+                    clearTimeout(allowTimer);
+                    if (dismissAllow) dismissAllow();
+                });
 
                 if (this.device) {
                     await this.finalizeConnection();
