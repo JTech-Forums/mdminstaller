@@ -1,184 +1,102 @@
 class CursorTrail {
     constructor() {
-        this.icons = [
-            '/apk/eGate/egate.svg',
-            '/apk/TripleUMDM/tripleumdm.svg',
-            '/apk/GenTech/gentech.svg',
-            '/apk/Kdroid/kdroid.svg',
-            '/apk/KosherPlay/kosherplay.svg',
-            '/apk/Livigent/livigent.svg',
-            '/apk/MBsmart/mbsmart.svg',
-            '/apk/Meshimer/meshimer.svg',
-            '/apk/Netfree/netfree.svg',
-            '/apk/Netspark/netspark.svg',
-            '/apk/OfflineMDM/offline.svg',
-            '/apk/OldMDM/oldmdm.svg',
-            '/apk/SecureGuardMDM/secureguard.svg',
-            '/apk/Techloq/techloq.svg'
-        ];
-        
+        const rootStyles = getComputedStyle(document.documentElement);
+        this.color = rootStyles.getPropertyValue('--primary-color').trim() || '#8b5cf6';
+        const { r, g, b } = this.hexToRgb(this.color);
+        this.rgbColor = `${r}, ${g}, ${b}`;
         this.particles = [];
-        this.maxParticles = 25; // More particles for denser smoke
         this.mouseX = 0;
         this.mouseY = 0;
-        this.lastMouseX = 0;
-        this.lastMouseY = 0;
-        this.isMoving = false;
-        this.moveTimeout = null;
-        this.animationFrame = null;
-        this.particleCounter = 0;
-        
+        this.lastX = 0;
+        this.lastY = 0;
         this.init();
     }
-    
+
     init() {
-        // Create container for trail particles
-        this.container = document.createElement('div');
-        this.container.className = 'cursor-trail-container';
-        document.body.appendChild(this.container);
-        
-        // Track mouse movement
+        this.canvas = document.createElement('canvas');
+        this.canvas.className = 'cursor-trail-canvas';
+        this.ctx = this.canvas.getContext('2d');
+        document.documentElement.appendChild(this.canvas);
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
         document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        
-        // Start animation loop
         this.animate();
     }
-    
+
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
     handleMouseMove(e) {
+        this.lastX = this.mouseX;
+        this.lastY = this.mouseY;
         this.mouseX = e.clientX;
         this.mouseY = e.clientY;
-        
-        // Calculate movement speed
-        const dx = this.mouseX - this.lastMouseX;
-        const dy = this.mouseY - this.lastMouseY;
-        const speed = Math.sqrt(dx * dx + dy * dy);
-        
-        // Create particles more frequently for denser smoke
-        if (speed > 1) {
-            this.isMoving = true;
-            // Create multiple particles for smoky effect
-            this.createParticle();
-            if (speed > 5 && this.particleCounter % 2 === 0) {
-                setTimeout(() => this.createParticle(), 50);
-            }
-            this.particleCounter++;
+        const dx = this.mouseX - this.lastX;
+        const dy = this.mouseY - this.lastY;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const vx = dx / dist;
+        const vy = dy / dist;
+        for (let i = 0; i < 3; i++) {
+            this.createParticle(vx, vy);
         }
-        
-        this.lastMouseX = this.mouseX;
-        this.lastMouseY = this.mouseY;
-        
-        // Clear existing timeout and set new one
-        clearTimeout(this.moveTimeout);
-        this.moveTimeout = setTimeout(() => {
-            this.isMoving = false;
-        }, 100);
     }
-    
-    createParticle() {
-        // Limit number of particles
-        if (this.particles.length >= this.maxParticles) {
-            return;
-        }
-        
-        const particle = document.createElement('div');
-        particle.className = 'cursor-trail-particle';
-        
-        // Create an img element for better control
-        const img = document.createElement('img');
-        const randomIcon = this.icons[Math.floor(Math.random() * this.icons.length)];
-        img.src = randomIcon;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'contain';
-        particle.appendChild(img);
-        
-        // Ensure transparent background
-        particle.style.backgroundColor = 'transparent';
-        
-        // Position at mouse with larger random spread for smoke effect
-        const offsetX = (Math.random() - 0.5) * 40;
-        const offsetY = (Math.random() - 0.5) * 40;
-        particle.style.left = (this.mouseX + offsetX) + 'px';
-        particle.style.top = (this.mouseY + offsetY) + 'px';
-        
-        // Larger initial size for more visibility
-        const scale = 0.6 + Math.random() * 0.8;
-        particle.style.transform = `translate(-50%, -50%) scale(${scale})`;
-        
-        // Add initial opacity
-        particle.style.opacity = '0.8';
-        
-        // Track particle data with smoke-like properties
-        const particleData = {
-            element: particle,
-            x: this.mouseX + offsetX,
-            y: this.mouseY + offsetY,
-            vx: (Math.random() - 0.5) * 3,  // More horizontal spread
-            vy: (Math.random() - 0.5) * 2 - 2,  // Stronger upward drift
-            life: 1.0,
-            decay: 0.015 + Math.random() * 0.015,  // Slower decay for longer trails
-            scale: scale,
-            rotation: Math.random() * 360
+
+    createParticle(vx, vy) {
+        const speed = 0.5 + Math.random() * 0.5;
+        const angle = Math.atan2(vy, vx) + (Math.random() - 0.5) * 0.5;
+        const particle = {
+            x: this.mouseX,
+            y: this.mouseY,
+            vx: Math.cos(angle) * speed + vx * 2,
+            vy: Math.sin(angle) * speed + vy * 2,
+            life: 1,
+            decay: 0.02 + Math.random() * 0.02,
+            size: 8 + Math.random() * 8
         };
-        
-        this.container.appendChild(particle);
-        this.particles.push(particleData);
+        this.particles.push(particle);
+        if (this.particles.length > 100) {
+            this.particles.shift();
+        }
     }
-    
+
     animate() {
-        // Update each particle
-        this.particles = this.particles.filter(particle => {
-            // Update life
-            particle.life -= particle.decay;
-            
-            if (particle.life <= 0) {
-                // Remove dead particle
-                particle.element.remove();
-                return false;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            p.life -= p.decay;
+            if (p.life <= 0) {
+                this.particles.splice(i, 1);
+                continue;
             }
-            
-            // Update position with smoke physics
-            particle.x += particle.vx;
-            particle.y += particle.vy;
-            particle.vy -= 0.08; // Stronger upward drift for smoke
-            particle.vx *= 0.98; // Slow down horizontal movement
-            
-            // Add some turbulence
-            particle.x += Math.sin(particle.life * 10) * 0.5;
-            
-            // Update visual properties
-            particle.element.style.left = particle.x + 'px';
-            particle.element.style.top = particle.y + 'px';
-            particle.element.style.opacity = particle.life * 0.8;
-            
-            // Expand and rotate as it rises (smoke effect)
-            const currentScale = particle.scale * (1 + (1 - particle.life) * 1.5);
-            particle.rotation += 2;
-            particle.element.style.transform = `translate(-50%, -50%) scale(${currentScale}) rotate(${particle.rotation}deg)`;
-            
-            // Add blur as particle fades
-            particle.element.style.filter = `blur(${(1 - particle.life) * 3}px)`;
-            
-            return true;
-        });
-        
-        this.animationFrame = requestAnimationFrame(() => this.animate());
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.98;
+            p.vy *= 0.98;
+            p.vy -= 0.02;
+            const alpha = p.life * 0.4;
+            const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+            gradient.addColorStop(0, `rgba(${this.rgbColor}, ${alpha})`);
+            gradient.addColorStop(1, `rgba(${this.rgbColor}, 0)`);
+            this.ctx.fillStyle = gradient;
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        requestAnimationFrame(() => this.animate());
     }
-    
-    destroy() {
-        // Clean up
-        if (this.animationFrame) {
-            cancelAnimationFrame(this.animationFrame);
-        }
-        this.particles.forEach(p => p.element.remove());
-        this.particles = [];
-        if (this.container) {
-            this.container.remove();
-        }
+
+    hexToRgb(hex) {
+        const normalized = hex.replace('#', '');
+        const bigint = parseInt(normalized, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return { r, g, b };
     }
 }
 
-// Initialize cursor trail when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.cursorTrail = new CursorTrail();
@@ -186,3 +104,4 @@ if (document.readyState === 'loading') {
 } else {
     window.cursorTrail = new CursorTrail();
 }
+
