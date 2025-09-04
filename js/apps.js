@@ -768,7 +768,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const app = new JTechMDMInstaller();
     await app.init();
     window.uiManager = app.uiManager;
-    if (!localStorage.getItem('tutorialSeen')) {
+    if (
+        localStorage.getItem('privacyAccepted') === 'true' &&
+        !localStorage.getItem('tutorialSeen')
+    ) {
         document.getElementById('welcomeModal')?.classList.remove('hidden');
     }
 });

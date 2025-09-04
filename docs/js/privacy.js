@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then((text) => {
       textEl.textContent = text;
       modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
     });
 
   checkbox.addEventListener('change', () => {
@@ -24,10 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
   acceptBtn.addEventListener('click', () => {
     localStorage.setItem('privacyAccepted', 'true');
     modal.classList.add('hidden');
+    document.body.style.overflow = '';
+    if (!localStorage.getItem('tutorialSeen')) {
+      document.getElementById('welcomeModal')?.classList.remove('hidden');
+    }
   });
 
   rejectBtn.addEventListener('click', () => {
     modal.classList.add('hidden');
     blocker.classList.remove('hidden');
+    document.body.style.overflow = '';
   });
 });
