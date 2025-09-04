@@ -1,2 +1,0 @@
-dpm set-device-owner com.android.cts.tripleu.oldmdm/.MyDeviceAdminReceiver
-pm grant com.android.cts.tripleu.oldmdm android.permission.WRITE_SECURE_SETTINGS

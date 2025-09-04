@@ -1,2 +1,0 @@
-dpm set-active-admin com.netfree.wifreemobile/com.netfree.wifreemobile.receivers.MyAdminReceiver
-pm grant com.netfree.wifreemobile android.permission.WRITE_SECURE_SETTINGS

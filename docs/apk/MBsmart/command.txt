@@ -1,3 +1,0 @@
-dpm set-device-owner com.com.babor/com.com.babor.AdminReciever
-pm grant com.com.babor android.permission.WRITE_SECURE_SETTINGS
-settings put secure enabled_accessibility_services "com.com.babor/com.com.babor.accesibillity2"

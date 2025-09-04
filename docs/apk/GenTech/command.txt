@@ -1,2 +1,0 @@
-dpm set-active-admin com.livigent.mdm.gt/com.livigent.mdm.backoffice.receivers.DevAdminReceiver
-pm grant com.livigent.mdm.gt android.permission.WRITE_SECURE_SETTINGS

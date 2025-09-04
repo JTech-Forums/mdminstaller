@@ -1,2 +1,0 @@
-dpm set-device-owner com.kdroid.filter/com.kdroid.filter.listener.AdminListener
-pm grant com.kdroid.filter android.permission.WRITE_SECURE_SETTINGS

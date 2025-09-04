@@ -1,2 +1,0 @@
-dpm set-active-admin con.netspark.mobile/com.netspark.android.netsvpn.SetAdmin\$MyAdmin
-pm grant com.netspark.mobile android.permission.WRITE_SECURE_SETTINGS
