@@ -18,10 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const bodyContent = `
         <header class="header">
             <div class="container">
-                <div class="logo">
-                    <h1>JTech MDM Installer</h1>
-                    <span class="tagline">Enterprise Android Device Management</span>
-                </div>
+                <a class="brand-logo-left" href="/">
+                    <img src="logo2.png" alt="JTech logo" class="logo-img">
+                </a>
+                <div class="logo-text"></div>
                 <nav class="nav">
                     <button class="nav-btn" id="tutorialBtn">Tutorial</button>
                     <button class="nav-btn" id="aboutBtn">About</button>
