@@ -87,6 +87,21 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Serve favicon
+  if (req.url === '/favicon.ico') {
+    const iconPath = path.join(__dirname, 'icon.png');
+    fs.readFile(iconPath, (err, content) => {
+      if (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not found');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'image/png' });
+        res.end(content, 'utf-8');
+      }
+    });
+    return;
+  }
+
   let filePath = '.' + req.url;
   
   const extname = String(path.extname(filePath)).toLowerCase();
