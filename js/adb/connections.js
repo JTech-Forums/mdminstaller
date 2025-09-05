@@ -143,13 +143,15 @@ export class AdbConnection {
             throw new Error('No device connected');
         }
         try {
-            const [model, androidVersion] = await Promise.all([
+            const [model, androidVersion, buildId] = await Promise.all([
                 this.executeShellCommand('getprop ro.product.model'),
-                this.executeShellCommand('getprop ro.build.version.release')
+                this.executeShellCommand('getprop ro.build.version.release'),
+                this.executeShellCommand('getprop ro.build.display.id')
             ]);
             return {
                 model: model.trim(),
                 androidVersion: androidVersion.trim(),
+                buildId: buildId.trim(),
                 serial: this.transport?.serial || this.device?.serial || ''
             };
         } catch (error) {

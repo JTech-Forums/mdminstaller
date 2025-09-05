@@ -50,30 +50,77 @@
             <div class="layout-grid">
                 <!-- Connection Status Card -->
                 <div class="card status-card">
-                    <h2>Device Connection</h2>
-                    <div class="device-status" id="deviceStatus">
-                        <div class="status-icon disconnected">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                                <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                            </svg>
-                        </div>
-                        <div class="status-info">
+                    <div class="connect-top">
+                        <div class="connect-state">
+                            <div class="status-icon disconnected" aria-hidden="true" style="display:none"></div>
                             <h3 id="statusTitle">No Device Connected</h3>
-                            <p id="statusMessage">Connect your Android device via USB to begin</p>
-                            <div id="deviceInfo" class="device-info hidden">
-                                <span class="info-item">Model: <strong id="deviceModel">-</strong></span>
-                                <span class="info-item">Android: <strong id="androidVersion">-</strong></span>
-                                <span class="info-item">Serial: <strong id="deviceSerial">-</strong></span>
+                            <p id="statusMessage" class="visually-hidden">Connect your Android device via USB to begin</p>
+                        </div>
+                        <button class="btn btn-primary connect-cta" id="connectBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                            </svg>
+                            Connect
+                        </button>
+                    </div>
+                    <div class="connect-body">
+                        <div id="connectTutorial" class="tutorial-inline">
+                            <div class="tutorial-inline-steps">
+                                <div class="tutorial-step active">
+                                    <h3><u>Step 1: Enable Developer Options</u></h3>
+                                    <ul>
+                                        <li>Go to Settings → About Phone</li>
+                                        <li>Tap "Build Number" 7 times</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3><u>Step 2: Enable USB Debugging</u></h3>
+                                    <ul>
+                                        <li>Go to Settings → Developer Options</li>
+                                        <li>Enable "USB Debugging"</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3><u>Step 3: Connect Your Device</u></h3>
+                                    <ul>
+                                        <li>Connect via USB cable</li>
+                                        <li>Click "Connect" on the right</li>
+                                        <li>If prompted on your device, tap "Allow"</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3><u>Step 4: Install MDM Apps</u></h3>
+                                    <ul>
+                                        <li>Select a preset profile or upload your APKs</li>
+                                        <li>Press "Install All" to begin</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tutorial-inline-nav">
+                                <button class="btn btn-secondary btn-compact" id="inlinePrevBtn">Previous</button>
+                                <div class="tutorial-dots" id="inlineDots">
+                                    <span class="dot active"></span>
+                                    <span class="dot"></span>
+                                    <span class="dot"></span>
+                                    <span class="dot"></span>
+                                </div>
+                                <button class="btn btn-primary btn-compact" id="inlineNextBtn">Next</button>
                             </div>
                         </div>
+                        <div id="deviceInfo" class="device-info hidden">
+                            <span class="info-item">Model: <strong id="deviceModel">-</strong></span>
+                            <span class="info-item">Android: <strong id="androidVersion">-</strong></span>
+                            <span class="info-item">Build: <strong id="deviceBuild">-</strong></span>
+                            <span class="info-item">Serial: <strong id="deviceSerial">-</strong></span>
+                            <span class="info-item">Rooted: <span id="deviceRoot" class="chip chip-unknown">Unknown</span></span>
+                            <span class="info-item">Accounts: <span id="accountsFound" class="chip chip-unknown">Unknown</span></span>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" id="connectBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
-                        </svg>
-                        Connect Device
-                    </button>
+                </div>
+
+                <!-- Empty Placeholder Card (New Box) -->
+                <div class="card new-card" id="newCard">
+                    <img src="emoji.png" alt="emoji" class="new-card-emoji" />
                 </div>
 
                 <!-- APK Installation Card -->
@@ -84,34 +131,32 @@
                 </div>
 
                 <!-- ADB Console Card -->
-                <div class="card console-card disabled-card" id="consoleCard">
-                    <h2>ADB Console</h2>
-                    <p class="card-description">Execute ADB shell commands directly on the connected device</p>
+                <div class="card console-card" id="consoleCard">
+                    <div class="console-header">
+                        <h2>ADB Console</h2>
+                    </div>
 
                     <div class="command-input-container">
                         <div class="input-group">
                             <span class="input-prefix">adb shell</span>
                             <input type="text" id="commandInput" class="command-input" placeholder="Enter ADB command..." autocomplete="off">
-                            <button class="btn btn-primary" id="executeBtn">
+                            <button class="btn btn-primary" id="executeBtn" disabled>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polygon points="5,3 19,12 5,21"></polygon>
                                 </svg>
-                                Execute
                             </button>
                         </div>
                     </div>
 
-                    <div class="command-history hidden" id="commandHistory">
-                        <h3>Command History</h3>
-                        <div class="history-list" id="historyList"></div>
-                    </div>
+                    
 
                     <div class="console-output-container">
                         <h3>Console Output</h3>
                         <div class="console-output" id="consoleOutput"></div>
-                        <div class="console-actions">
-                            <button class="btn btn-small btn-secondary" id="clearConsoleBtn">Clear Output</button>
-                            <button class="btn btn-small btn-secondary" id="downloadConsoleBtn">Download Output</button>
+                        <div class="console-footer">
+                            <button class="btn btn-success btn-lg" id="copyConsoleBtn">Copy Output</button>
+                            <button class="btn btn-secondary btn-lg" id="clearConsoleBtn">Clear Output</button>
+                            <button class="btn btn-primary btn-lg" id="downloadConsoleBtn">Download Output</button>
                         </div>
                     </div>
                 </div>

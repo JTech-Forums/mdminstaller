@@ -35,7 +35,6 @@
         <div class="container">
             <!-- Connection Status Card -->
             <div class="card status-card">
-                <h2>Device Connection</h2>
                 <div class="device-status" id="deviceStatus">
                     <div class="status-icon disconnected">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -57,39 +56,37 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
                     </svg>
-                    Connect Device
+                    Connect
                 </button>
             </div>
 
             <!-- ADB Console Card -->
-            <div class="card console-card disabled-card" id="consoleCard">
-                <h2>ADB Console</h2>
-                <p class="card-description">Execute ADB shell commands directly on the connected device</p>
+            <div class="card console-card" id="consoleCard">
+                <div class="console-header">
+                    <h2>ADB Console</h2>
+                </div>
 
                 <div class="command-input-container">
                     <div class="input-group">
                         <span class="input-prefix">adb shell</span>
                         <input type="text" id="commandInput" class="command-input" placeholder="Enter ADB command..." autocomplete="off">
-                        <button class="btn btn-primary" id="executeBtn">
+                        <button class="btn btn-primary" id="executeBtn" disabled>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polygon points="5,3 19,12 5,21"></polygon>
                             </svg>
-                            Execute
                         </button>
                     </div>
                 </div>
 
-                <div class="command-history hidden" id="commandHistory">
-                    <h3>Command History</h3>
-                    <div class="history-list" id="historyList"></div>
-                </div>
+                
 
                 <div class="console-output-container">
                     <h3>Console Output</h3>
                     <div class="console-output" id="consoleOutput"></div>
-                    <div class="console-actions">
-                        <button class="btn btn-small btn-secondary" id="clearConsoleBtn">Clear Output</button>
-                        <button class="btn btn-small btn-secondary" id="downloadConsoleBtn">Download Output</button>
+                    <div class="console-footer">
+                        <button class="btn btn-success btn-lg" id="copyConsoleBtn">Copy Output</button>
+                        <button class="btn btn-secondary btn-lg" id="clearConsoleBtn">Clear Output</button>
+                        <button class="btn btn-primary btn-lg" id="downloadConsoleBtn">Download Output</button>
                     </div>
                 </div>
             </div>

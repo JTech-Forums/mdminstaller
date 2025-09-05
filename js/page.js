@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
                             </svg>
-                            Connect Device
+                            Connect
                         </button>
                     </div>
 
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
 
-                    <div class="card console-card disabled-card" id="consoleCard">
+                    <div class="card console-card" id="consoleCard">
                         <h2>ADB Console</h2>
                         <p class="card-description">Execute ADB shell commands directly on the connected device</p>
 
@@ -82,11 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     Execute
                                 </button>
                             </div>
-                        </div>
-
-                        <div class="command-history hidden" id="commandHistory">
-                            <h3>Command History</h3>
-                            <div class="history-list" id="historyList"></div>
                         </div>
 
                         <div class="console-output-container">

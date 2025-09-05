@@ -3,7 +3,7 @@ import { ApkInstaller } from './adb/apk-installer.js';
 import { UIManager } from './ui/ui-manager.js';
 import KITS from './data/kits.js';
 import { renderKits } from './ui/cards.js';
-import { deviceHasAccounts, disableAccountApps, reenablePackages } from './adb/account-utils.js';
+import { deviceHasAccounts, disableAccountApps, reenablePackages, isDeviceRooted } from './adb/account-utils.js';
 
 class JTechMDMInstaller {
     constructor() {
@@ -13,8 +13,6 @@ class JTechMDMInstaller {
         this.device = null;
         this.apkQueue = [];
         this.availableApks = [];
-        this.commandHistory = [];
-        this.currentHistoryIndex = 0;
         this.currentTutorialStep = 0;
         this.tutorialSteps = [];
         this.swiper = null;
@@ -27,6 +25,15 @@ class JTechMDMInstaller {
         await this.loadAvailableApks();
         this.renderAvailableApks(); // Initialize Swiper here
         await this.tryAutoConnect();
+        const executeBtn = document.getElementById('executeBtn');
+        if (executeBtn) executeBtn.disabled = true;
+        // Respect inline tutorial hidden state
+        const inlineTutorial = document.getElementById('connectTutorial');
+        if (inlineTutorial && localStorage.getItem('inlineGuideHidden') === 'true') {
+            inlineTutorial.classList.add('hidden');
+        }
+        // New card reveal effect
+        this.setupNewCardEffects();
     }
 
     checkWebUSBSupport() {
@@ -72,11 +79,10 @@ class JTechMDMInstaller {
         document.getElementById('executeBtn')?.addEventListener('click', () => this.executeCommand());
         document.getElementById('commandInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.executeCommand();
-            if (e.key === 'ArrowUp') this.showPreviousCommand();
-            if (e.key === 'ArrowDown') this.showNextCommand();
         });
         document.getElementById('clearConsoleBtn')?.addEventListener('click', () => this.clearConsole());
         document.getElementById('downloadConsoleBtn')?.addEventListener('click', () => this.downloadConsoleOutput());
+        document.getElementById('copyConsoleBtn')?.addEventListener('click', () => this.copyConsoleOutput());
 
         // Modals
         document.getElementById('tutorialBtn')?.addEventListener('click', () => {
@@ -115,10 +121,29 @@ class JTechMDMInstaller {
 
         document.getElementById('nextStepBtn')?.addEventListener('click', () => {
             this.showTutorialStep(this.currentTutorialStep + 1);
+            this.updateInlineDots();
         });
 
         document.getElementById('prevStepBtn')?.addEventListener('click', () => {
             this.showTutorialStep(this.currentTutorialStep - 1);
+            this.updateInlineDots();
+        });
+
+        // Inline tutorial navigation inside connection card
+        document.getElementById('inlineNextBtn')?.addEventListener('click', () => {
+            const steps = document.querySelectorAll('.tutorial-inline .tutorial-step');
+            if (steps.length && this.currentTutorialStep >= steps.length - 1) {
+                const inline = document.getElementById('connectTutorial');
+                inline?.classList.add('hidden');
+                try { localStorage.setItem('inlineGuideHidden', 'true'); } catch {}
+                return;
+            }
+            this.showTutorialStep(this.currentTutorialStep + 1);
+            this.updateInlineDots();
+        });
+        document.getElementById('inlinePrevBtn')?.addEventListener('click', () => {
+            this.showTutorialStep(this.currentTutorialStep - 1);
+            this.updateInlineDots();
         });
 
         // Close modals on outside click
@@ -164,7 +189,11 @@ class JTechMDMInstaller {
     }
 
     showTutorialStep(index) {
-        this.tutorialSteps = Array.from(document.querySelectorAll('.tutorial-step'));
+        const inlineContainer = document.querySelector('.tutorial-inline');
+        const modalContainer = document.querySelector('#tutorialModal .tutorial-container');
+        const usingInline = inlineContainer && !inlineContainer.classList.contains('hidden');
+        const scope = usingInline ? inlineContainer : (modalContainer || document);
+        this.tutorialSteps = Array.from(scope.querySelectorAll('.tutorial-step'));
         if (this.tutorialSteps.length === 0) return;
 
         if (index >= this.tutorialSteps.length) {
@@ -179,17 +208,20 @@ class JTechMDMInstaller {
             step.classList.toggle('active', i === index);
         });
         this.currentTutorialStep = index;
+        
+        const prevBtn = usingInline ? document.getElementById('inlinePrevBtn') : document.getElementById('prevStepBtn');
+        const nextBtn = usingInline ? document.getElementById('inlineNextBtn') : document.getElementById('nextStepBtn');
 
-        const prevBtn = document.getElementById('prevStepBtn');
-        const nextBtn = document.getElementById('nextBtn');
+        if (prevBtn) prevBtn.disabled = index === 0;
+        if (nextBtn) nextBtn.textContent = (index === this.tutorialSteps.length - 1) ? 'Finish' : 'Next';
+        this.updateInlineDots();
+    }
 
-        if (prevBtn) {
-            prevBtn.disabled = index === 0;
-        }
-
-        if (nextBtn) {
-            nextBtn.textContent = (index === this.tutorialSteps.length - 1) ? 'Finish' : 'Next';
-        }
+    updateInlineDots() {
+        const dots = document.querySelectorAll('#inlineDots .dot');
+        const count = this.tutorialSteps?.length || 0;
+        if (!dots.length || !count) return;
+        dots.forEach((d, i) => d.classList.toggle('active', i === Math.min(this.currentTutorialStep, count - 1)));
     }
 
     async handleConnect(silent = false) {
@@ -246,14 +278,14 @@ class JTechMDMInstaller {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
                 </svg>
-                Connect Device
+                Connect
             `;
             btn.disabled = false;
         }
 
-        // Keep install card interactive but disable buttons only
-        const consoleCard = document.getElementById('consoleCard');
-        consoleCard?.classList.add('disabled-card');
+        // Disable only the execute button when disconnected
+        const executeBtn = document.getElementById('executeBtn');
+        if (executeBtn) executeBtn.disabled = true;
 
         // Keep swiper active but update button states
         this.updateInstallButtonStates();
@@ -266,7 +298,11 @@ class JTechMDMInstaller {
         this.uiManager.logToConsole('If prompted on your device, tap "Allow" to authorize this computer', 'warning');
 
         const deviceInfo = await this.adbConnection.getDeviceInfo();
-        this.uiManager.updateConnectionStatus('connected', deviceInfo);
+        let rooted = false;
+        let accountsFound = false;
+        try { rooted = await isDeviceRooted(this.adbConnection); } catch {}
+        try { accountsFound = await deviceHasAccounts(this.adbConnection); } catch {}
+        this.uiManager.updateConnectionStatus('connected', { ...deviceInfo, rooted, accountsFound });
         if (btn) {
             btn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -277,9 +313,9 @@ class JTechMDMInstaller {
             `;
             btn.disabled = false;
         }
-        // Install card stays interactive, buttons are enabled via updateInstallButtonStates
-        const consoleCard = document.getElementById('consoleCard');
-        consoleCard?.classList.remove('disabled-card');
+        // Enable execute button when connected
+        const executeBtn = document.getElementById('executeBtn');
+        if (executeBtn) executeBtn.disabled = false;
         this.uiManager.logToConsole('Device connected and ready', 'success');
         
         // Update install button states when connected
@@ -705,13 +741,10 @@ class JTechMDMInstaller {
         }
 
         try {
-            this.commandHistory.push(command);
-            this.currentHistoryIndex = this.commandHistory.length;
             this.uiManager.logToConsole(`$ adb shell ${command}`, 'command');
             const result = await this.adbConnection.executeShellCommand(command);
             if (result.trim()) this.uiManager.logToConsole(result, 'output');
             else this.uiManager.logToConsole('(no output)', 'info');
-            this.updateCommandHistory();
         } catch (error) {
             this.uiManager.logToConsole(`ERROR: ${error.message}`, 'error');
         }
@@ -729,42 +762,11 @@ class JTechMDMInstaller {
     }
 
 
-    showPreviousCommand() {
-        if (this.commandHistory.length === 0) return;
-        if (this.currentHistoryIndex > 0) this.currentHistoryIndex--;
-        const input = document.getElementById('commandInput');
-        if (input) input.value = this.commandHistory[this.currentHistoryIndex] || '';
-    }
+    
 
-    showNextCommand() {
-        if (this.commandHistory.length === 0) return;
-        const input = document.getElementById('commandInput');
-        if (this.currentHistoryIndex < this.commandHistory.length - 1) {
-            this.currentHistoryIndex++;
-            if (input) input.value = this.commandHistory[this.currentHistoryIndex];
-        } else {
-            this.currentHistoryIndex = this.commandHistory.length;
-            if (input) input.value = '';
-        }
-    }
+    
 
-    updateCommandHistory() {
-        const historyList = document.getElementById('historyList');
-        const historySection = document.getElementById('commandHistory');
-        if (!historyList || !historySection) return;
-
-        if (this.commandHistory.length > 0) {
-            historySection.classList.remove('hidden');
-            historyList.innerHTML = this.commandHistory
-                .slice(-10)
-                .reverse()
-                .map((cmd) => `
-                    <div class="history-item" onclick="document.getElementById('commandInput').value='${cmd.replace(/'/g, "\'" )}'; document.getElementById('commandInput').focus();">
-                        <code>${cmd}</code>
-                    </div>
-                `).join('');
-        }
-    }
+    
 
     clearConsole() {
         const consoleOutput = document.getElementById('consoleOutput');
@@ -809,6 +811,59 @@ class JTechMDMInstaller {
         } catch (error) {
             throw new Error(`Failed to execute command: ${error.message}`);
         }
+    }
+
+    copyConsoleOutput() {
+        const consoleOutput = document.getElementById('consoleOutput');
+        if (!consoleOutput || consoleOutput.children.length === 0) {
+            this.uiManager.showWarning('No console output to copy');
+            return;
+        }
+        const content = Array.from(consoleOutput.children)
+            .map(entry => entry.textContent)
+            .join('\n');
+        navigator.clipboard.writeText(content)
+            .then(() => this.uiManager.showSuccess('Console output copied to clipboard'))
+            .catch(() => this.uiManager.showError('Failed to copy output'));
+    }
+
+    setupNewCardEffects() {
+        const card = document.getElementById('newCard');
+        if (!card) return;
+        // Ensure emoji exists (in case the markup was not present)
+        if (!card.querySelector('.new-card-emoji')) {
+            const img = document.createElement('img');
+            img.src = 'emoji.png';
+            img.alt = 'emoji';
+            img.className = 'new-card-emoji';
+            card.appendChild(img);
+        }
+        const setCoords = (clientX, clientY) => {
+            const rect = card.getBoundingClientRect();
+            const x = ((clientX - rect.left) / rect.width) * 100;
+            const y = ((clientY - rect.top) / rect.height) * 100;
+            card.style.setProperty('--x', x + '%');
+            card.style.setProperty('--y', y + '%');
+        };
+        const trigger = (clientX, clientY) => {
+            setCoords(clientX, clientY);
+            card.classList.remove('boom');
+            // restart animation
+            void card.offsetWidth; // reflow
+            card.classList.add('boom');
+        };
+        card.addEventListener('mousemove', (e) => setCoords(e.clientX, e.clientY));
+        card.addEventListener('mouseenter', (e) => trigger(e.clientX, e.clientY));
+        card.addEventListener('click', (e) => {
+            trigger(e.clientX, e.clientY);
+            card.classList.toggle('revealed');
+        });
+        card.addEventListener('touchstart', (e) => {
+            const t = e.touches[0];
+            if (!t) return;
+            trigger(t.clientX, t.clientY);
+            card.classList.toggle('revealed');
+        }, { passive: true });
     }
 }
 
