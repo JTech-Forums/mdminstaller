@@ -63,13 +63,13 @@ body {
 .header {
     background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
     border-bottom: 1px solid var(--border-color);
-    padding: 1.5rem 0;
+    padding: 1rem 0;
     box-shadow: var(--shadow-sm);
 }
 
 .header .container {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
 }
 
@@ -81,9 +81,10 @@ body {
 }
 
 .logo-img {
-    height: 72px;
+    height: 44px;
     width: auto;
     display: block;
+    filter: drop-shadow(0 0 6px rgba(59,130,246,0.22));
 }
 
 .logo-text {
@@ -97,6 +98,20 @@ body {
 .brand-logo-left {
     justify-self: start;
     line-height: 0;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* tiny glowing ring around logo anchor */
+.brand-logo-left::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.32), 0 0 12px rgba(59,130,246,0.18);
+    pointer-events: none;
 }
 
 .logo h1, .logo-text h1 {
@@ -1168,7 +1183,7 @@ body.scaled {
     }
 
     .logo-img {
-        height: 42px;
+        height: 38px;
     }
 
     .device-status {
