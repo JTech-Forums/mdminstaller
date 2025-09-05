@@ -398,7 +398,7 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     padding: 0.75rem 0.9rem;
-    min-height: 64px;
+    min-height: 84px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -414,12 +414,15 @@ body {
 .metric-value {
     font-size: 1.25rem;
     color: var(--text-primary);
+    display: block;
+    min-height: 1.8em; /* keep height even when empty */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
 }
 .metric-value.empty { color: var(--text-secondary); opacity: 0.65; }
+.metric-value.empty::after { content: '\00a0'; } /* NBSP to maintain height if scripts miss it */
 .metric-value.truncate { max-width: 100%; }
 
 @media (max-width: 900px) {

@@ -15,10 +15,10 @@ export class UIManager {
         const inlineTutorial = document.getElementById('connectTutorial');
         const setVal = (el, text) => {
             if (!el) return;
-            const value = text ? String(text) : '';
-            el.textContent = value;
-            el.title = value;
-            el.classList.toggle('empty', !value);
+            const raw = text ? String(text) : '';
+            el.textContent = raw || '\u00A0';
+            el.title = raw;
+            el.classList.toggle('empty', !raw);
         };
 
         if (status === 'connected' && deviceInfo) {
