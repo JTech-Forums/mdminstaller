@@ -2,7 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 8000;
+// Prefer env var, default to 8000
+let PORT = Number(process.env.PORT) || 8000;
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -128,6 +129,24 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/`);
+// Log once listening (works for retries too)
+server.on('listening', () => {
+  const addr = server.address();
+  const port = typeof addr === 'string' ? addr : addr.port;
+  console.log(`Server running at http://localhost:${port}/`);
 });
+
+// If port is already in use, try next ports automatically
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    const nextPort = PORT + 1;
+    console.warn(`Port ${PORT} in use. Trying ${nextPort}...`);
+    PORT = nextPort;
+    setTimeout(() => server.listen(PORT), 150);
+  } else {
+    console.error('Server error:', err);
+    process.exit(1);
+  }
+});
+
+server.listen(PORT);

@@ -173,17 +173,11 @@ class JTechMDMInstaller {
         }
 
         // Release ADB connection when tab is hidden and reconnect when visible
+        // Keep ADB session alive across tab switches to avoid repeated
+        // authorization prompts. Reconnect only if we're not already connected.
         document.addEventListener('visibilitychange', async () => {
-            if (document.hidden) {
-                if (this.device) {
-                    await this.adbConnection.disconnect(false);
-                    this.device = null;
-                    this.apkInstaller.setAdbConnection(null);
-                }
-            } else {
-                if (!this.device) {
-                    await this.tryAutoConnect();
-                }
+            if (!document.hidden && !this.device) {
+                await this.tryAutoConnect();
             }
         });
     }
