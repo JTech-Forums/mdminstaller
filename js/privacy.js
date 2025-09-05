@@ -26,9 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('privacyAccepted', 'true');
     modal.classList.add('hidden');
     document.body.style.overflow = '';
-    if (!localStorage.getItem('tutorialSeen')) {
-      document.getElementById('welcomeModal')?.classList.remove('hidden');
-    }
+    // Do not auto-open tutorial/welcome after accepting privacy
   });
 
   rejectBtn.addEventListener('click', () => {

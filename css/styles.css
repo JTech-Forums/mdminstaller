@@ -384,21 +384,94 @@ body {
     padding: 0 1.25rem;
 }
 
-.connect-body { min-height: 0; }
+.status-card { display: flex; flex-direction: column; }
+.connect-body { min-height: 0; flex: 1; display: flex; flex-direction: column; }
+/* Device metrics grid */
+.device-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+.metric-card {
+    background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem 0.9rem;
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0; /* allow ellipsis */
+}
+.metric-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 0.2rem;
+}
+.metric-value {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+.metric-value.empty { color: var(--text-secondary); opacity: 0.65; }
+.metric-value.truncate { max-width: 100%; }
+
+@media (max-width: 900px) {
+    .device-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
 
 .tutorial-inline {
     background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
 }
 
-.tutorial-inline h3 { text-align: center; margin-bottom: 0.75rem; font-size: 1.35rem; }
-.tutorial-inline ul { list-style: disc inside; text-align: center; }
-.tutorial-inline li { font-size: 1.05rem; margin: 0.35rem 0; }
-.tutorial-inline-steps { min-height: 140px; }
-.tutorial-inline .tutorial-step { display: none; }
+/* Inline tutorial header */
+.tutorial-inline-header {
+    flex: 0 0 20%;
+    display: flex;
+    align-items: flex-end;
+    padding: 0.25rem 0.25rem 0.75rem;
+    margin-bottom: 0.25rem;
+    border-bottom: 1px dashed var(--border-color);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0));
+}
+.tutorial-inline-header .guide-title {
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.tutorial-inline h3 { text-align: left; margin-bottom: 1.2rem; font-size: 1.6rem; line-height: 1.25; }
+.tutorial-inline ul { list-style: none; padding-left: 0; margin: 0; text-align: left; }
+.tutorial-inline li { font-size: 1.35rem; line-height: 1.65; margin: 0.55rem 0; }
+.tutorial-inline-steps { position: relative; min-height: 0; flex: 1 1 auto; }
+.tutorial-inline .tutorial-step { display: none; position: absolute; inset: 0; width: 100%; will-change: transform, opacity; }
 .tutorial-inline .tutorial-step.active { display: block; }
+
+/* Slide animations for tutorial steps */
+@keyframes slide-in-right { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slide-in-left  { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slide-out-left { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-20px); } }
+@keyframes slide-out-right{ from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(20px); } }
+
+.tutorial-step.enter-right { animation: slide-in-right 260ms ease both; }
+.tutorial-step.enter-left  { animation: slide-in-left 260ms ease both; }
+.tutorial-step.leave-left  { animation: slide-out-left 260ms ease both; }
+.tutorial-step.leave-right { animation: slide-out-right 260ms ease both; }
 
 .tutorial-inline-nav {
     display: grid;
@@ -984,6 +1057,20 @@ body {
 .tutorial-step.active {
     display: block;
 }
+
+/* Modal tutorial layout and typography */
+.modal .tutorial-container { position: relative; min-height: 220px; }
+.modal .tutorial-container h3 { text-align: left; font-size: 1.4rem; line-height: 1.25; }
+.modal .tutorial-container ul { list-style: none; padding-left: 0; margin: 0; text-align: left; }
+.modal .tutorial-container li { font-size: 1.1rem; line-height: 1.5; }
+.modal .tutorial-step { position: absolute; inset: 0; width: 100%; }
+.modal .tutorial-step.active { display: block; }
+
+/* Ensure consistent slide effect in modal too */
+.modal .tutorial-step.enter-right { animation: slide-in-right 260ms ease both; }
+.modal .tutorial-step.enter-left  { animation: slide-in-left 260ms ease both; }
+.modal .tutorial-step.leave-left  { animation: slide-out-left 260ms ease both; }
+.modal .tutorial-step.leave-right { animation: slide-out-right 260ms ease both; }
 
 .tutorial-navigation {
     display: flex;

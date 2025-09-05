@@ -7,9 +7,19 @@ export class UIManager {
         const statusIcon = document.querySelector('.status-icon');
         const statusTitle = document.getElementById('statusTitle');
         const statusMessage = document.getElementById('statusMessage');
-        const deviceInfoDiv = document.getElementById('deviceInfo');
+        const modelEl = document.getElementById('modelValue');
+        const androidEl = document.getElementById('androidVersionValue');
+        const rootedEl = document.getElementById('rootedValue');
+        const accountsEl = document.getElementById('accountsValue');
         const connectBtn = document.getElementById('connectBtn');
         const inlineTutorial = document.getElementById('connectTutorial');
+        const setVal = (el, text) => {
+            if (!el) return;
+            const value = text ? String(text) : '';
+            el.textContent = value;
+            el.title = value;
+            el.classList.toggle('empty', !value);
+        };
 
         if (status === 'connected' && deviceInfo) {
             statusIcon.classList.remove('disconnected');
@@ -17,25 +27,11 @@ export class UIManager {
             statusTitle.textContent = 'Device Connected';
             if (statusMessage) statusMessage.textContent = 'Ready to install MDM applications';
 
-            document.getElementById('deviceModel').textContent = deviceInfo.model || 'Unknown';
-            document.getElementById('androidVersion').textContent = deviceInfo.androidVersion || 'Unknown';
-            const buildEl = document.getElementById('deviceBuild');
-            if (buildEl) buildEl.textContent = deviceInfo.buildId || '-';
-            document.getElementById('deviceSerial').textContent = deviceInfo.serial || 'Unknown';
-            const rootEl = document.getElementById('deviceRoot');
-            const acctEl = document.getElementById('accountsFound');
-            if (rootEl) {
-                rootEl.textContent = deviceInfo.rooted ? 'Yes' : 'No';
-                rootEl.classList.remove('chip-unknown','chip-warning','chip-success');
-                rootEl.classList.add(deviceInfo.rooted ? 'chip-warning' : 'chip-success');
-            }
-            if (acctEl) {
-                acctEl.textContent = deviceInfo.accountsFound ? 'Found' : 'None';
-                acctEl.classList.remove('chip-unknown','chip-warning','chip-success');
-                acctEl.classList.add(deviceInfo.accountsFound ? 'chip-warning' : 'chip-success');
-            }
-            deviceInfoDiv.classList.remove('hidden');
-            if (inlineTutorial) inlineTutorial.classList.add('hidden');
+            setVal(modelEl, deviceInfo.model || '');
+            setVal(androidEl, deviceInfo.androidVersion || '');
+            setVal(rootedEl, deviceInfo.rooted ? 'Yes' : 'No');
+            setVal(accountsEl, deviceInfo.accountsFound ? 'Found' : 'None');
+            // keep tutorial visible\n            // if (inlineTutorial) inlineTutorial.classList.add('hidden');
 
             connectBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -49,11 +45,11 @@ export class UIManager {
             statusIcon.classList.add('disconnected');
             statusTitle.textContent = 'No Device Connected';
             if (statusMessage) statusMessage.textContent = 'Connect your Android device via USB to begin';
-            deviceInfoDiv.classList.add('hidden');
-            if (inlineTutorial) {
-                const hiddenPref = localStorage.getItem('inlineGuideHidden') === 'true';
-                inlineTutorial.classList.toggle('hidden', hiddenPref);
-            }
+            setVal(modelEl, '');
+            setVal(androidEl, '');
+            setVal(rootedEl, '');
+            setVal(accountsEl, '');
+            if (inlineTutorial) inlineTutorial.classList.remove('hidden');
 
             connectBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

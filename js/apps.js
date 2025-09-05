@@ -27,11 +27,8 @@ class JTechMDMInstaller {
         await this.tryAutoConnect();
         const executeBtn = document.getElementById('executeBtn');
         if (executeBtn) executeBtn.disabled = true;
-        // Respect inline tutorial hidden state
-        const inlineTutorial = document.getElementById('connectTutorial');
-        if (inlineTutorial && localStorage.getItem('inlineGuideHidden') === 'true') {
-            inlineTutorial.classList.add('hidden');
-        }
+        // Ensure tutorial dots match steps
+        this.setupInlineTutorialDots();
         // New card reveal effect
         this.setupNewCardEffects();
     }
@@ -85,10 +82,6 @@ class JTechMDMInstaller {
         document.getElementById('copyConsoleBtn')?.addEventListener('click', () => this.copyConsoleOutput());
 
         // Modals
-        document.getElementById('tutorialBtn')?.addEventListener('click', () => {
-            this.showTutorialStep(0);
-            document.getElementById('tutorialModal')?.classList.remove('hidden');
-        });
 
         document.getElementById('aboutBtn')?.addEventListener('click', () => {
             document.getElementById('aboutModal')?.classList.remove('hidden');
@@ -120,29 +113,22 @@ class JTechMDMInstaller {
         });
 
         document.getElementById('nextStepBtn')?.addEventListener('click', () => {
-            this.showTutorialStep(this.currentTutorialStep + 1);
+            this.showTutorialStep(this.currentTutorialStep + 1, 'forward');
             this.updateInlineDots();
         });
 
         document.getElementById('prevStepBtn')?.addEventListener('click', () => {
-            this.showTutorialStep(this.currentTutorialStep - 1);
+            this.showTutorialStep(this.currentTutorialStep - 1, 'backward');
             this.updateInlineDots();
         });
 
         // Inline tutorial navigation inside connection card
         document.getElementById('inlineNextBtn')?.addEventListener('click', () => {
-            const steps = document.querySelectorAll('.tutorial-inline .tutorial-step');
-            if (steps.length && this.currentTutorialStep >= steps.length - 1) {
-                const inline = document.getElementById('connectTutorial');
-                inline?.classList.add('hidden');
-                try { localStorage.setItem('inlineGuideHidden', 'true'); } catch {}
-                return;
-            }
-            this.showTutorialStep(this.currentTutorialStep + 1);
+            this.showTutorialStep(this.currentTutorialStep + 1, 'forward');
             this.updateInlineDots();
         });
         document.getElementById('inlinePrevBtn')?.addEventListener('click', () => {
-            this.showTutorialStep(this.currentTutorialStep - 1);
+            this.showTutorialStep(this.currentTutorialStep - 1, 'backward');
             this.updateInlineDots();
         });
 
@@ -182,7 +168,7 @@ class JTechMDMInstaller {
         });
     }
 
-    showTutorialStep(index) {
+    showTutorialStep(index, direction) {
         const inlineContainer = document.querySelector('.tutorial-inline');
         const modalContainer = document.querySelector('#tutorialModal .tutorial-container');
         const usingInline = inlineContainer && !inlineContainer.classList.contains('hidden');
@@ -190,32 +176,90 @@ class JTechMDMInstaller {
         this.tutorialSteps = Array.from(scope.querySelectorAll('.tutorial-step'));
         if (this.tutorialSteps.length === 0) return;
 
+        const lastIndex = this.currentTutorialStep;
         if (index >= this.tutorialSteps.length) {
-            document.getElementById('tutorialModal')?.classList.add('hidden');
-            localStorage.setItem('tutorialSeen', 'true');
-            return;
+            index = 0; // Start over instead of closing
         }
 
         if (index < 0) index = 0;
 
-        this.tutorialSteps.forEach((step, i) => {
-            step.classList.toggle('active', i === index);
-        });
+        // Animate transition
+        if (typeof lastIndex === 'number' && lastIndex !== index) {
+            const forward = direction ? direction === 'forward' : (index > lastIndex || (lastIndex === this.tutorialSteps.length - 1 && index === 0));
+            this.animateTutorialTransition(lastIndex, index, forward);
+        } else {
+            this.tutorialSteps.forEach((step, i) => step.classList.toggle('active', i === index));
+        }
         this.currentTutorialStep = index;
         
         const prevBtn = usingInline ? document.getElementById('inlinePrevBtn') : document.getElementById('prevStepBtn');
         const nextBtn = usingInline ? document.getElementById('inlineNextBtn') : document.getElementById('nextStepBtn');
 
         if (prevBtn) prevBtn.disabled = index === 0;
-        if (nextBtn) nextBtn.textContent = (index === this.tutorialSteps.length - 1) ? 'Finish' : 'Next';
+        if (nextBtn) nextBtn.textContent = (index === this.tutorialSteps.length - 1) ? 'Start Over' : 'Next';
         this.updateInlineDots();
     }
 
+    animateTutorialTransition(fromIndex, toIndex, forward = true) {
+        const fromEl = this.tutorialSteps[fromIndex];
+        const toEl = this.tutorialSteps[toIndex];
+        if (!fromEl || !toEl) return;
+
+        // Lock container height to prevent jump
+        const container = fromEl.parentElement;
+        if (container) {
+            const currentH = fromEl.offsetHeight;
+            // Activate target to measure height without flashing
+            toEl.classList.add('active');
+            const nextH = toEl.offsetHeight;
+            const targetH = Math.max(currentH, nextH);
+            container.style.height = targetH + 'px';
+        } else {
+            // Ensure target visible if no container
+            toEl.classList.add('active');
+        }
+
+        // Apply animation classes
+        const leaveClass = forward ? 'leave-left' : 'leave-right';
+        const enterClass = forward ? 'enter-right' : 'enter-left';
+        // Force a reflow so the browser picks up the active state before animating
+        void toEl.offsetWidth;
+        fromEl.classList.add(leaveClass);
+        toEl.classList.add(enterClass);
+
+        const cleanup = () => {
+            fromEl.classList.remove('active', 'leave-left', 'leave-right');
+            toEl.classList.remove('enter-right', 'enter-left');
+            if (container) container.style.height = '';
+            fromEl.removeEventListener('animationend', onAnimEnd);
+        };
+        const onAnimEnd = () => cleanup();
+        fromEl.addEventListener('animationend', onAnimEnd, { once: true });
+    }
+
     updateInlineDots() {
-        const dots = document.querySelectorAll('#inlineDots .dot');
         const count = this.tutorialSteps?.length || 0;
-        if (!dots.length || !count) return;
-        dots.forEach((d, i) => d.classList.toggle('active', i === Math.min(this.currentTutorialStep, count - 1)));
+        const dotsContainer = document.getElementById('inlineDots');
+        if (!dotsContainer || !count) return;
+        // Rebuild if count mismatches
+        if (dotsContainer.children.length !== count) {
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const span = document.createElement('span');
+                span.className = 'dot' + (i === this.currentTutorialStep ? ' active' : '');
+                dotsContainer.appendChild(span);
+            }
+        } else {
+            Array.from(dotsContainer.children).forEach((d, i) => d.classList.toggle('active', i === this.currentTutorialStep));
+        }
+    }
+
+    setupInlineTutorialDots() {
+        const inline = document.querySelector('.tutorial-inline');
+        if (!inline) return;
+        this.tutorialSteps = Array.from(inline.querySelectorAll('.tutorial-step'));
+        this.currentTutorialStep = 0;
+        this.updateInlineDots();
     }
 
     async handleConnect(silent = false) {
@@ -867,10 +911,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     const app = new JTechMDMInstaller();
     await app.init();
     window.uiManager = app.uiManager;
-    if (
-        localStorage.getItem('privacyAccepted') === 'true' &&
-        !localStorage.getItem('tutorialSeen')
-    ) {
-        document.getElementById('welcomeModal')?.classList.remove('hidden');
-    }
+    // Do not auto-open tutorial/welcome on first load
 });
