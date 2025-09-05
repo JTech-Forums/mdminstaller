@@ -104,12 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="modal-body">
                     <div id="privacyText" class="policy-content"></div>
-                    <div class="policy-actions">
-                        <label><input type="checkbox" id="policyCheck"> I agree to the Privacy Policy</label>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn btn-secondary" id="rejectPolicyBtn">Reject</button>
-                        <button class="btn btn-primary" id="acceptPolicyBtn" disabled>Accept</button>
+                    <div class="policy-footer">
+                        <label class="policy-check"><input type="checkbox" id="policyCheck"> I agree to the Privacy Policy</label>
+                        <div class="actions">
+                            <button class="btn btn-secondary" id="rejectPolicyBtn">Reject</button>
+                            <button class="btn btn-primary" id="acceptPolicyBtn" disabled>Accept</button>
+                        </div>
                     </div>
                 </div>
             </div>

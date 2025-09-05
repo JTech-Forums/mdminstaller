@@ -304,6 +304,9 @@ body {
 .btn#executeBtn { padding: 0.5rem 0.6rem; }
 .btn#executeBtn svg { width: 16px; height: 16px; }
 
+/* Slight inset so execute button doesn’t touch edge */
+.input-group > #executeBtn { margin-right: 0.5rem; }
+
 .console-header { display:flex; align-items:center; justify-content: space-between; margin-bottom: 0.5rem; }
 .console-actions { display:flex; gap:0.5rem; }
 .console-actions .btn-small { padding: 0.35rem; font-size: 0.8rem; background: transparent; border: 1px solid transparent; }
@@ -313,7 +316,8 @@ body {
 .console-output { min-height: 160px; height: 100%; flex: 1; }
 
 /* Console footer with primary actions */
-.console-footer { display:flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.75rem; }
+.console-footer { display:flex; gap: 0.75rem; justify-content: center; margin-top: 0.75rem; }
+.console-footer .btn { min-width: 160px; justify-content: center; }
 .btn-lg { padding: 0.9rem 1.25rem; font-size: 0.95rem; }
 
 /* Transparent, themed scrollbar for console output */
@@ -1019,25 +1023,23 @@ body {
     align-items: center;
     justify-content: center;
     padding-top: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 #privacyModal .modal-content {
-    max-width: 1100px;
-    width: min(90vw, 1100px);
-    max-height: calc(100vh - 6rem);
+    max-width: 720px;
+    width: min(92vw, 720px);
+    max-height: 80vh;
     margin: 0 auto;
-    transform: translateY(4vh);
+    transform: none;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: rgba(11, 18, 32, 0.55);
-    -webkit-backdrop-filter: blur(12px) saturate(120%);
-    backdrop-filter: blur(12px) saturate(120%);
-    border: 1px solid rgba(59, 130, 246, 0.30);
-    box-shadow: 0 0 24px rgba(59, 130, 246, 0.25), 0 12px 40px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
 }
 
 #privacyText {
@@ -1045,13 +1047,13 @@ body {
     max-height: none;
     overflow-y: auto;
     overflow-x: hidden;
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
     font-size: 1.025rem;
     line-height: 1.6;
     scrollbar-width: thin;
     scrollbar-color: rgba(59, 130, 246, 0.4) transparent;
     padding-right: 0.5rem;
-    padding-bottom: 6rem; /* prevent content hidden behind sticky footer */
+    padding-bottom: 1rem;
     overscroll-behavior: contain;
     flex: 1;
 }
@@ -1062,7 +1064,7 @@ body {
     overflow: hidden; /* avoid nested scrollbars; let #privacyText scroll */
     flex: 1;
     min-height: 0;
-    padding-bottom: 0;
+    padding-bottom: 0.75rem;
 }
 
 #privacyText::-webkit-scrollbar {
@@ -1082,22 +1084,13 @@ body {
     background-color: rgba(59, 130, 246, 0.6);
 }
 
-.policy-actions {
-    margin: 0;
-    padding: 0.75rem 1.5rem;
-    position: sticky;
-    bottom: 3.5rem;
-    background: linear-gradient(180deg, rgba(11,18,32,0.55), rgba(11,18,32,0.7));
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    border-top: 1px solid rgba(59, 130, 246, 0.20);
-    z-index: 2;
-}
-
-.policy-actions label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.policy-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.5rem; }
+.policy-footer .policy-check { display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); }
+.policy-footer .actions { display: flex; gap: 0.75rem; }
+.policy-footer .actions .btn { min-width: 120px; }
+@media (max-width: 560px) {
+  .policy-footer { flex-direction: column; align-items: stretch; }
+  .policy-footer .actions .btn { width: 100%; }
 }
 
 /* Responsive fixes for privacy modal */
@@ -1313,15 +1306,7 @@ body.scaled {
 
 /* Command History removed */
 
-#privacyModal .modal-actions {
-    margin: 0;
-    padding: 0.75rem 1.5rem;
-    position: sticky;
-    bottom: 0;
-    background: linear-gradient(180deg, rgba(11,18,32,0.7), rgba(11,18,32,0.85));
-    border-top: 1px solid rgba(59, 130, 246, 0.25);
-    z-index: 3;
-}
+#privacyModal .modal-actions { justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem; padding: 0; position: static; background: transparent; border: none; }
 
 html {
     height: 100%;
