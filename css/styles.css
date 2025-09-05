@@ -102,6 +102,8 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    /* Nudge right so it aligns with cards below (avoids glow overhang) */
+    margin-left: 6px;
 }
 
 /* tiny glowing ring around logo anchor */
@@ -1180,6 +1182,8 @@ body.scaled {
     }
     .brand-logo-left {
         justify-self: center;
+        /* Remove desktop offset when centered on mobile */
+        margin-left: 0;
     }
 
     .logo-img {

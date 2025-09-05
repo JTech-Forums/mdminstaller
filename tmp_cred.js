@@ -1,0 +1,8 @@
+﻿/**
+ * Bundled by jsDelivr using Rollup v2.79.2 and Terser v5.39.0.
+ * Original file: /npm/@yume-chan/adb-credential-web@2.1.0/esm/index.js
+ *
+ * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
+ */
+function e(){return new Promise(((e,t)=>{const n=indexedDB.open("Tango",1);n.onerror=()=>{t(n.error)},n.onupgradeneeded=()=>{n.result.createObjectStore("Authentication",{autoIncrement:!0})},n.onsuccess=()=>{const t=n.result;e(t)}}))}class t{#e;constructor(e="Tango"){this.#e=e}async generateKey(){const{privateKey:t}=await crypto.subtle.generateKey({name:"RSASSA-PKCS1-v1_5",modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:"SHA-1"},!0,["sign","verify"]),n=new Uint8Array(await crypto.subtle.exportKey("pkcs8",t));return await async function(t){const n=await e();return new Promise(((e,o)=>{const r=n.transaction("Authentication","readwrite"),a=r.objectStore("Authentication").add(t);a.onerror=()=>{o(a.error)},a.onsuccess=()=>{e()},r.onerror=()=>{o(r.error)},r.oncomplete=()=>{n.close()}}))}(n),{buffer:n,name:`${this.#e}@${globalThis.location.hostname}`}}async*iterateKeys(){for(const t of await async function(){const t=await e();return new Promise(((e,n)=>{const o=t.transaction("Authentication","readonly"),r=o.objectStore("Authentication").getAll();r.onerror=()=>{n(r.error)},r.onsuccess=()=>{e(r.result)},o.onerror=()=>{n(o.error)},o.oncomplete=()=>{t.close()}}))}())yield{buffer:t,name:`${this.#e}@${globalThis.location.hostname}`}}}export{t as default};
+//# sourceMappingURL=/sm/624d67b9876c3626cd082b207b4f326a75920bbaee527d61fa2f9b9d13df1e89.map
