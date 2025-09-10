@@ -1,19 +1,18 @@
-name: Build & Deploy to GitHub Pages
+name: Build and Deploy to Pages
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,33 +39,21 @@ jobs:
       - name: Build site
         run: npm run build
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
-          publish_branch: gh-pages
-      
-      - name: List files (debug)
-        run: ls -la docs
-
-      - name: "Preflight: ensure index.html exists"
-        run: |
-          if [ ! -f "docs/index.html" ]; then
-            echo "ERROR: No index.html found in docs."
-            echo "If you're using Next.js, make sure you ran 'next export' (not just next build)."
-            exit 1
-          fi
-
-      # Write the CNAME so GitHub binds your custom domain
-      - name: Add CNAME
-        run: echo "installer.jtechforums.org" > docs/CNAME
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: ./docs
 
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
