@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: "pages"
@@ -16,9 +14,6 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,9 +24,6 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
 
       # Ensure a build script exists
       - name: Verify build script
@@ -48,40 +40,9 @@ jobs:
       - name: Build site
         run: npm run build
 
-      # Detect common static output directories
-      - name: Detect output directory
-        id: detect
-        run: |
-          for d in dist build out .next/out .output/public public docs; do
-            if [ -d "$d" ]; then
-              echo "dir=$d" >> $GITHUB_OUTPUT
-              echo "Detected output dir: $d"
-              exit 0
-            fi
-          done
-          echo "ERROR: Could not find a build output directory (looked for dist, build, out, .next/out, .output/public, public, docs)."
-          exit 1
-
-      - name: List files (debug)
-        run: ls -la "${{ steps.detect.outputs.dir }}"
-
-      - name: "Preflight: ensure index.html exists"
-        run: |
-          if [ ! -f "${{ steps.detect.outputs.dir }}/index.html" ]; then
-            echo "ERROR: No index.html found in ${{ steps.detect.outputs.dir }}."
-            echo "If you're using Next.js, make sure you ran 'next export' (not just next build)."
-            exit 1
-          fi
-
-      # Write the CNAME so GitHub binds your custom domain
-      - name: Add CNAME
-        run: echo "installer.jtechforums.org" > "${{ steps.detect.outputs.dir }}/CNAME"
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: ${{ steps.detect.outputs.dir }}
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
