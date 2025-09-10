@@ -144,7 +144,7 @@ const server = http.createServer((req, res) => {
           for (const img of iconCandidates) {
             const imgPath = path.join(dirPath, img);
             if (fs.existsSync(imgPath)) {
-              imageFile = `/apk/${dir.name}/${img}`;
+              imageFile = `apk/${dir.name}/${img}`;
               break;
             }
           }

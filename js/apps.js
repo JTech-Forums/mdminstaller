@@ -434,7 +434,7 @@ class JTechMDMInstaller {
                     title: kit.title || apk.name,
                     infoUrl: kit.infoUrl || '#',
                     key: kit.key || apk.name,
-                    image: kit.image ? `/apk/${kit.key}/${kit.image}` : apk.image
+                    image: kit.image ? `apk/${kit.key}/${kit.image}` : apk.image
                 };
             });
             

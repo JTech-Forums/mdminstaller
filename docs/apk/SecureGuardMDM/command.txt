@@ -1,0 +1,2 @@
+dpm set-device-owner com.secureguard.mdm/com.secureguard.mdm.SecureGuardDeviceAdminReceiver
+pm grant com.secureguard.mdm android.permission.WRITE_SECURE_SETTINGS
