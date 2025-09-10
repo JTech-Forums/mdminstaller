@@ -38,7 +38,6 @@ temp/
 # Build outputs (if any build process is added later)
 dist/
 build/
-docs/
 
 # Environment variables
 .env

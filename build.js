@@ -28,13 +28,8 @@ const items = [
   { src: 'template.html', dest: 'index.html' },
   { src: 'console.html', dest: 'console.html' },
   { src: 'privacy.txt', dest: 'privacy.txt' },
-  { src: 'logo2.png', dest: 'logo2.png' },
-  { src: 'icon.png', dest: 'icon.png' },
-  { src: 'icon.png', dest: 'favicon.ico' },
-  { src: 'emoji.png', dest: 'emoji.png' },
   { src: 'css', dest: 'css' },
   { src: 'js', dest: 'js' },
-  { src: 'apk', dest: 'apk' },
   { src: 'CNAME', dest: 'CNAME' }
 ];
 
@@ -64,10 +59,10 @@ function generateApkMetadata() {
           .filter((c) => c.trim());
       }
 
-      let imageFile = null;
+      let imageUrl = null;
       for (const file of fs.readdirSync(dirPath)) {
         if (/\.(png|jpe?g|svg)$/i.test(file)) {
-          imageFile = `/apk/${dir.name}/${file}`;
+          imageUrl = `https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/${dir.name}/${file}`;
           break;
         }
       }
@@ -81,7 +76,7 @@ function generateApkMetadata() {
 
       return {
         name: dir.name,
-        image: imageFile,
+        image: imageUrl,
         url: apkUrl,
         postInstallCommands
       };
