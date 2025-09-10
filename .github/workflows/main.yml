@@ -46,3 +46,27 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           publish_branch: gh-pages
+      
+      - name: List files (debug)
+        run: ls -la docs
+
+      - name: "Preflight: ensure index.html exists"
+        run: |
+          if [ ! -f "docs/index.html" ]; then
+            echo "ERROR: No index.html found in docs."
+            echo "If you're using Next.js, make sure you ran 'next export' (not just next build)."
+            exit 1
+          fi
+
+      # Write the CNAME so GitHub binds your custom domain
+      - name: Add CNAME
+        run: echo "installer.jtechforums.org" > docs/CNAME
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
