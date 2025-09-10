@@ -9,6 +9,7 @@ function copyRecursive(src, dest) {
   if (stat.isDirectory()) {
     fs.mkdirSync(dest, { recursive: true });
     for (const entry of fs.readdirSync(src)) {
+      if (entry === 'url.txt') continue; // skip helper metadata files
       copyRecursive(path.join(src, entry), path.join(dest, entry));
     }
   } else {
@@ -71,7 +72,12 @@ function generateApkMetadata() {
         }
       }
 
-      const apkUrl = `https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/${dir.name}.apk`;
+      // Allow per-app override of APK URL via optional url.txt
+      let apkUrl = `https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/${dir.name}.apk`;
+      const urlPath = path.join(dirPath, 'url.txt');
+      if (fs.existsSync(urlPath)) {
+        apkUrl = fs.readFileSync(urlPath, 'utf8').trim();
+      }
 
       return {
         name: dir.name,
