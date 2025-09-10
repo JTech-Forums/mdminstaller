@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
@@ -25,6 +26,89 @@ const server = http.createServer((req, res) => {
   console.log(`Request: ${req.method} ${req.url}`);
   
   // Handle API endpoints
+  if (req.method === 'POST' && req.url === '/api/reviews') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; if (body.length > 1e6) req.destroy(); });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const { vendor, name, rating, text, cfToken } = data || {};
+        if (!vendor || !text || !rating || !cfToken) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Missing fields' }));
+        }
+
+        // Verify Turnstile
+        const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET || '0x4AAAAAAB0euZX6xBIjkB87qVjhPzyxjm8';
+        const verifyResp = await new Promise((resolve, reject) => {
+          const postData = new URLSearchParams({ secret: TURNSTILE_SECRET, response: cfToken }).toString();
+          const reqOpts = {
+            method: 'POST',
+            hostname: 'challenges.cloudflare.com',
+            path: '/turnstile/v0/siteverify',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(postData) }
+          };
+          const vreq = https.request(reqOpts, vres => {
+            let resp = '';
+            vres.on('data', d => resp += d);
+            vres.on('end', () => {
+              try { resolve(JSON.parse(resp)); } catch (e) { reject(e); }
+            });
+          });
+          vreq.on('error', reject);
+          vreq.write(postData);
+          vreq.end();
+        });
+
+        if (!verifyResp || !verifyResp.success) {
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Turnstile verification failed' }));
+        }
+
+        // Insert into Supabase
+        const SUPABASE_URL = process.env.SUPABASE_REST_URL || 'https://hspzbenmhijqowsltijs.supabase.co/rest/v1/reviews';
+        const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzcHpiZW5taGlqcW93c2x0aWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MjQyMDYsImV4cCI6MjA3MzEwMDIwNn0.3IZkSFy44cruJDFPdwOwbhj9x2afcBEun3UVAm7oh9k';
+
+        const supaResp = await new Promise((resolve, reject) => {
+          const payload = JSON.stringify({ vendor, name: name || 'Anonymous', rating: Math.max(1, Math.min(5, Number(rating) || 5)), text });
+          const url = new URL(SUPABASE_URL);
+          const opts = {
+            method: 'POST',
+            hostname: url.hostname,
+            path: url.pathname + (url.search || ''),
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(payload),
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`,
+              'Prefer': 'return=representation'
+            }
+          };
+          const sreq = https.request(opts, sres => {
+            let resp = '';
+            sres.on('data', d => resp += d);
+            sres.on('end', () => resolve({ status: sres.statusCode, body: resp }));
+          });
+          sreq.on('error', reject);
+          sreq.write(payload);
+          sreq.end();
+        });
+
+        if (!supaResp || supaResp.status < 200 || supaResp.status >= 300) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Supabase insert failed' }));
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(supaResp.body || '{}');
+      } catch (e) {
+        console.error('Review submit error:', e);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Server error' }));
+      }
+    });
+    return;
+  }
   if (req.url === '/api/apks') {
     // List application folders in the apk directory
     fs.readdir('./apk', { withFileTypes: true }, (err, entries) => {

@@ -1,4 +1,4 @@
-<!-- Template served by server.js -->
+﻿<!-- Template served by server.js -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,15 +130,15 @@
                                     </ul>
                                 </div>
                                 <div class="tutorial-step">
-                                    <h3>Step 9: You’re Connected</h3>
+                                    <h3>Step 9: Youâ€™re Connected</h3>
                                     <ul>
-                                        <li>Bingo! You’re connected — now you can install one of our filters.</li>
+                                        <li>Bingo! Youâ€™re connected â€” now you can install one of our filters.</li>
                                     </ul>
                                 </div>
                                 <div class="tutorial-step">
                                     <h3>Step 10: Join the Community</h3>
                                     <ul>
-                                        <li>When you’re done (success or error), <a href="https://forums.jtechforums.org/signup" target="_blank" rel="noopener noreferrer"><strong>join JTech Forums</strong></a> — we’d love your feedback!</li>
+                                        <li>When youâ€™re done (success or error), <a href="https://forums.jtechforums.org/signup" target="_blank" rel="noopener noreferrer"><strong>join JTech Forums</strong></a> â€” weâ€™d love your feedback!</li>
                                     </ul>
                                 </div>
                             </div>
@@ -152,9 +152,48 @@
                     </div>
                 </div>
 
-                <!-- Empty Placeholder Card (New Box) -->
+                <!-- MDM Info Card (center panel) -->
                 <div class="card new-card" id="newCard">
-                    <img src="emoji.png" alt="emoji" class="new-card-emoji" />
+                    <div class="info-card" id="mdmInfo" aria-live="polite">
+                        <div class="info-header">
+                            <h2 id="infoTitle">Select an MDM</h2>
+                        </div>
+                        <div class="info-body">
+                            <p class="info-desc" id="infoDesc">Swipe the carousel below to view details.</p>
+                            <div class="info-meta">
+                                <span id="infoPrice" class="badge">Price: â€”</span>
+                                <a id="infoLink" class="info-link" href="#" target="_blank" rel="noopener noreferrer">Website</a>
+                            </div>
+
+                            <div class="info-views" id="infoViews">
+                                <!-- Reviews view (default) -->
+                                <div class="reviews" id="reviews">
+                                    <div class="reviews-header">
+                                        <h3>Reviews</h3>
+                                        <button class="btn btn-primary btn-compact" id="writeReviewBtn" type="button">Write a review</button>
+                                    </div>
+                                    <div id="reviewsList" class="reviews-list"></div>
+                                </div>
+
+                                <!-- Review form panel (toggles in, overlays, non-resizing) -->
+                                <div class="review-panel hidden" id="reviewPanel">
+                                    <h3>Write a Review</h3>
+                                    <form id="reviewForm" class="review-form">
+                                        <div class="review-actions">
+                                            <div class="cf-turnstile" data-sitekey="0x4AAAAAAB0euR9XLuq8-8qr" data-theme="dark" data-size="invisible"></div>
+                                            <button class="btn btn-secondary btn-compact" id="cancelReviewBtn" type="button">Cancel</button>
+                                            <button class="btn btn-primary btn-compact" type="submit">Submit</button>
+                                        </div>
+                                        <div class="star-input" id="reviewStars" aria-label="Your rating">
+                                            <!-- interactive stars injected -->
+                                        </div>
+                                        <input type="text" id="reviewName" placeholder="Name (optional)" class="review-input" autocomplete="name">
+                                        <textarea id="reviewText" class="review-text" placeholder="Share your experience..." required></textarea>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- APK Installation Card -->
@@ -297,15 +336,15 @@
                         </ul>
                     </div>
                     <div class="tutorial-step">
-                        <h3>Step 9: You’re Connected</h3>
+                        <h3>Step 9: Youâ€™re Connected</h3>
                         <ul>
-                            <li>Bingo! You’re connected — now you can install one of our filters.</li>
+                            <li>Bingo! Youâ€™re connected â€” now you can install one of our filters.</li>
                         </ul>
                     </div>
                     <div class="tutorial-step">
                         <h3>Step 10: Join the Community</h3>
                         <ul>
-                            <li>When you’re done (success or error), <a href="https://forums.jtechforums.org/signup" target="_blank" rel="noopener noreferrer"><strong>join JTech Forums</strong></a> — we’d love your feedback!</li>
+                            <li>When youâ€™re done (success or error), <a href="https://forums.jtechforums.org/signup" target="_blank" rel="noopener noreferrer"><strong>join JTech Forums</strong></a> â€” weâ€™d love your feedback!</li>
                         </ul>
                     </div>
                 </div>
@@ -343,7 +382,7 @@
                     <li>Android device with USB debugging enabled</li>
                     <li>USB cable for device connection</li>
                 </ul>
-                <p class="footer-text">© 2024 JTech Solutions. Version 1.0.0</p>
+                <p class="footer-text">Â© 2024 JTech Solutions. Version 1.0.0</p>
             </div>
         </div>
     </div>
@@ -353,6 +392,23 @@
     <script src="js/ui/auto-scale.js"></script>
     <script src="js/ui/cursor-trail.js"></script>
     <script src="js/privacy.js"></script>
+    <!-- Reviews backend configuration (Supabase REST) -->
+    <script>
+      window.REVIEWS_CONFIG = {
+        supabase: {
+          url: 'https://hspzbenmhijqowsltijs.supabase.co/rest/v1/reviews',
+          apiKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzcHpiZW5taGlqcW93c2x0aWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MjQyMDYsImV4cCI6MjA3MzEwMDIwNn0.3IZkSFy44cruJDFPdwOwbhj9x2afcBEun3UVAm7oh9k'
+        }
+      };
+    </script>
+    <!-- Cloudflare Turnstile for review submissions -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script>
+      window.REVIEWS_CONFIG = Object.assign({}, window.REVIEWS_CONFIG, {
+        proxy: { url: '/api/reviews' },
+        cloudflare: { siteKey: '0x4AAAAAAB0euR9XLuq8-8qr' }
+      });
+    </script>
     <script src="js/apps.js" type="module"></script>
 </body>
 </html>

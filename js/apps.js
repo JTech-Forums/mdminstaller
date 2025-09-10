@@ -3,6 +3,7 @@ import { ApkInstaller } from './adb/apk-installer.js';
 import { UIManager } from './ui/ui-manager.js';
 import KITS from './data/kits.js';
 import { renderKits } from './ui/cards.js';
+import { loadReviews, loadAllReviews, submitReview, computeAverage } from './reviews.js';
 import { deviceHasAccounts, disableAccountApps, reenablePackages, isDeviceRooted } from './adb/account-utils.js';
 
 class JTechMDMInstaller {
@@ -16,6 +17,9 @@ class JTechMDMInstaller {
         this.currentTutorialStep = 0;
         this.tutorialSteps = [];
         this.swiper = null;
+        this.reviewsCache = {};
+        this.infoRenderToken = 0;
+        this.activeVendorKey = '';
     }
 
     async init() {
@@ -24,13 +28,17 @@ class JTechMDMInstaller {
         this.uiManager.updateConnectionStatus('disconnected');
         await this.loadAvailableApks();
         this.renderAvailableApks(); // Initialize Swiper here
+        // Prefetch all reviews to avoid race conditions when swiping fast
+        try {
+            this.reviewsCache = await loadAllReviews();
+        } catch {}
         await this.tryAutoConnect();
         const executeBtn = document.getElementById('executeBtn');
         if (executeBtn) executeBtn.disabled = true;
         // Ensure tutorial dots match steps
         this.setupInlineTutorialDots();
-        // New card reveal effect
-        this.setupNewCardEffects();
+        // Initialize info card based on active slide
+        this.bindSwiperInfo();
     }
 
     checkWebUSBSupport() {
@@ -456,6 +464,237 @@ class JTechMDMInstaller {
         
         // Set initial button states based on connection status
         this.updateInstallButtonStates();
+    }
+
+    bindSwiperInfo() {
+        if (!this.swiper) return;
+        const update = () => this.updateInfoCardForActive();
+        this.swiper.on('slideChange', update);
+        this.swiper.on('activeIndexChange', update);
+        this.swiper.on('slideChangeTransitionEnd', update);
+        // initial
+        setTimeout(update, 0);
+    }
+
+    async updateInfoCardForActive() {
+        if (!this.swiper || !Array.isArray(this.availableApks) || this.availableApks.length === 0) return;
+        const activeIdx = this.swiper.activeIndex ?? 0;
+        const slideEl = this.swiper.slides?.[activeIdx];
+        const key = slideEl?.dataset?.key;
+        let apk = null;
+        if (key) {
+            apk = this.availableApks.find(a => (a.key || a.name) === key) || null;
+        }
+        if (!apk) {
+            const idx = this.swiper.realIndex ?? 0;
+            apk = this.availableApks[idx] || this.availableApks[0];
+        }
+        await this.renderInfoCard(apk);
+    }
+
+    async renderInfoCard(apk) {
+        const titleEl = document.getElementById('infoTitle');
+        const descEl = document.getElementById('infoDesc');
+        const priceEl = document.getElementById('infoPrice');
+        const linkEl = document.getElementById('infoLink');
+        const ratingEl = document.getElementById('infoRating');
+        const listEl = document.getElementById('reviewsList');
+        const formEl = document.getElementById('reviewForm');
+        const starsInput = document.getElementById('reviewStars');
+        const writeBtn = document.getElementById('writeReviewBtn');
+        const cancelBtn = document.getElementById('cancelReviewBtn');
+        const reviewPanel = document.getElementById('reviewPanel');
+        const reviewsSection = document.getElementById('reviews');
+        // Default to view mode
+        if (reviewPanel && reviewsSection) {
+            reviewPanel.classList.add('hidden');
+            reviewsSection.classList.remove('hidden');
+        }
+        // Ensure meta/desc are visible in view mode
+        if (descEl) descEl.classList.remove('hidden');
+        if (priceEl) priceEl.classList.remove('hidden');
+        if (linkEl) linkEl.classList.remove('hidden');
+
+        if (!titleEl) return;
+
+        titleEl.textContent = apk.title || apk.name || 'MDM';
+        descEl.textContent = apk.description || 'No description available.';
+        const priceText = apk.pricing || apk.price || ((apk.badge && /free/i.test(apk.badge)) ? 'Free' : '—');
+        priceEl.textContent = `Price: ${priceText}`;
+        if (apk.infoUrl) {
+            linkEl.href = apk.infoUrl;
+            linkEl.textContent = 'Website';
+        } else {
+            linkEl.removeAttribute('href');
+            linkEl.textContent = '—';
+        }
+
+        // Load and render reviews (cached first), guard races when swiping quickly
+        const vendor = apk.key || apk.name || 'unknown';
+        this.activeVendorKey = vendor;
+        const token = ++this.infoRenderToken;
+        const cached = this.reviewsCache[vendor];
+        if (cached) {
+            this.renderStars(ratingEl, computeAverage(cached));
+            this.renderReviewsList(listEl, cached);
+        } else {
+            this.renderReviewsList(listEl, []);
+        }
+        try {
+            const fresh = await loadReviews(vendor);
+            if (token === this.infoRenderToken && vendor === this.activeVendorKey) {
+                this.reviewsCache[vendor] = fresh;
+                this.renderStars(ratingEl, computeAverage(fresh));
+                this.renderReviewsList(listEl, fresh);
+            }
+        } catch {}
+        this.setupReviewForm(starsInput, formEl, vendor, listEl, ratingEl, () => {
+            if (reviewPanel && reviewsSection) {
+                reviewPanel.classList.add('hidden');
+                reviewsSection.classList.remove('hidden');
+                if (descEl) descEl.classList.remove('hidden');
+                if (priceEl) priceEl.classList.remove('hidden');
+                if (linkEl) linkEl.classList.remove('hidden');
+            }
+        });
+
+        if (writeBtn && reviewPanel && reviewsSection) {
+            writeBtn.onclick = () => {
+                reviewsSection.classList.add('hidden');
+                reviewPanel.classList.remove('hidden');
+                if (descEl) descEl.classList.add('hidden');
+                if (priceEl) priceEl.classList.add('hidden');
+                if (linkEl) linkEl.classList.add('hidden');
+            };
+        }
+        if (cancelBtn && reviewPanel && reviewsSection) {
+            cancelBtn.onclick = () => {
+                reviewPanel.classList.add('hidden');
+                reviewsSection.classList.remove('hidden');
+                if (descEl) descEl.classList.remove('hidden');
+                if (priceEl) priceEl.classList.remove('hidden');
+                if (linkEl) linkEl.classList.remove('hidden');
+            };
+        }
+    }
+
+    renderStars(container, avgOrValue) {
+        if (!container) return;
+        const value = Number(avgOrValue) || 0;
+        container.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            const span = document.createElement('span');
+            span.className = 'star' + (i <= Math.round(value) ? '' : ' empty');
+            span.textContent = '★';
+            container.appendChild(span);
+        }
+        // stars only; omit numeric avg
+    }
+
+    renderReviewsList(container, reviews) {
+        if (!container) return;
+        container.innerHTML = '';
+        if (!reviews || reviews.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'review-item';
+            empty.textContent = 'No reviews yet. Be the first to review!';
+            container.appendChild(empty);
+            return;
+        }
+        reviews.slice(0, 20).forEach(r => {
+            const item = document.createElement('div');
+            item.className = 'review-item';
+            const meta = document.createElement('div');
+            meta.className = 'review-meta';
+            const left = document.createElement('div');
+            left.textContent = r.name || 'Anonymous';
+            const right = document.createElement('div');
+            right.textContent = new Date(r.createdAt || Date.now()).toLocaleDateString();
+            meta.appendChild(left);
+            meta.appendChild(right);
+            const stars = document.createElement('div');
+            stars.className = 'info-rating';
+            for (let i = 1; i <= 5; i++) {
+                const s = document.createElement('span');
+                s.className = 'star' + (i <= (Number(r.rating) || 0) ? '' : ' empty');
+                s.textContent = '★';
+                stars.appendChild(s);
+            }
+            const text = document.createElement('div');
+            text.className = 'review-body';
+            text.textContent = r.text || '';
+            item.appendChild(meta);
+            item.appendChild(stars);
+            item.appendChild(text);
+            container.appendChild(item);
+        });
+    }
+
+    setupReviewForm(starsContainer, formEl, vendor, listEl, avgContainer, onSubmitted) {
+        if (!starsContainer || !formEl) return;
+        // Build interactive star input
+        starsContainer.innerHTML = '';
+        let selected = 5;
+        const draw = () => {
+            starsContainer.querySelectorAll('.star').forEach((node, idx) => {
+                node.classList.toggle('empty', idx + 1 > selected);
+            });
+        };
+        for (let i = 1; i <= 5; i++) {
+            const star = document.createElement('span');
+            star.className = 'star' + (i <= selected ? '' : ' empty');
+            star.textContent = '★';
+            star.dataset.value = String(i);
+            star.addEventListener('click', () => { selected = i; draw(); });
+            starsContainer.appendChild(star);
+        }
+
+        formEl.onsubmit = async (e) => {
+            e.preventDefault();
+            const name = (document.getElementById('reviewName')?.value || '').trim();
+            const text = (document.getElementById('reviewText')?.value || '').trim();
+            if (!text) return;
+            const tsEl = document.querySelector('.cf-turnstile');
+            const acquireCfToken = async () => {
+                if (!window.turnstile || !tsEl) return null;
+                try { await new Promise((r) => window.turnstile.ready(r)); } catch {}
+                try { window.turnstile.execute(tsEl); } catch (e) { try { window.turnstile.execute(); } catch {} }
+                for (let i = 0; i < 50; i++) { // wait up to ~5s
+                    const v = document.querySelector('input[name="cf-turnstile-response"]')?.value;
+                    if (v) return v;
+                    await new Promise(res => setTimeout(res, 100));
+                }
+                return null;
+            };
+            const cfToken = await acquireCfToken();
+            if (!cfToken) {
+                // Top-left error toast
+                const n = document.createElement('div');
+                n.style.cssText = 'position:fixed;top:20px;left:20px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:10px 14px;border-radius:8px;z-index:1002;box-shadow:0 10px 15px -3px rgba(0,0,0,.5);border:1px solid var(--border-color);';
+                n.textContent = 'Cloudflare verification failed. Please try again.';
+                document.body.appendChild(n);
+                setTimeout(() => n.remove(), 5000);
+                return;
+            }
+            try {
+                const updated = await submitReview(vendor, { name, text, rating: selected }, { cfToken });
+                if (window.turnstile && typeof window.turnstile.reset === 'function') {
+                    try { window.turnstile.reset(); } catch {}
+                }
+                this.reviewsCache[vendor] = updated;
+                this.renderReviewsList(listEl, updated);
+                this.renderStars(avgContainer, computeAverage(updated));
+                formEl.reset();
+                selected = 5; draw();
+                if (typeof onSubmitted === 'function') onSubmitted();
+            } catch (err) {
+                const n = document.createElement('div');
+                n.style.cssText = 'position:fixed;top:20px;left:20px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:10px 14px;border-radius:8px;z-index:1002;box-shadow:0 10px 15px -3px rgba(0,0,0,.5);border:1px solid var(--border-color);';
+                n.textContent = 'Cloudflare verification failed. Please try again.';
+                document.body.appendChild(n);
+                setTimeout(() => n.remove(), 5000);
+            }
+        };
     }
     
     updateInstallButtonStates() {

@@ -4,9 +4,10 @@ export function renderKits(apks, { onInstall } = {}) {
 
     grid.innerHTML = '';
 
-    apks.forEach((apk) => {
+    apks.forEach((apk, i) => {
         const slide = document.createElement('div');
         slide.className = 'swiper-slide';
+        slide.dataset.key = apk.key || apk.name || String(i);
         slide.innerHTML = `
             <div class="app-item card-modern">
                 <div class="app-icon">
@@ -28,7 +29,7 @@ export function renderKits(apks, { onInstall } = {}) {
     // Start with eGate as the prominent option
     const startIndex = apks.findIndex(a => a.key === 'eGate' || a.name === 'eGate');
 
-    return new Swiper('#kitsSwiper', {
+    const swiper = new Swiper('#kitsSwiper', {
         effect: 'coverflow',
         grabCursor: true,
         centeredSlides: true,
@@ -47,5 +48,6 @@ export function renderKits(apks, { onInstall } = {}) {
         watchSlidesProgress: true,
         loop: true
     });
-}
 
+    return swiper;
+}
