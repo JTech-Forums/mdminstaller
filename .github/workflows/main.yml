@@ -47,40 +47,26 @@ jobs:
 
       - name: Build site
         run: npm run build
-
-      # Detect common static output directories
-      - name: Detect output directory
-        id: detect
-        run: |
-          for d in dist build out .next/out .output/public public docs; do
-            if [ -d "$d" ]; then
-              echo "dir=$d" >> $GITHUB_OUTPUT
-              echo "Detected output dir: $d"
-              exit 0
-            fi
-          done
-          echo "ERROR: Could not find a build output directory (looked for dist, build, out, .next/out, .output/public, public, docs)."
-          exit 1
-
+      
       - name: List files (debug)
-        run: ls -la "${{ steps.detect.outputs.dir }}"
+        run: ls -la docs
 
       - name: "Preflight: ensure index.html exists"
         run: |
-          if [ ! -f "${{ steps.detect.outputs.dir }}/index.html" ]; then
-            echo "ERROR: No index.html found in ${{ steps.detect.outputs.dir }}."
+          if [ ! -f "docs/index.html" ]; then
+            echo "ERROR: No index.html found in docs."
             echo "If you're using Next.js, make sure you ran 'next export' (not just next build)."
             exit 1
           fi
 
       # Write the CNAME so GitHub binds your custom domain
       - name: Add CNAME
-        run: echo "installer.jtechforums.org" > "${{ steps.detect.outputs.dir }}/CNAME"
+        run: echo "installer.jtechforums.org" > docs/CNAME
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ steps.detect.outputs.dir }}
+          path: docs
 
       - name: Deploy to GitHub Pages
         id: deployment
