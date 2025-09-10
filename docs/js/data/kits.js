@@ -19,6 +19,7 @@ const KITS = [
     apkName: "eGate.apk",
     cmdName: "command.txt",
     image: "egate.svg",
+    pricing: '$40 one-time',
   },
   {
     key: "GenTech",
@@ -29,6 +30,7 @@ const KITS = [
     apkName: "GenTech.apk",
     cmdName: "command.txt",
     image: "gentech.svg",
+    pricing: '$180 yearly',
   },
   {
     key: "Kdroid",
@@ -50,6 +52,7 @@ const KITS = [
     apkName: "KosherPlay.apk",
     cmdName: "command.txt",
     image: "kosherplay.svg",
+    pricing: 'Unknown',
   },
   {
     key: "Livigent",
@@ -71,6 +74,7 @@ const KITS = [
     apkName: "MBSmart.apk",
     cmdName: "command.txt",
     image: "mbsmart.svg",
+    pricing: '$46 yearly',
   },
   {
     key: "Meshimer",
@@ -81,6 +85,7 @@ const KITS = [
     apkName: "Meshimer.apk",
     cmdName: "command.txt",
     image: "meshimer.svg",
+    pricing: '$180 yearly',
   },
   {
     key: "Netfree",
@@ -91,6 +96,7 @@ const KITS = [
     apkName: "Netfree.apk",
     cmdName: "command.txt",
     image: "netfree.svg",
+    pricing: 'Unknown',
   },
   {
     key: "Netspark",
@@ -101,6 +107,7 @@ const KITS = [
     apkName: "Netspark.apk",
     cmdName: "command.txt",
     image: "netspark.svg",
+    pricing: '$150 yearly',
   },
   {
     key: "OfflineMDM",
@@ -144,6 +151,7 @@ const KITS = [
     apkName: "Techloq.apk",
     cmdName: "command.txt",
     image: "techloq.svg",
+    pricing: '$156 yearly',
   },
 ];
 
