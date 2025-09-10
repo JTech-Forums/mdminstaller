@@ -30,7 +30,8 @@ const items = [
   { src: 'privacy.txt', dest: 'privacy.txt' },
   { src: 'css', dest: 'css' },
   { src: 'js', dest: 'js' },
-  { src: 'CNAME', dest: 'CNAME' }
+  { src: 'CNAME', dest: 'CNAME' },
+  { src: 'apk', dest: 'apk' }
 ];
 
 for (const item of items) {
@@ -62,7 +63,7 @@ function generateApkMetadata() {
       let imageUrl = null;
       for (const file of fs.readdirSync(dirPath)) {
         if (/\.(png|jpe?g|svg)$/i.test(file)) {
-          imageUrl = `https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/${dir.name}/${file}`;
+          imageUrl = `apk/${dir.name}/${file}`;
           break;
         }
       }

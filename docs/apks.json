@@ -1,7 +1,7 @@
 [
   {
     "name": "GenTech",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/GenTech/gentech.svg",
+    "image": "apk/GenTech/gentech.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/GenTech.apk",
     "postInstallCommands": [
       "dpm set-active-admin com.livigent.mdm.gt/com.livigent.mdm.backoffice.receivers.DevAdminReceiver",
@@ -10,7 +10,7 @@
   },
   {
     "name": "Kdroid",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/Kdroid/kdroid.svg",
+    "image": "apk/Kdroid/kdroid.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Kdroid.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.kdroid.filter/com.kdroid.filter.listener.AdminListener",
@@ -19,7 +19,7 @@
   },
   {
     "name": "KosherPlay",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/KosherPlay/kosherplay.svg",
+    "image": "apk/KosherPlay/kosherplay.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/KosherPlay.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.shapsplus.kmarket/com.shapsplus.kmarket.receivers.DeviceAdminPermissionReceiver",
@@ -29,7 +29,7 @@
   },
   {
     "name": "Livigent",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/Livigent/livigent.svg",
+    "image": "apk/Livigent/livigent.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Livigent.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.lge.livigent.lglitemdm/com.lge.livigent.lglitemdm.receivers.DevAdmin",
@@ -38,7 +38,7 @@
   },
   {
     "name": "MBsmart",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/MBsmart/mbsmart.svg",
+    "image": "apk/MBsmart/mbsmart.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/MBsmart.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.com.babor/com.com.babor.AdminReciever",
@@ -48,7 +48,7 @@
   },
   {
     "name": "Meshimer",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/Meshimer/meshimer.svg",
+    "image": "apk/Meshimer/meshimer.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Meshimer.apk",
     "postInstallCommands": [
       "dpm set-active-admin com.livigent.mdm.meshimer/com.livigent.mdm.backoffice.receivers.DevAdminReceiver",
@@ -57,7 +57,7 @@
   },
   {
     "name": "Netfree",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/Netfree/netfree.svg",
+    "image": "apk/Netfree/netfree.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Netfree.apk",
     "postInstallCommands": [
       "dpm set-active-admin com.netfree.wifreemobile/com.netfree.wifreemobile.receivers.MyAdminReceiver",
@@ -66,7 +66,7 @@
   },
   {
     "name": "Netspark",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/Netspark/netspark.svg",
+    "image": "apk/Netspark/netspark.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Netspark.apk",
     "postInstallCommands": [
       "dpm set-active-admin con.netspark.mobile/com.netspark.android.netsvpn.SetAdmin\\$MyAdmin",
@@ -75,7 +75,7 @@
   },
   {
     "name": "OfflineMDM",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/OfflineMDM/offline.svg",
+    "image": "apk/OfflineMDM/offline.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/OfflineMDM.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.rrivenllc.offlinemdm/com.rrivenllc.offlinemdm.receivers.DeviceOwnerReceiver",
@@ -84,7 +84,7 @@
   },
   {
     "name": "OldMDM",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/OldMDM/oldmdm.svg",
+    "image": "apk/OldMDM/oldmdm.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/OldMDM.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.android.cts.tripleu.oldmdm/.MyDeviceAdminReceiver",
@@ -93,7 +93,7 @@
   },
   {
     "name": "SecureGuardMDM",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/SecureGuardMDM/secureguard.svg",
+    "image": "apk/SecureGuardMDM/secureguard.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/SecureGuardMDM.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.secureguard.mdm/com.secureguard.mdm.SecureGuardDeviceAdminReceiver",
@@ -102,7 +102,7 @@
   },
   {
     "name": "Techloq",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/Techloq/techloq.svg",
+    "image": "apk/Techloq/techloq.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/Techloq.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.techloq.agent/com.techloq.agent.sdk.watchdog.admin.AdminReceiver",
@@ -112,7 +112,7 @@
   },
   {
     "name": "TripleUMDM",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/TripleUMDM/tripleumdm.svg",
+    "image": "apk/TripleUMDM/tripleumdm.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/TripleUMDM.apk",
     "postInstallCommands": [
       "dpm set-device-owner \"com.tripleu.mdm/.a\"",
@@ -121,7 +121,7 @@
   },
   {
     "name": "eGate",
-    "image": "https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/apk/eGate/egate.svg",
+    "image": "apk/eGate/egate.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/eGate.apk",
     "postInstallCommands": [
       "dpm set-device-owner com.oss.egate/com.oss.egate.a",
