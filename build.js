@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const KITS = require('./js/data/kits.js').default;
 
 const root = __dirname;
 const outDir = path.join(root, 'docs');
@@ -83,9 +84,18 @@ function generateApkMetadata() {
       };
     });
 
+  const enrichedApps = apps.map((app) => {
+    const kit = KITS.find((k) => k.key === app.name);
+    if (kit) {
+      if (kit.pricing) app.pricing = kit.pricing;
+      if (kit.badge) app.badge = kit.badge;
+    }
+    return app;
+  });
+
   fs.writeFileSync(
     path.join(outDir, 'apks.json'),
-    JSON.stringify(apps, null, 2)
+    JSON.stringify(enrichedApps, null, 2)
   );
 }
 

@@ -6,7 +6,8 @@
     "postInstallCommands": [
       "dpm set-active-admin com.livigent.mdm.gt/com.livigent.mdm.backoffice.receivers.DevAdminReceiver",
       "pm grant com.livigent.mdm.gt android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "pricing": "$180 yearly"
   },
   {
     "name": "Kdroid",
@@ -15,7 +16,8 @@
     "postInstallCommands": [
       "dpm set-device-owner com.kdroid.filter/com.kdroid.filter.listener.AdminListener",
       "pm grant com.kdroid.filter android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "badge": "Free"
   },
   {
     "name": "KosherPlay",
@@ -25,7 +27,8 @@
       "dpm set-device-owner com.shapsplus.kmarket/com.shapsplus.kmarket.receivers.DeviceAdminPermissionReceiver",
       "pm grant com.shapsplus.kmarket android.permission.WRITE_SECURE_SETTINGS",
       "settings put secure enabled_accessibility_services \"com.shapsplus.kmarket/com.shapsplus.kmarket.services.AccessService\""
-    ]
+    ],
+    "pricing": "Unknown"
   },
   {
     "name": "Livigent",
@@ -34,7 +37,8 @@
     "postInstallCommands": [
       "dpm set-device-owner com.lge.livigent.lglitemdm/com.lge.livigent.lglitemdm.receivers.DevAdmin",
       "pm grant com.lge.livigent.lglitemdm android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "badge": "Free"
   },
   {
     "name": "MBsmart",
@@ -44,7 +48,8 @@
       "dpm set-device-owner com.com.babor/com.com.babor.AdminReciever",
       "pm grant com.com.babor android.permission.WRITE_SECURE_SETTINGS",
       "settings put secure enabled_accessibility_services \"com.com.babor/com.com.babor.accesibillity2\""
-    ]
+    ],
+    "pricing": "$46 yearly"
   },
   {
     "name": "Meshimer",
@@ -53,7 +58,8 @@
     "postInstallCommands": [
       "dpm set-active-admin com.livigent.mdm.meshimer/com.livigent.mdm.backoffice.receivers.DevAdminReceiver",
       "pm grant com.livigent.mdm.meshimer android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "pricing": "$180 yearly"
   },
   {
     "name": "Netfree",
@@ -62,7 +68,8 @@
     "postInstallCommands": [
       "dpm set-active-admin com.netfree.wifreemobile/com.netfree.wifreemobile.receivers.MyAdminReceiver",
       "pm grant com.netfree.wifreemobile android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "pricing": "Unknown"
   },
   {
     "name": "Netspark",
@@ -71,7 +78,8 @@
     "postInstallCommands": [
       "dpm set-active-admin con.netspark.mobile/com.netspark.android.netsvpn.SetAdmin\\$MyAdmin",
       "pm grant com.netspark.mobile android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "pricing": "$150 yearly"
   },
   {
     "name": "OfflineMDM",
@@ -80,7 +88,8 @@
     "postInstallCommands": [
       "dpm set-device-owner com.rrivenllc.offlinemdm/com.rrivenllc.offlinemdm.receivers.DeviceOwnerReceiver",
       "pm grant com.rrivenllc.offlinemdm android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "badge": "Free"
   },
   {
     "name": "OldMDM",
@@ -89,7 +98,8 @@
     "postInstallCommands": [
       "dpm set-device-owner com.android.cts.tripleu.oldmdm/.MyDeviceAdminReceiver",
       "pm grant com.android.cts.tripleu.oldmdm android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "badge": "Free"
   },
   {
     "name": "SecureGuardMDM",
@@ -98,7 +108,8 @@
     "postInstallCommands": [
       "dpm set-device-owner com.secureguard.mdm/com.secureguard.mdm.SecureGuardDeviceAdminReceiver",
       "pm grant com.secureguard.mdm android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "badge": "Free"
   },
   {
     "name": "Techloq",
@@ -108,7 +119,8 @@
       "dpm set-device-owner com.techloq.agent/com.techloq.agent.sdk.watchdog.admin.AdminReceiver",
       "pm grant com.techloq.agent android.permission.WRITE_SECURE_SETTINGS",
       "settings put secure enabled_accessibility_services \"com.techloq.agent/com.techloq.agent.sdk.watchdog.accessibility.ScreenTrackingService\""
-    ]
+    ],
+    "pricing": "$156 yearly"
   },
   {
     "name": "TripleUMDM",
@@ -117,7 +129,8 @@
     "postInstallCommands": [
       "dpm set-device-owner \"com.tripleu.mdm/.a\"",
       "pm grant com.tripleu.mdm android.permission.WRITE_SECURE_SETTINGS"
-    ]
+    ],
+    "badge": "Free"
   },
   {
     "name": "eGate",
@@ -127,6 +140,7 @@
       "dpm set-device-owner com.oss.egate/com.oss.egate.a",
       "pm grant com.oss.egate android.permission.WRITE_SECURE_SETTINGS",
       "settings put secure enabled_accessibility_services \"com.oss.egate/com.oss.egate.MyAccessibilityService\""
-    ]
+    ],
+    "pricing": "$40 one-time"
   }
 ]
