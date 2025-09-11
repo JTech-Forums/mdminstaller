@@ -285,8 +285,6 @@ body {
 .review-input { width:100%; background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.5rem; }
 .review-input:focus, .review-text:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(59,130,246,0.25); }
 .review-actions, .reviews-actions { display:flex; gap: 0.5rem; justify-content: flex-end; }
-.review-actions .cf-turnstile { margin-right: auto; width: 1px; height: 1px; overflow: hidden; }
-.review-actions .cf-turnstile iframe { transform: none; width: 1px; height: 1px; }
 .reviews-header { display:flex; align-items:center; justify-content: space-between; gap: 0.5rem; }
 .reviews-header h3 { margin: 0; }
 .review-panel h3 { margin: 0 0 0.5rem 0; }

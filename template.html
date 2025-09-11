@@ -180,7 +180,7 @@
                                     <h3>Write a Review</h3>
                                     <form id="reviewForm" class="review-form">
                                         <div class="review-actions">
-                                            <div class="cf-turnstile" data-sitekey="0x4AAAAAAB0euR9XLuq8-8qr" data-theme="dark" data-size="invisible"></div>
+                                            <!-- Turnstile removed: no widget needed for pure Supabase -->
                                             <button class="btn btn-secondary btn-compact" id="cancelReviewBtn" type="button">Cancel</button>
                                             <button class="btn btn-primary btn-compact" type="submit">Submit</button>
                                         </div>
@@ -401,17 +401,12 @@
         }
       };
     </script>
-    <!-- Configure review proxy (local or production). Turnstile script loads on demand. -->
+    <!-- Pure Supabase reviews (no proxy, no Turnstile) -->
     <script>
       (function() {
-        var host = location.hostname;
-        var isLocal = host === 'localhost' || host === '127.0.0.1';
-        var PROD_PROXY = 'https://54dbe616.reviewturnstile.pages.dev/api/reviews';
         if (!window.REVIEWS_CONFIG) window.REVIEWS_CONFIG = {};
-        window.REVIEWS_CONFIG = Object.assign({}, window.REVIEWS_CONFIG, {
-          proxy: { url: isLocal ? '/api/reviews' : PROD_PROXY },
-          cloudflare: { siteKey: '0x4AAAAAAB0euR9XLuq8-8qr' }
-        });
+        // Ensure direct Supabase writes are enabled
+        window.REVIEWS_CONFIG.allowDirectSupabase = true;
       })();
     </script>
     <script src="js/apps.js" type="module"></script>

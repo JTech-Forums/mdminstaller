@@ -48,7 +48,13 @@ async function submitToSupabase(vendor, review) {
       text: review.text || '',
     }),
   });
-  return res.ok;
+  if (!res.ok) {
+    let body = '';
+    try { body = await res.text(); } catch {}
+    const err = new Error(`Supabase insert failed (${res.status}) ${body}`);
+    err.status = res.status; err.body = body; throw err;
+  }
+  return true;
 }
 
 export async function loadReviews(vendor) {
@@ -96,20 +102,8 @@ export async function loadAllReviews() {
 
 export async function submitReview(vendor, review, opts = {}) {
   const cfg = window.REVIEWS_CONFIG || {};
-  const proxyCfg = cfg.proxy || {};
-  const cfToken = opts.cfToken || null;
-  if (proxyCfg.url && cfToken) {
-    // Submit via proxy with Turnstile verification
-    const res = await fetch(proxyCfg.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vendor, name: review.name, rating: review.rating, text: review.text, cfToken })
-    });
-    if (!res.ok) throw new Error('Review submission failed');
-  } else if (cfg.allowDirectSupabase === true) {
-    // Optional direct submission for trusted environments only
-    try { await submitToSupabase(vendor, review); } catch {}
-  }
+  // Always attempt direct Supabase submission for pure client flow
+  try { await submitToSupabase(vendor, review); } catch {}
   // Optimistically store locally
   const map = loadLocal();
   const list = map[vendor] || [];

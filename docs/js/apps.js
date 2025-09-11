@@ -417,12 +417,19 @@ class JTechMDMInstaller {
     async loadAvailableApks() {
         try {
             let apks = [];
+            const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
             try {
-                const res = await fetch('apks.json');
-                if (!res.ok) throw new Error('apks.json not found');
-                apks = await res.json();
+                if (isLocal) {
+                    const res = await fetch('/api/apks');
+                    if (!res.ok) throw new Error('/api/apks failed');
+                    apks = await res.json();
+                } else {
+                    const res = await fetch('apks.json');
+                    if (!res.ok) throw new Error('apks.json not found');
+                    apks = await res.json();
+                }
             } catch (err) {
-                const res = await fetch('/api/apks');
+                const res = await fetch(isLocal ? 'apks.json' : '/api/apks');
                 apks = await res.json();
             }
 
@@ -654,71 +661,8 @@ class JTechMDMInstaller {
             const name = (document.getElementById('reviewName')?.value || '').trim();
             const text = (document.getElementById('reviewText')?.value || '').trim();
             if (!text) return;
-            const tsEl = document.querySelector('.cf-turnstile');
-            const acquireCfToken = async () => {
-                // Lazy-load Turnstile only when needed
-                const ensureScript = async () => {
-                    if (window.turnstile) return;
-                    await new Promise((resolve, reject) => {
-                        const s = document.createElement('script');
-                        s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-                        s.async = true; s.defer = true;
-                        s.onload = resolve; s.onerror = () => resolve();
-                        document.head.appendChild(s);
-                    });
-                };
-                if (!tsEl) return null;
-                await ensureScript();
-                if (!window.turnstile) return null;
-                try { await new Promise((r) => window.turnstile.ready(r)); } catch {}
-                // Render explicitly when using ?render=explicit
-                let widgetId = tsEl.getAttribute('data-widget-id') || null;
-                if (!widgetId) {
-                    try {
-                        const siteKey = (window.REVIEWS_CONFIG && window.REVIEWS_CONFIG.cloudflare && window.REVIEWS_CONFIG.cloudflare.siteKey) || '';
-                        widgetId = window.turnstile.render(tsEl, { sitekey: siteKey, size: 'invisible' });
-                        if (widgetId) tsEl.setAttribute('data-widget-id', widgetId);
-                    } catch {}
-                }
-                try {
-                    if (widgetId) {
-                        window.turnstile.execute(widgetId);
-                    } else {
-                        window.turnstile.execute(tsEl);
-                    }
-                } catch (e) {
-                    try { window.turnstile.execute(); } catch {}
-                }
-                for (let i = 0; i < 50; i++) { // wait up to ~5s
-                    let v = null;
-                    try {
-                        if (widgetId && typeof window.turnstile.getResponse === 'function') {
-                            v = window.turnstile.getResponse(widgetId);
-                        }
-                    } catch {}
-                    if (!v) {
-                        v = document.querySelector('input[name="cf-turnstile-response"]')?.value;
-                    }
-                    if (v) return v;
-                    await new Promise(res => setTimeout(res, 100));
-                }
-                return null;
-            };
-            const cfToken = await acquireCfToken();
-            if (!cfToken) {
-                // Top-left error toast
-                const n = document.createElement('div');
-                n.style.cssText = 'position:fixed;top:20px;left:20px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:10px 14px;border-radius:8px;z-index:1002;box-shadow:0 10px 15px -3px rgba(0,0,0,.5);border:1px solid var(--border-color);';
-                n.textContent = 'Cloudflare verification failed. Please try again.';
-                document.body.appendChild(n);
-                setTimeout(() => n.remove(), 5000);
-                return;
-            }
             try {
-                const updated = await submitReview(vendor, { name, text, rating: selected }, { cfToken });
-                if (window.turnstile && typeof window.turnstile.reset === 'function') {
-                    try { window.turnstile.reset(); } catch {}
-                }
+                const updated = await submitReview(vendor, { name, text, rating: selected });
                 this.reviewsCache[vendor] = updated;
                 this.renderReviewsList(listEl, updated);
                 this.renderStars(avgContainer, computeAverage(updated));
@@ -726,9 +670,10 @@ class JTechMDMInstaller {
                 selected = 5; draw();
                 if (typeof onSubmitted === 'function') onSubmitted();
             } catch (err) {
+                console.warn('Review submit failed:', err && err.message, err && err.details);
                 const n = document.createElement('div');
                 n.style.cssText = 'position:fixed;top:20px;left:20px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:10px 14px;border-radius:8px;z-index:1002;box-shadow:0 10px 15px -3px rgba(0,0,0,.5);border:1px solid var(--border-color);';
-                n.textContent = 'Cloudflare verification failed. Please try again.';
+                n.textContent = 'Review submission failed. Please try again.';
                 document.body.appendChild(n);
                 setTimeout(() => n.remove(), 5000);
             }
