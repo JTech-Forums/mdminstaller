@@ -948,6 +948,11 @@ class JTechMDMInstaller {
         this.uiManager.logToConsole(`Running: ${command}`, 'info');
         let result = await this.adbConnection.executeShellCommand(command);
 
+        // Always show raw output from the command, even if it indicates failure
+        if (result && result.trim()) {
+            this.uiManager.logToConsole(result.trim(), 'output');
+        }
+
         if (command.includes('dpm set-device-owner') && !/success/i.test(result)) {
             const hasAccounts = /account/i.test(result) || await deviceHasAccounts(this.adbConnection);
             if (hasAccounts) {
@@ -956,20 +961,23 @@ class JTechMDMInstaller {
                 try {
                     this.uiManager.logToConsole('Retrying device owner command...', 'info');
                     result = await this.adbConnection.executeShellCommand(command);
+                    // Show retry output as well
+                    if (result && result.trim()) {
+                        this.uiManager.logToConsole(result.trim(), 'output');
+                    }
                 } finally {
                     await reenablePackages(this.adbConnection, disabled);
                 }
                 if (!/success/i.test(result)) {
+                    // Surface a clear warning but keep full output visible above
                     throw new Error('accounts found - please go into settings>accounts>remove all accounts - then reboot and try again.');
                 }
             } else {
+                // No accounts detected, but command still failed — show raw result already printed
                 throw new Error(result.trim() || 'Command failed');
             }
         }
 
-        if (result.trim()) {
-            this.uiManager.logToConsole(`Command output: ${result.trim()}`, 'info');
-        }
         return result;
     }
 
