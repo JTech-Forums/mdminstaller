@@ -1,6 +1,5 @@
 // Cloudflare Worker: Review submission proxy with Turnstile verification
 //
-// Deploy steps (summary):
 // - In Cloudflare dashboard, create a Worker and paste this file.
 // - Set environment variables (Bindings):
 //     TURNSTILE_SECRET:   Cloudflare Turnstile secret key
