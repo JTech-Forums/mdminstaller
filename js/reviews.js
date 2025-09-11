@@ -41,6 +41,11 @@ async function submitToSupabase(vendor, review) {
       Authorization: `Bearer ${cfg.apiKey}`,
       Prefer: 'return=representation',
     },
+    // Ensure no cookies/CF creds leak and CORS is explicit
+    mode: 'cors',
+    credentials: 'omit',
+    referrerPolicy: 'no-referrer',
+    cache: 'no-store',
     body: JSON.stringify({
       vendor,
       name: review.name || 'Anonymous',
@@ -51,6 +56,12 @@ async function submitToSupabase(vendor, review) {
   if (!res.ok) {
     let body = '';
     try { body = await res.text(); } catch {}
+    // If a Cloudflare HTML challenge page is returned by some network middleware,
+    // surface a clean error without blocking the local optimistic path.
+    if (/cloudflare/i.test(body)) {
+      const err = new Error('Blocked by intermediary (Cloudflare)');
+      err.status = res.status; err.body = body; throw err;
+    }
     const err = new Error(`Supabase insert failed (${res.status}) ${body}`);
     err.status = res.status; err.body = body; throw err;
   }
