@@ -668,13 +668,12 @@ class JTechMDMInstaller {
             };
             const cfToken = await acquireCfToken();
             if (!cfToken) {
-                // Top-left error toast
+                // Show warning but continue with local submission
                 const n = document.createElement('div');
                 n.style.cssText = 'position:fixed;top:20px;left:20px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:10px 14px;border-radius:8px;z-index:1002;box-shadow:0 10px 15px -3px rgba(0,0,0,.5);border:1px solid var(--border-color);';
-                n.textContent = 'Cloudflare verification failed. Please try again.';
+                n.textContent = 'Cloudflare verification failed. Submitting without verification.';
                 document.body.appendChild(n);
                 setTimeout(() => n.remove(), 5000);
-                return;
             }
             try {
                 const updated = await submitReview(vendor, { name, text, rating: selected }, { cfToken });
@@ -690,7 +689,7 @@ class JTechMDMInstaller {
             } catch (err) {
                 const n = document.createElement('div');
                 n.style.cssText = 'position:fixed;top:20px;left:20px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:10px 14px;border-radius:8px;z-index:1002;box-shadow:0 10px 15px -3px rgba(0,0,0,.5);border:1px solid var(--border-color);';
-                n.textContent = 'Cloudflare verification failed. Please try again.';
+                n.textContent = 'Review submission failed. Please try again.';
                 document.body.appendChild(n);
                 setTimeout(() => n.remove(), 5000);
             }
