@@ -2,16 +2,41 @@
 
 const LOCAL_KEY = 'mdm_reviews_v1';
 
+function backendEnabled() {
+  try {
+    const cfg = window.REVIEWS_CONFIG || {};
+    // Explicit off switch
+    if (cfg.disableBackend === true) return false;
+    // Only enable if explicitly requested
+    const allowed = cfg.enableBackend === true || cfg.allowDirectSupabase === true;
+    if (!allowed) return false;
+    const supa = (cfg && cfg.supabase) || window.REVIEWS_SUPABASE;
+    return !!(supa && supa.url && supa.apiKey);
+  } catch {
+    return false;
+  }
+}
+
+function getSupabaseConfig() {
+  const cfg = window.REVIEWS_CONFIG || {};
+  return (cfg && cfg.supabase) || window.REVIEWS_SUPABASE;
+}
+
 function loadLocal() {
   try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); } catch { return {}; }
 }
 
 function saveLocal(map) {
-  localStorage.setItem(LOCAL_KEY, JSON.stringify(map));
+  try {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(map));
+  } catch (e) {
+    console.warn('Unable to persist reviews to localStorage:', e && e.message);
+  }
 }
 
 async function loadFromSupabase(vendor) {
-  const cfg = (window.REVIEWS_CONFIG && window.REVIEWS_CONFIG.supabase) || window.REVIEWS_SUPABASE;
+  if (!backendEnabled()) return null;
+  const cfg = getSupabaseConfig();
   if (!cfg || !cfg.url || !cfg.apiKey) return null;
   const url = `${cfg.url}?vendor=eq.${encodeURIComponent(vendor)}&order=created_at.desc`;
   const res = await fetch(url, {
@@ -31,7 +56,8 @@ async function loadFromSupabase(vendor) {
 }
 
 async function submitToSupabase(vendor, review) {
-  const cfg = (window.REVIEWS_CONFIG && window.REVIEWS_CONFIG.supabase) || window.REVIEWS_SUPABASE;
+  if (!backendEnabled()) return false;
+  const cfg = getSupabaseConfig();
   if (!cfg || !cfg.url || !cfg.apiKey) return false;
   const res = await fetch(cfg.url, {
     method: 'POST',
@@ -54,16 +80,11 @@ async function submitToSupabase(vendor, review) {
     }),
   });
   if (!res.ok) {
+    // Log and let caller continue with local fallback without surfacing provider-specific text
     let body = '';
     try { body = await res.text(); } catch {}
-    // If a Cloudflare HTML challenge page is returned by some network middleware,
-    // surface a clean error without blocking the local optimistic path.
-    if (/cloudflare/i.test(body)) {
-      const err = new Error('Blocked by intermediary (Cloudflare)');
-      err.status = res.status; err.body = body; throw err;
-    }
-    const err = new Error(`Supabase insert failed (${res.status}) ${body}`);
-    err.status = res.status; err.body = body; throw err;
+    console.warn('Supabase insert failed', res.status, body?.slice(0, 200));
+    return false;
   }
   return true;
 }
@@ -82,11 +103,12 @@ export async function loadReviews(vendor) {
 
 // Load all reviews for all vendors in one request (if Supabase configured)
 export async function loadAllReviews() {
-  const cfg = (window.REVIEWS_CONFIG && window.REVIEWS_CONFIG.supabase) || window.REVIEWS_SUPABASE;
   // Fallback to local map when no backend
-  if (!cfg || !cfg.url || !cfg.apiKey) return loadLocal();
+  if (!backendEnabled()) return loadLocal();
 
   try {
+    const cfg = getSupabaseConfig();
+    if (!cfg || !cfg.url || !cfg.apiKey) return loadLocal();
     const url = `${cfg.url}?select=vendor,name,rating,text,created_at&order=created_at.desc`;
     const res = await fetch(url, {
       headers: { apikey: cfg.apiKey, Authorization: `Bearer ${cfg.apiKey}` },

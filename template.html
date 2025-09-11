@@ -392,22 +392,15 @@
     <script src="js/ui/auto-scale.js"></script>
     <script src="js/ui/cursor-trail.js"></script>
     <script src="js/privacy.js"></script>
-    <!-- Reviews backend configuration (Supabase REST) -->
+    <!-- Reviews configuration: Supabase backend enabled -->
     <script>
       window.REVIEWS_CONFIG = {
+        enableBackend: true,
         supabase: {
           url: 'https://hspzbenmhijqowsltijs.supabase.co/rest/v1/reviews',
           apiKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzcHpiZW5taGlqcW93c2x0aWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MjQyMDYsImV4cCI6MjA3MzEwMDIwNn0.3IZkSFy44cruJDFPdwOwbhj9x2afcBEun3UVAm7oh9k'
         }
       };
-    </script>
-    <!-- Pure Supabase reviews (no proxy, no Turnstile) -->
-    <script>
-      (function() {
-        if (!window.REVIEWS_CONFIG) window.REVIEWS_CONFIG = {};
-        // Ensure direct Supabase writes are enabled
-        window.REVIEWS_CONFIG.allowDirectSupabase = true;
-      })();
     </script>
     <script src="js/apps.js" type="module"></script>
 </body>
