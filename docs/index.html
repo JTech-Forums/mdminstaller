@@ -401,17 +401,13 @@
         }
       };
     </script>
-    <!-- Enable Turnstile + review proxy (local or production) -->
+    <!-- Configure review proxy (local or production). Turnstile script loads on demand. -->
     <script>
       (function() {
         var host = location.hostname;
         var isLocal = host === 'localhost' || host === '127.0.0.1';
         var PROD_PROXY = 'https://54dbe616.reviewturnstile.pages.dev/api/reviews';
         if (!window.REVIEWS_CONFIG) window.REVIEWS_CONFIG = {};
-        var s = document.createElement('script');
-        s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-        s.async = true; s.defer = true;
-        document.head.appendChild(s);
         window.REVIEWS_CONFIG = Object.assign({}, window.REVIEWS_CONFIG, {
           proxy: { url: isLocal ? '/api/reviews' : PROD_PROXY },
           cloudflare: { siteKey: '0x4AAAAAAB0euR9XLuq8-8qr' }

@@ -656,11 +656,49 @@ class JTechMDMInstaller {
             if (!text) return;
             const tsEl = document.querySelector('.cf-turnstile');
             const acquireCfToken = async () => {
-                if (!window.turnstile || !tsEl) return null;
+                // Lazy-load Turnstile only when needed
+                const ensureScript = async () => {
+                    if (window.turnstile) return;
+                    await new Promise((resolve, reject) => {
+                        const s = document.createElement('script');
+                        s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+                        s.async = true; s.defer = true;
+                        s.onload = resolve; s.onerror = () => resolve();
+                        document.head.appendChild(s);
+                    });
+                };
+                if (!tsEl) return null;
+                await ensureScript();
+                if (!window.turnstile) return null;
                 try { await new Promise((r) => window.turnstile.ready(r)); } catch {}
-                try { window.turnstile.execute(tsEl); } catch (e) { try { window.turnstile.execute(); } catch {} }
+                // Render explicitly when using ?render=explicit
+                let widgetId = tsEl.getAttribute('data-widget-id') || null;
+                if (!widgetId) {
+                    try {
+                        const siteKey = (window.REVIEWS_CONFIG && window.REVIEWS_CONFIG.cloudflare && window.REVIEWS_CONFIG.cloudflare.siteKey) || '';
+                        widgetId = window.turnstile.render(tsEl, { sitekey: siteKey, size: 'invisible' });
+                        if (widgetId) tsEl.setAttribute('data-widget-id', widgetId);
+                    } catch {}
+                }
+                try {
+                    if (widgetId) {
+                        window.turnstile.execute(widgetId);
+                    } else {
+                        window.turnstile.execute(tsEl);
+                    }
+                } catch (e) {
+                    try { window.turnstile.execute(); } catch {}
+                }
                 for (let i = 0; i < 50; i++) { // wait up to ~5s
-                    const v = document.querySelector('input[name="cf-turnstile-response"]')?.value;
+                    let v = null;
+                    try {
+                        if (widgetId && typeof window.turnstile.getResponse === 'function') {
+                            v = window.turnstile.getResponse(widgetId);
+                        }
+                    } catch {}
+                    if (!v) {
+                        v = document.querySelector('input[name="cf-turnstile-response"]')?.value;
+                    }
                     if (v) return v;
                     await new Promise(res => setTimeout(res, 100));
                 }
