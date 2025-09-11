@@ -95,7 +95,8 @@ export async function loadAllReviews() {
 }
 
 export async function submitReview(vendor, review, opts = {}) {
-  const proxyCfg = (window.REVIEWS_CONFIG && window.REVIEWS_CONFIG.proxy) || {};
+  const cfg = window.REVIEWS_CONFIG || {};
+  const proxyCfg = cfg.proxy || {};
   const cfToken = opts.cfToken || null;
   if (proxyCfg.url && cfToken) {
     // Submit via proxy with Turnstile verification
@@ -105,6 +106,9 @@ export async function submitReview(vendor, review, opts = {}) {
       body: JSON.stringify({ vendor, name: review.name, rating: review.rating, text: review.text, cfToken })
     });
     if (!res.ok) throw new Error('Review submission failed');
+  } else if (cfg.allowDirectSupabase === true) {
+    // Optional direct submission for trusted environments only
+    try { await submitToSupabase(vendor, review); } catch {}
   }
   // Optimistically store locally
   const map = loadLocal();
@@ -118,9 +122,6 @@ export async function submitReview(vendor, review, opts = {}) {
   list.unshift(entry);
   map[vendor] = list.slice(0, 1000); // cap per vendor
   saveLocal(map);
-
-  // Also attempt Supabase if available (no-op if proxy handled with stricter backend)
-  try { await submitToSupabase(vendor, entry); } catch {}
   return map[vendor];
 }
 
