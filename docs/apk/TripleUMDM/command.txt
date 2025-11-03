@@ -1,0 +1,2 @@
+dpm set-device-owner "com.tripleu.mdm/.a"
+pm grant com.tripleu.mdm android.permission.WRITE_SECURE_SETTINGS

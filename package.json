@@ -1,0 +1,33 @@
+{
+  "name": "jtech-mdm-installer",
+  "version": "1.0.0",
+  "description": "Web-based MDM APK installer for Android devices using WebUSB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve-https": "npx http-server -S -C cert.pem -p 8443",
+    "build": "node build.js"
+  },
+  "keywords": [
+    "mdm",
+    "android",
+    "webadb",
+    "webusb",
+    "apk",
+    "installer",
+    "device-management"
+  ],
+  "author": "JTech Solutions",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/jtechmdminstaller.git"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

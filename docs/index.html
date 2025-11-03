@@ -1,0 +1,407 @@
+﻿<!-- Template served by server.js -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JTech MDM Installer - Android Device Management</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/cursor-trail.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/icon.png">
+    <meta property="og:image" content="https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/icon.png">
+</head>
+<body>
+    <div class="modal hidden" id="mobileWarningModal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Desktop Browser Only</h2>
+                <p>This site is for desktop browsers and may not work well on mobile devices. Do you wish to proceed?</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="mobileLeaveBtn">Go Back</button>
+                    <button class="btn btn-primary" id="mobileProceedBtn">Proceed Anyway</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <header class="header">
+        <div class="container">
+            <a class="brand-logo-left" href="/">
+                <img src="https://raw.githubusercontent.com/JTech-Forums/mdminstaller/main/logo2.png" alt="JTech logo" class="logo-img">
+            </a>
+            <div class="logo-text"></div>
+            <nav class="nav">
+                <button class="nav-btn" id="aboutBtn">About</button>
+                <a class="nav-btn" id="forumsBtn" href="https://forums.jtechforums.org/signup" target="_blank" rel="noopener noreferrer">Jtech Forums</a>
+                <a class="nav-btn" id="contactBtn" href="https://jtechforums.org/contact-us" target="_blank" rel="noopener noreferrer">Contact Us</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="layout-grid">
+                <!-- Connection Status Card -->
+                <div class="card status-card">
+                    <div class="connect-top">
+                        <div class="connect-state">
+                            <div class="status-icon disconnected" aria-hidden="true" style="display:none"></div>
+                            <h3 id="statusTitle">No Device Connected</h3>
+                            <p id="statusMessage" class="visually-hidden">Connect your Android device via USB to begin</p>
+                        </div>
+                        <button class="btn btn-primary connect-cta" id="connectBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0l1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                            </svg>
+                            Connect
+                        </button>
+                    </div>
+                    <div class="connect-body">
+                        <div class="device-metrics" id="deviceMetrics">
+                            <div class="metric-card">
+                                <div class="metric-label">Android</div>
+                                <div class="metric-value empty" id="androidVersionValue"></div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Rooted</div>
+                                <div class="metric-value empty" id="rootedValue"></div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Accounts</div>
+                                <div class="metric-value empty" id="accountsValue"></div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Model</div>
+                                <div class="metric-value empty truncate" id="modelValue"></div>
+                            </div>
+                        </div>
+                        <div id="connectTutorial" class="tutorial-inline">
+                            <div class="tutorial-inline-steps">
+                                <div class="tutorial-step active">
+                                    <h3>Step 1: Open Settings</h3>
+                                    <ul>
+                                        <li>Turn on your device and open the <strong>Settings</strong> app.</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 2: About Phone</h3>
+                                    <ul>
+                                        <li>Scroll down and tap <strong>About phone</strong> (or <strong>About device</strong>).</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 3: Become a Developer</h3>
+                                    <ul>
+                                        <li>Find <strong>Build number</strong> and tap it <strong>7 times</strong> quickly until you see the confirmation.</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 4: Developer Options</h3>
+                                    <ul>
+                                        <li>Go back and open the new <strong>Developer options</strong> menu.</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 5: Enable USB Debugging</h3>
+                                    <ul>
+                                        <li>Scroll to <strong>USB debugging</strong> and switch it <strong>On</strong>.</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 6: Connect to PC</h3>
+                                    <ul>
+                                        <li>Plug your device into your PC via USB, then click <strong>Connect</strong> on this website.</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 7: Pick Your Device</h3>
+                                    <ul>
+                                        <li>In <strong>Chrome</strong> or <strong>Edge</strong>, select your device from the prompt and click <strong>Connect</strong>.</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 8: Trust This Computer</h3>
+                                    <ul>
+                                        <li>On your phone, check <strong>Always allow from this computer</strong>, then tap <strong>OK</strong>.</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 9: Youâ€™re Connected</h3>
+                                    <ul>
+                                        <li>Bingo! Youâ€™re connected â€” now you can install one of our filters.</li>
+                                    </ul>
+                                </div>
+                                <div class="tutorial-step">
+                                    <h3>Step 10: Join the Community</h3>
+                                    <ul>
+                                        <li>When youâ€™re done (success or error), <a href="https://forums.jtechforums.org/signup" target="_blank" rel="noopener noreferrer"><strong>join JTech Forums</strong></a> â€” weâ€™d love your feedback!</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tutorial-inline-nav">
+                                <button class="btn btn-secondary btn-compact" id="inlinePrevBtn">Previous</button>
+                                <div class="tutorial-dots" id="inlineDots"><!-- dots injected dynamically --></div>
+                                <button class="btn btn-primary btn-compact" id="inlineNextBtn">Next</button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- MDM Info Card (center panel) -->
+                <div class="card new-card" id="newCard">
+                    <div class="info-card" id="mdmInfo" aria-live="polite">
+                        <div class="info-header">
+                            <h2 id="infoTitle">Select an MDM</h2>
+                        </div>
+                        <div class="info-body">
+                            <p class="info-desc" id="infoDesc">Swipe the carousel below to view details.</p>
+                            <div class="info-meta">
+                                <span id="infoPrice" class="badge">Price: â€”</span>
+                                <a id="infoLink" class="info-link" href="#" target="_blank" rel="noopener noreferrer">Website</a>
+                            </div>
+
+                            <div class="info-views" id="infoViews">
+                                <!-- Reviews view (default) -->
+                                <div class="reviews" id="reviews">
+                                    <div class="reviews-header">
+                                        <h3>Reviews</h3>
+                                        <button class="btn btn-primary btn-compact" id="writeReviewBtn" type="button">Write a review</button>
+                                    </div>
+                                    <div id="reviewsList" class="reviews-list"></div>
+                                </div>
+
+                                <!-- Review form panel (toggles in, overlays, non-resizing) -->
+                                <div class="review-panel hidden" id="reviewPanel">
+                                    <h3>Write a Review</h3>
+                                    <form id="reviewForm" class="review-form">
+                                        <div class="review-actions">
+                                            <!-- Turnstile removed: no widget needed for pure Supabase -->
+                                            <button class="btn btn-secondary btn-compact" id="cancelReviewBtn" type="button">Cancel</button>
+                                            <button class="btn btn-primary btn-compact" type="submit">Submit</button>
+                                        </div>
+                                        <div class="star-input" id="reviewStars" aria-label="Your rating">
+                                            <!-- interactive stars injected -->
+                                        </div>
+                                        <input type="text" id="reviewName" placeholder="Name (optional)" class="review-input" autocomplete="name">
+                                        <textarea id="reviewText" class="review-text" placeholder="Share your experience..." required></textarea>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- APK Installation Card -->
+                <div class="card install-card" id="installCard">
+                    <div class="swiper mySwiper" id="kitsSwiper">
+                        <div class="swiper-wrapper" id="kitsGrid"></div>
+                    </div>
+                </div>
+
+                <!-- ADB Console Card -->
+                <div class="card console-card" id="consoleCard">
+                    <div class="console-header">
+                        <h2>ADB Console</h2>
+                    </div>
+
+                    <div class="command-input-container">
+                        <div class="input-group">
+                            <span class="input-prefix">adb shell</span>
+                            <input type="text" id="commandInput" class="command-input" placeholder="Enter ADB command..." autocomplete="off">
+                            <button class="btn btn-primary" id="executeBtn" disabled>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5,3 19,12 5,21"></polygon>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="console-output-container">
+                        <h3>Console Output</h3>
+                        <div class="console-output" id="consoleOutput"></div>
+                        <div class="console-footer">
+                            <button class="btn btn-success btn-lg" id="copyConsoleBtn">Copy Output</button>
+                            <button class="btn btn-secondary btn-lg" id="clearConsoleBtn">Clear Output</button>
+                            <button class="btn btn-primary btn-lg" id="downloadConsoleBtn">Download Output</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal hidden" id="privacyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Privacy Policy</h2>
+            </div>
+            <div class="modal-body">
+                <div id="privacyText" class="policy-content"></div>
+                <div class="policy-footer">
+                    <label class="policy-check"><input type="checkbox" id="policyCheck"> I agree to the Privacy Policy</label>
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="rejectPolicyBtn">Reject</button>
+                        <button class="btn btn-primary" id="acceptPolicyBtn" disabled>Accept</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="policyBlocker" class="policy-blocker hidden">
+        <p>Privacy policy not accepted. Refresh to try again.</p>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div class="modal hidden" id="welcomeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to JTech MDM Installer</h2>
+                <button class="modal-close" id="closeWelcomeBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Let's start by connecting your device.</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="skipTutorialBtn">Skip Tutorial</button>
+                    <button class="btn btn-primary" id="startTutorialBtn">Start Tutorial</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div class="modal hidden" id="tutorialModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>How to Use JTech MDM Installer</h2>
+                <button class="modal-close" id="closeTutorialBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tutorial-container" id="tutorialContainer">
+                    <div class="tutorial-step active">
+                        <h3>Step 1: Open Settings</h3>
+                        <ul>
+                            <li>Turn on your device and open the <strong>Settings</strong> app.</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 2: About Phone</h3>
+                        <ul>
+                            <li>Scroll down and tap <strong>About phone</strong> (or <strong>About device</strong>).</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 3: Become a Developer</h3>
+                        <ul>
+                            <li>Find <strong>Build number</strong> and tap it <strong>7 times</strong> quickly until you see the confirmation.</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 4: Developer Options</h3>
+                        <ul>
+                            <li>Go back and open the new <strong>Developer options</strong> menu.</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 5: Enable USB Debugging</h3>
+                        <ul>
+                            <li>Scroll to <strong>USB debugging</strong> and switch it <strong>On</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 6: Connect to PC</h3>
+                        <ul>
+                            <li>Plug your device into your PC via USB, then click <strong>Connect</strong> on this website.</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 7: Pick Your Device</h3>
+                        <ul>
+                            <li>In <strong>Chrome</strong> or <strong>Edge</strong>, select your device from the prompt and click <strong>Connect</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 8: Trust This Computer</h3>
+                        <ul>
+                            <li>On your phone, check <strong>Always allow from this computer</strong>, then tap <strong>OK</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 9: Youâ€™re Connected</h3>
+                        <ul>
+                            <li>Bingo! Youâ€™re connected â€” now you can install one of our filters.</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h3>Step 10: Join the Community</h3>
+                        <ul>
+                            <li>When youâ€™re done (success or error), <a href="https://forums.jtechforums.org/signup" target="_blank" rel="noopener noreferrer"><strong>join JTech Forums</strong></a> â€” weâ€™d love your feedback!</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="tutorial-navigation">
+                    <button class="btn btn-secondary" id="prevStepBtn">Previous</button>
+                    <button class="btn btn-primary" id="nextStepBtn">Next</button>
+                </div>
+                <div class="warning">
+                    <strong>Note:</strong> This tool requires Chrome or Edge browser with WebUSB support.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal hidden" id="aboutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About JTech MDM Installer</h2>
+                <button class="modal-close" id="closeAboutBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>JTech MDM Installer is a web-based tool for deploying Mobile Device Management solutions to Android devices directly from your browser.</p>
+                <h3>Features</h3>
+                <ul>
+                    <li>Direct USB connection to Android devices</li>
+                    <li>Pre-configured MDM application profiles</li>
+                    <li>Batch APK installation support</li>
+                    <li>Real-time installation progress tracking</li>
+                    <li>No software installation required</li>
+                </ul>
+                <h3>Requirements</h3>
+                <ul>
+                    <li>Chrome or Edge browser (version 61+)</li>
+                    <li>Android device with USB debugging enabled</li>
+                    <li>USB cable for device connection</li>
+                </ul>
+                <p class="footer-text">Â© 2024 JTech Solutions. Version 1.0.0</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="js/mobile-warning.js"></script>
+    <script src="js/ui/auto-scale.js"></script>
+    <script src="js/ui/cursor-trail.js"></script>
+    <script src="js/privacy.js"></script>
+    <!-- Reviews configuration: Supabase backend enabled -->
+    <script>
+      window.REVIEWS_CONFIG = {
+        enableBackend: true,
+        supabase: {
+          url: 'https://hspzbenmhijqowsltijs.supabase.co/rest/v1/reviews',
+          apiKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzcHpiZW5taGlqcW93c2x0aWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MjQyMDYsImV4cCI6MjA3MzEwMDIwNn0.3IZkSFy44cruJDFPdwOwbhj9x2afcBEun3UVAm7oh9k'
+        }
+      };
+    </script>
+    <script src="js/apps.js" type="module"></script>
+</body>
+</html>
