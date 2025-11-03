@@ -958,6 +958,11 @@ class JTechMDMInstaller {
             if (hasAccounts) {
                 this.uiManager.logToConsole('Accounts detected - temporarily disabling account apps...', 'warning');
                 const disabled = await disableAccountApps(this.adbConnection);
+                if (disabled.length > 0) {
+                    this.uiManager.logToConsole(`Temporarily disabled: ${disabled.join(', ')}`, 'info');
+                } else {
+                    this.uiManager.logToConsole('No specific account packages detected; proceeding with retry.', 'warning');
+                }
                 try {
                     this.uiManager.logToConsole('Retrying device owner command...', 'info');
                     result = await this.adbConnection.executeShellCommand(command);
@@ -967,6 +972,9 @@ class JTechMDMInstaller {
                     }
                 } finally {
                     await reenablePackages(this.adbConnection, disabled);
+                    if (disabled.length > 0) {
+                        this.uiManager.logToConsole('Re-enabled previously disabled account packages.', 'info');
+                    }
                 }
                 if (!/success/i.test(result)) {
                     // Surface a clear warning but keep full output visible above

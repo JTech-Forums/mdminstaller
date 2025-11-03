@@ -420,6 +420,7 @@ class JTechMDMInstaller {
             const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
             try {
                 if (isLocal) {
+                    // Prefer dynamic API in dev to avoid 404 noise
                     const res = await fetch('/api/apks');
                     if (!res.ok) throw new Error('/api/apks failed');
                     apks = await res.json();
@@ -429,6 +430,7 @@ class JTechMDMInstaller {
                     apks = await res.json();
                 }
             } catch (err) {
+                // Fallback to the other source
                 const res = await fetch(isLocal ? 'apks.json' : '/api/apks');
                 apks = await res.json();
             }
@@ -956,6 +958,11 @@ class JTechMDMInstaller {
             if (hasAccounts) {
                 this.uiManager.logToConsole('Accounts detected - temporarily disabling account apps...', 'warning');
                 const disabled = await disableAccountApps(this.adbConnection);
+                if (disabled.length > 0) {
+                    this.uiManager.logToConsole(`Temporarily disabled: ${disabled.join(', ')}`, 'info');
+                } else {
+                    this.uiManager.logToConsole('No specific account packages detected; proceeding with retry.', 'warning');
+                }
                 try {
                     this.uiManager.logToConsole('Retrying device owner command...', 'info');
                     result = await this.adbConnection.executeShellCommand(command);
@@ -965,6 +972,9 @@ class JTechMDMInstaller {
                     }
                 } finally {
                     await reenablePackages(this.adbConnection, disabled);
+                    if (disabled.length > 0) {
+                        this.uiManager.logToConsole('Re-enabled previously disabled account packages.', 'info');
+                    }
                 }
                 if (!/success/i.test(result)) {
                     // Surface a clear warning but keep full output visible above
