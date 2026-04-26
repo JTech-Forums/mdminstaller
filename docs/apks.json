@@ -123,16 +123,6 @@
     "pricing": "$156 yearly"
   },
   {
-    "name": "TripleUMDM",
-    "image": "apk/TripleUMDM/tripleumdm.svg",
-    "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/TripleUMDM.apk",
-    "postInstallCommands": [
-      "dpm set-device-owner \"com.tripleu.mdm/.a\"",
-      "pm grant com.tripleu.mdm android.permission.WRITE_SECURE_SETTINGS"
-    ],
-    "badge": "Free"
-  },
-  {
     "name": "eGate",
     "image": "apk/eGate/egate.svg",
     "url": "https://pub-587c8a0ce03148689a821b1655d304f5.r2.dev/eGate.apk",

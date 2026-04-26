@@ -447,9 +447,9 @@ class JTechMDMInstaller {
                 };
             });
             
-            // Sort to make eGate and TripleUMDM most prominent
+            // Sort to make eGate most prominent
             this.availableApks.sort((a, b) => {
-                const priority = { 'eGate': 1, 'TripleUMDM': 2 };
+                const priority = { 'eGate': 1 };
                 const aPriority = priority[a.key] || 999;
                 const bPriority = priority[b.key] || 999;
                 return aPriority - bPriority;

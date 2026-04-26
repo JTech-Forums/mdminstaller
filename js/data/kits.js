@@ -1,16 +1,5 @@
 const KITS = [
   {
-    key: "TripleUMDM",
-    title: "TripleU MDM",
-    description: "A free, community-driven MDM with rich features and frequent updates, though small bugs may occur.",
-    baseUrl: "/TripleUMDM",
-    infoUrl: "https://github.com/TripleU613/TripleUMDM_Public",
-    apkName: "TripleUMDM.apk",
-    cmdName: "command.txt",
-    image: "tripleumdm.svg",
-    badge: "Free",
-  },
-  {
     key: "eGate",
     title: "eGate",
     description: "A one-time-payment filter offering a wide range of features, trusted as one of the best-value options.",
