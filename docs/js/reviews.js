@@ -5,7 +5,9 @@ const LOCAL_KEY = 'mdm_reviews_v1';
 function backendEnabled() {
   try {
     const cfg = window.REVIEWS_CONFIG || {};
+    // Explicit off switch
     if (cfg.disableBackend === true) return false;
+    // Only enable if explicitly requested
     const allowed = cfg.enableBackend === true || cfg.allowDirectSupabase === true;
     if (!allowed) return false;
     const supa = (cfg && cfg.supabase) || window.REVIEWS_SUPABASE;
@@ -65,6 +67,7 @@ async function submitToSupabase(vendor, review) {
       Authorization: `Bearer ${cfg.apiKey}`,
       Prefer: 'return=representation',
     },
+    // Ensure no cookies/CF creds leak and CORS is explicit
     mode: 'cors',
     credentials: 'omit',
     referrerPolicy: 'no-referrer',
@@ -77,6 +80,7 @@ async function submitToSupabase(vendor, review) {
     }),
   });
   if (!res.ok) {
+    // Log and let caller continue with local fallback without surfacing provider-specific text
     let body = '';
     try { body = await res.text(); } catch {}
     console.warn('Supabase insert failed', res.status, body?.slice(0, 200));
